@@ -1,4 +1,4 @@
-# 🛡️ Malware Detection Web - Frontend
+# 🛡️ Web - Frontend
 
 
 ## 🛠️ 사용 기술 스택
