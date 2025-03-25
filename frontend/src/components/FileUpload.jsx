@@ -1,5 +1,6 @@
-// 파일 업로드, 드래그 앤 드롭, 파일 정보 및 진행률 표시 기능
 import React, { useState, useRef } from "react";
+import FileInput from "./FileInput";
+import DragAndDrop from "./DragAndDrop";
 
 function FileUpload ({ onFileSelect, onUploadProgress }) {
     const [fileInfo, setFileInfo] = useState(null);
@@ -16,6 +17,21 @@ function FileUpload ({ onFileSelect, onUploadProgress }) {
             });
             
             onFileSelect (selectedFile);
+        }
+    };
+
+    // 드래그 앤 드롭 시 처리
+    const handleDrop = (e) => {
+        e.preventDefault();
+        const droppedFile = e.dataTransfer.files[0];
+
+        if (droppedFile) {
+            setFileInfo ({
+                name: droppedFile.name,
+                size: droppedFile.size,
+            });
+
+            onFileSelect(droppedFile);
         }
     };
 }
