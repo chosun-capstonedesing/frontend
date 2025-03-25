@@ -13,7 +13,7 @@ function DragAndDrop ({ onDrop, onDragOver, children }) {
         <div
             onDrop={onDrop}
             onDragOver={onDragOver}
-            className=""
+            className="border-dashed border-2 border-gray-300 p-4 rounded mb-4 text-center"
         >
             {children}
         </div>
