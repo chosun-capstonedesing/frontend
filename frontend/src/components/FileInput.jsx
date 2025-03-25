@@ -8,7 +8,7 @@ import React from "react";
  * - id: input 요소의 id(label과 연동)
  */
 
-function FileInput ({ onFileChange, inputRef, id}) {
+function FileInput ({ onFileChange, inputRef, id }) {
     return (
         <input
             ref={inputRef}
