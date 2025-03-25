@@ -1,12 +1,16 @@
 import React, { useState } from 'react'
-import './App.css'
-import Layout from './components/Layout';
-import FileInfoDisplay from './components/FileInfoDispaly';
-import FileUploadView from './components/FileUploadView';
 import FileUpload from './components/FileUpload';
+import { NULL } from 'mysql/lib/protocol/constants/types';
 
 function App() {
   const [activeTab, setActiveTab] = useState('analyusis');
+  const [uploadedFile, setUploadedFile] = useState(null);
+
+  // 파일 선택 시 콜백
+  const handleFileSelect = (file) => {
+    console.log('선택된 파일: ', file);
+    setUploadedFile(file);
+  };
 
   return (
     <Layout activeTab={activeTab} setActiveTab={setActiveTab}>

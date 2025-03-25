@@ -1,6 +1,4 @@
 import React, { useState, useRef } from "react";
-import FileInput from "./FileInput";
-import DragAndDrop from "./DragAndDrop";
 import FileUploadView from "./FileUploadView";
 
 function FileUpload ({ onFileSelect, onUploadProgress }) {
@@ -12,12 +10,8 @@ function FileUpload ({ onFileSelect, onUploadProgress }) {
         const selectedFile = e.target.files[0];
         
         if (selectedFile) {
-            setFileInfo ({
-                name: selectedFile.name,
-                size: selectedFile.size,
-            });
-            
-            onFileSelect (selectedFile);
+            setFileInfo ({ name: selectedFile.name, size: selectedFile });
+            onFileSelect?.(selectedFile);
         }
     };
 
@@ -27,19 +21,13 @@ function FileUpload ({ onFileSelect, onUploadProgress }) {
         const droppedFile = e.dataTransfer.files[0];
 
         if (droppedFile) {
-            setFileInfo ({
-                name: droppedFile.name,
-                size: droppedFile.size,
-            });
-
-            onFileSelect(droppedFile);
+            setFileInfo ({ name: droppedFile.name, size: droppedFile });
+            onFileSelect?.(droppedFile);
         }
     };
 
     // 드래그 오버 이벤트 처리 -> 기본 동작 방지
-    const handleDropOver = (e) => {
-        e.preventDefault();
-    };
+    const handleDropOver = (e) => e.preventDefault();
 
     return (
         <FileUploadView
@@ -48,6 +36,7 @@ function FileUpload ({ onFileSelect, onUploadProgress }) {
             onDrop={handleDrop}
             onDragOver={handleDropOver}
             onFileChange={handleFileChange}
+            onUploadProgress={onUploadProgress}
         />
     );
 }
