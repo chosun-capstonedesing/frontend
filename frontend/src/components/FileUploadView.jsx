@@ -4,6 +4,12 @@ import FileInput from "./FileInput";
 import fileInfoDisplay from "./FileInfoDispaly";
 import ProgressBar from "./ProgressBar";
 
+
+/**
+ * 파일 업로드 UI
+ * - UI/마크업만 담당 -> 로직은 상위 FileUpload 에서 관리
+ */
+
 function FileUploadView ({
     fileInfo,
     fileinputRef,

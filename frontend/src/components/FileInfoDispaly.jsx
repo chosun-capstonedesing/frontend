@@ -1,5 +1,11 @@
 import React from "react";
 
+/**
+ * 선택된 파일 정보 표시 
+ * 
+ * - fileInfo: { name: string, size: number }
+ */
+
 function fileInfoDisplay ({ fileInfo }) {
     if (!fileInfo) return null;
 
