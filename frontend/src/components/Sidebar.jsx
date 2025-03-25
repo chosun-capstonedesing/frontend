@@ -13,10 +13,19 @@ function Sidebar ({ activeTab, setActiveTab }) {
             <nav className="flex-1 p-4">
                 <ul className="space-y-2">
                     <li>
-                        /** */
+                        <button
+                            onClick={() => setActiveTab('analysis')}
+                            className={`flex itmes-center w-full p-2 rounded hover:bg-blue-500 transition-colors ${activeTab === 'analysis' ? 'bg-blue-700' : ''}`}
+                        >
+                        
+                            <FaHome className="mr-2" />
+                            분석
+                        </button>
                     </li>
                 </ul>
             </nav>
         </aside>
     )
 }
+
+export default Sidebar;
