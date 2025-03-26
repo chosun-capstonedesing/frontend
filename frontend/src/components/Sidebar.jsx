@@ -22,10 +22,40 @@ function Sidebar ({ activeTab, setActiveTab }) {
                             분석
                         </button>
                     </li>
+
+                    <li>
+                        <button
+                            onClick={() => setActiveTab('dataset')}
+                            className={`flex items-center w-full p-2 rounded hover:bg-blue-500 transition-colors ${activeTab === 'dataset' ? 'bg-blue-700' : ''}`}
+                        >
+                            <FaDatabase className="mr-2" />
+                            데이터셋
+                        </button>
+                    </li>
+
+                    <li>
+                        <button
+                            onClick={() => setActiveTab('learning')}
+                            className={`flex items-center w-full p-2 rounded hover:bg-blue-500 transition-colors ${activeTab === 'learning' ? 'bg-blue-700' : ''}`}
+                        >
+                            <FaChartLine className="mr-2"/>
+                            학습 상태
+                        </button>
+                    </li>
+
+                    <li>
+                        <button
+                            onClick={() => setActiveTab('model')}
+                            className={`flex items-center w-full p-2 rounded hover:bg-blue-500 transition-colors ${activeTab === 'model' ? 'bg-blue-700' : ''}`}
+                        >
+                            <FaCogs className="mr-2"/>
+                            모델
+                        </button>
+                    </li>
                 </ul>
             </nav>
         </aside>
-    )
+    );
 }
 
 export default Sidebar;

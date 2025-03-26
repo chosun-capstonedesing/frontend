@@ -18,7 +18,7 @@ function FileUpload ({ onFileSelect, onUploadProgress }) {
         const selectedFile = e.target.files[0];
         
         if (selectedFile) {
-            setFileInfo ({ name: selectedFile.name, size: selectedFile });
+            setFileInfo ({ name: selectedFile.name, size: selectedFile.size });
             onFileSelect?.(selectedFile);
         }
     };
@@ -35,16 +35,16 @@ function FileUpload ({ onFileSelect, onUploadProgress }) {
     };
 
     // 드래그 오버 이벤트 처리 -> 기본 동작 방지
-    const handleDropOver = (e) => e.preventDefault();
+    const handleDragOver = (e) => e.preventDefault();
 
     return (
         <FileUploadView
-            fileinfo={fileInfo}
+            fileInfo={fileInfo}
             fileinputRef={fileInputRef}
             onDrop={handleDrop}
-            onDragOver={handleDropOver}
+            onDragOver={handleDragOver}
             onFileChange={handleFileChange}
-            onUploadProgress={onUploadProgress}
+            uploadProgress={onUploadProgress}
         />
     );
 }

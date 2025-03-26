@@ -1,24 +1,44 @@
-import React from "react";
+import React from 'react';
 
-function TabNavigation ({ activeTab, setActiveTab }) {
-    return (
-        <div className="mb-4 border-b flex space-x-4">
-            <button
-                className={`py-2 px-4 ${activetab === 'analysis' ? 'border-b-2 border-blue-500 font-bold' : ''}`}
-                onClick={() => setActiveTab('analysis')}
-                >Analysis board</button>
+/**
+ * TabNavigation 컴포넌트
+ * - activeTab: 현재 선택된 탭 상태
+ * - setActiveTab: 탭 클릭 시 상태를 변경하는 함수
+ */
+function TabNavigation({ activeTab, setActiveTab }) {
+  return (
+    <div className="flex space-x-4 border-b mb-4">
+      {/* 분석 탭 */}
+      <button
+        className={`px-4 py-2 font-semibold ${
+          activeTab === 'analysis' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'
+        }`}
+        onClick={() => setActiveTab('analysis')}
+      >
+        분석
+      </button>
 
-            <button
-                className={`py-2 px-4 ${activetab === 'performance' ? 'border-b-2 border-blue-500 font-bold' : ''}`}
-                onClick={() => setActiveTab('performance')}
-                >Model</button>
+      {/* 성능 탭 */}
+      <button
+        className={`px-4 py-2 font-semibold ${
+          activeTab === 'performance' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'
+        }`}
+        onClick={() => setActiveTab('performance')}
+      >
+        성능
+      </button>
 
-            <button
-                className={`py-2 px-4 ${activetab === 'guide' ? 'border-b-2 border-blue-500 font-bold' : ''}`}
-                onClick={() => setActiveTab('guide')}
-                >Guide</button>
-        </div>
-    );
+      {/* 가이드 탭 */}
+      <button
+        className={`px-4 py-2 font-semibold ${
+          activeTab === 'guide' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'
+        }`}
+        onClick={() => setActiveTab('guide')}
+      >
+        가이드
+      </button>
+    </div>
+  );
 }
 
 export default TabNavigation;

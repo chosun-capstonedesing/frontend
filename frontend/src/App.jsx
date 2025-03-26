@@ -2,12 +2,17 @@ import React, { useState } from 'react'
 import Layout from './components/Layout';
 import FileUpload from './components/FileUpload';
 import PerformanceSection from './components/PerformanceSection';
-import GuideSection from './components/GuideSecton';
+import GuideSection from './components/GuideSection';
 import TabNavigation from './components/TabNavigation';
 
 function App() {
   const [activeTab, setActiveTab] = useState('analysis');
   const [uploadedFile, setUploadedFile] = useState(null);
+
+  const handleFileSelect = (file) => {
+    console.log('선택된 파일: ', file);
+    setUploadedFile(file);
+  };
 
   return (
     <div className='min-h-screen bg-gray-100 p-4'>
@@ -18,12 +23,12 @@ function App() {
       {/* 사이드바 레이아웃 컴포넌트 */}
       <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
         {activeTab === 'analysis' && (
-          <div className="max-w-md max-auto bg-white shadow-md rounded p-6">
+          <div className="max-w-md mx-auto bg-white shadow-md rounded p-6">
             <h1 className='text-xl font-bold mb-4'>파일 분석</h1>
             <FileUpload onFileSelect={handleFileSelect} />
             {uploadedFile && (
               <p className='mt-2 text-green-600'>
-                파일: {uploadedFile.naame}
+                파일: {uploadedFile.name}
               </p>
             )}
           </div>

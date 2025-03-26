@@ -6,7 +6,7 @@ import React from "react";
  * - fileInfo: { name: string, size: number }
  */
 
-function fileInfoDisplay ({ fileInfo }) {
+function FileInfoDisplay ({ fileInfo }) {
     if (!fileInfo) return null;
 
     return (
@@ -17,4 +17,4 @@ function fileInfoDisplay ({ fileInfo }) {
     );
 }
 
-export default fileInfoDisplay;
+export default FileInfoDisplay;

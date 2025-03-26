@@ -1,7 +1,7 @@
 import React from "react";
 import DragAndDrop from "./DragAndDrop";
 import FileInput from "./FileInput";
-import fileInfoDisplay from "./FileInfoDispaly";
+import FileInfoDisplay from "./FileInfoDispaly";
 import ProgressBar from "./ProgressBar";
 
 
@@ -16,7 +16,7 @@ function FileUploadView ({
     onDrop,
     onDragOver,
     onFileChange,
-    onUploadProgress,
+    uploadProgress,
 
 }) {
     return (
@@ -30,12 +30,15 @@ function FileUploadView ({
                 />
 
                 <label htmlFor="file-upload-input" className="cursor-pointer">
-                    파일 업로드 (또는 여기에 드래그 앤 드롭)
+                    📁 파일 업로드 (또는 여기에 드래그 앤 드롭)
                 </label>
             </DragAndDrop>
 
-            <fileInfoDisplay fileInfo={fileInfo} />
-            <ProgressBar progress={onUploadProgress} />
+            {fileInfo && <FileInfoDisplay fileInfo={fileInfo} />}
+            
+            {typeof uploadProgress === "number" && (
+                <ProgressBar progress={uploadProgress} />
+            )}
         </div>
     );
 }
