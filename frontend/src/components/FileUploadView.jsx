@@ -1,7 +1,7 @@
 import React from "react";
 import DragAndDrop from "./DragAndDrop";
 import FileInput from "./FileInput";
-import FileInfoDisplay from "./FileInfoDispaly";
+import FileInfoDisplay from "./FileInfoDisplay";
 import ProgressBar from "./ProgressBar";
 
 
