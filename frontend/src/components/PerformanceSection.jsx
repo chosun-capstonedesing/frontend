@@ -1,5 +1,10 @@
 import React from "react";
 
+/**
+ * 모델 성능 검증 페이지 관련 UI 컴포넌트
+ * - 테스트 샘플 리스트, 예측 결과, 실제 결과, 성능 지표 등
+ */
+
 function PerformanceSection() {
     return (
         <div className="bg-white shadow-sm rounded p-6">
