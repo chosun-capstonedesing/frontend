@@ -1,6 +1,14 @@
 import React, { useState, useRef } from "react";
 import FileUploadView from "./FileUploadView";
 
+/**
+ * 파일 업로드 로직(컨테이너) 컴포넌트
+ * -> 상태 및 이벤트 핸들러 담당
+ * 
+ * - onFileSelect : 파일 선택(또는 드롭) 시 상위에 파일 객체 전달
+ * - onUploadProgress: 업로드 진행률(%) 표시
+ */
+
 function FileUpload ({ onFileSelect, onUploadProgress }) {
     const [fileInfo, setFileInfo] = useState(null);
     const fileInputRef = useRef();
