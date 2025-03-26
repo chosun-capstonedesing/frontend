@@ -29,7 +29,7 @@ function FileUpload ({ onFileSelect, onUploadProgress }) {
         const droppedFile = e.dataTransfer.files[0];
 
         if (droppedFile) {
-            setFileInfo ({ name: droppedFile.name, size: droppedFile });
+            setFileInfo ({ name: droppedFile.name, size: droppedFile.size });
             onFileSelect?.(droppedFile);
         }
     };
