@@ -27,3 +27,6 @@ dist-ssr
 .vite
 # Lock files
 yarn.lock   
+
+# Local Netlify folder
+.netlify
