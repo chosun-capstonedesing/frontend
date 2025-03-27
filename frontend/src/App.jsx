@@ -1,35 +1,53 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from 'react'
+import Layout from './components/Layout';
+import FileUpload from './components/FileUpload';
+import PerformanceSection from './components/PerformanceSection';
+import GuideSection from './components/GuideSection';
+import TabNavigation from './components/TabNavigation';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [activeTab, setActiveTab] = useState('analysis');
+  const [uploadedFile, setUploadedFile] = useState(null);
+
+  const handleFileSelect = (file) => {
+    console.log('선택된 파일: ', file);
+    setUploadedFile(file);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className='min-h-screen bg-gray-100 p-4'>
+
+      {/* 탭 전환 UI */}
+      <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
+
+      {/* 사이드바 레이아웃 컴포넌트 */}
+      <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
+        {activeTab === 'analysis' && (
+          <div className="max-w-md mx-auto bg-white shadow-md rounded p-6">
+            <h1 className='text-xl font-bold mb-4'>파일 분석</h1>
+            <FileUpload onFileSelect={handleFileSelect} />
+            {uploadedFile && (
+              <p className='mt-2 text-green-600'>
+                파일: {uploadedFile.name}
+              </p>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'performance' && (
+          <div className='mt-4'>
+            <PerformanceSection />
+          </div>
+        )}
+
+        {activeTab === 'guide' && (
+          <div className='mt-4'>
+            <GuideSection />
+          </div>
+        )}
+      </Layout>
+    </div>
+  );
 }
 
-export default App
+export default App;

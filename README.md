@@ -1,4 +1,21 @@
 # 🛡️ Web - Frontend
+AI 기반 악성코드 탐지 시스템의 프론트엔드 웹 페이지입니다.    
+파일 업로드, CNN 기반 분석 결과 시각화, 모델 성능 확인 등의 기능을 제공할 예정입니다.   
+
+<br/>
+
+## 🌐 배포 주소
+👉 [배포된 웹 페이지 바로가기](https://web-front-test.netlify.app/)    
+
+> 🔐 웹 개발 확인을 위한 테스트용 배포로, 정식 배포가 아닙니다.   
+검색 차단 설정(`robots.txt`, `<meta name="robots">`) 이 적용되어 검색 엔진에는 노출되지 않으며, 팀원들에게만 공유되는 내부 배포 페이지입니다.
+
+
+<br/>
+
+---
+
+<br/>
 
 
 ## 🛠️ 사용 기술 스택
@@ -14,25 +31,47 @@
 </div>
 
 
+<br/>
+
 ---
+
+<br/>
+
 
 ## 📂 프로젝트 구조
 ```
 frontend/
 ├── public/
+│   ├── robots.txt              # 배포 -> 검색 차단
+│   └── vite.svg                # 웹 상단 아이콘 -> 변경 예정
 ├── src/
-│   ├── App.css/      
-│   ├── App.jsx/           
-│   ├── Index.css/         
-│   ├── main.jsx/           
+│   ├── components/             # UI 기능 단위 컴포넌트들
+│   │   ├── DragAndDrop.jsx
+│   │   ├── FileInfoDisplay.jsx
+│   │   ├── FileInput.jsx
+│   │   ├── FileUpload.jsx
+│   │   ├── FileUploadView.jsx
+│   │   ├── GuideSection.jsx
+│   │   ├── Layout.jsx
+│   │   ├── PerformanceSection.jsx
+│   │   ├── ProgressBar.jsx
+│   │   ├── Sidebar.jsx
+│   │   ├── TabNavigation.jsx
+│   │   └── UtilityBar.jsx
+│   ├── App.css                 # App 전용 스타일
+│   ├── App.jsx                 # 메인 앱 컴포넌트
+│   ├── index.css               # 전역 스타일 (Tailwind 포함)
+│   └── main.jsx                # React 진입점
 ├── .gitignore
-├── README.md
 ├── eslint.config.js
-├── index.html
-├── package-lock.json
-├── package.jason
+├── index.html                  # 전역 html
+├── package-lock.json           
+├── package.json                # 프로젝트 메타 정보 및 스크립트
 ├── postcss.config.js
-├── tailwind.config.js
-└── vite.config.js
+├── README.md
+├── tailwind.config.js          # Tailwind 설정
+└── vite.config.js              # Vite 설정
 ```
 
+
+<br/>
