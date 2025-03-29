@@ -1,6 +1,14 @@
 import React from "react";
 import { FaChartLine, FaDatabase, FaCogs, FaHome } from 'react-icons/fa';
 
+/**
+ * 왼쪽에 고정된 SideBar UI
+ * 메뉴 버튼 클릭 시 activeTab을 변경하여 App에서 다른 화면을 렌더링
+ * 
+ * - activeTab: 현재 선택된 탭('analysis', 'dataset', 'learning', 'model')
+ * - setActiveTab: 탭 전환 함수
+ */
+
 function Sidebar ({ activeTab, setActiveTab }) {
     return (
         <aside className="w-64 bg-blue-600 text-white flex flex-col">
