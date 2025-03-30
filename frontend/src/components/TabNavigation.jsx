@@ -7,12 +7,13 @@ import React from 'react';
  */
 function TabNavigation({ activeTab, setActiveTab }) {
   return (
-    <div className="flex space-x-4 border-b mb-4">
+    <div className="flex items-center h-12 border-b px-4 transition-all
+    duration-300 ml-14 md:ml-0 space-x-4 mb-4">
+      
       {/* 분석 탭 */}
       <button
-        className={`px-4 py-2 font-semibold ${
-          activeTab === 'analysis' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'
-        }`}
+        className={`px-4 py-2 font-semibold ${activeTab === 'analysis' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'
+          }`}
         onClick={() => setActiveTab('analysis')}
       >
         분석
@@ -20,9 +21,8 @@ function TabNavigation({ activeTab, setActiveTab }) {
 
       {/* 성능 탭 */}
       <button
-        className={`px-4 py-2 font-semibold ${
-          activeTab === 'performance' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'
-        }`}
+        className={`px-4 py-2 font-semibold ${activeTab === 'performance' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'
+          }`}
         onClick={() => setActiveTab('performance')}
       >
         성능
@@ -30,9 +30,8 @@ function TabNavigation({ activeTab, setActiveTab }) {
 
       {/* 가이드 탭 */}
       <button
-        className={`px-4 py-2 font-semibold ${
-          activeTab === 'guide' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'
-        }`}
+        className={`px-4 py-2 font-semibold ${activeTab === 'guide' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'
+          }`}
         onClick={() => setActiveTab('guide')}
       >
         가이드

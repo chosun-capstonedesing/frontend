@@ -30,7 +30,7 @@ function FileUploadView ({
                 />
 
                 <label htmlFor="file-upload-input" className="cursor-pointer">
-                    📁 파일 업로드 (또는 여기에 드래그 앤 드롭)
+                    📁 파일 선택하기 (또는 여기에 드래그 앤 드롭)
                 </label>
             </DragAndDrop>
 

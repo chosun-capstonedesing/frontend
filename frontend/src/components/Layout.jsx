@@ -17,22 +17,22 @@ function Layout({ children, activeTab, setActiveTab }) {
     return (
         <div className="flex h-60">
             {/* Sidebar */}
-            {sidebarOpen && (
-                <div className="fixed top-0 left-0 z-40 w-64 h-[85vh] max-h-screen bg-blue-600 text-white md:static md:flex-shrink-0">
-                    {/* 닫기 버튼 (모바일용) */}
-                    <div className="md:hidden p-4 flex justify-end">
-                        <button onClick={toggleSidebar} className="text-white text-2xl">
-                            ✕
-                        </button>
-                    </div>
-                    <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+            <div className={`${
+                sidebarOpen ? "block" : "hidden"
+            } md:block fixed top-20 left-0 z-40 w-64 h-[85vh] max-h-screen bg-blue-600 text-white md:static md:flex-shrink-0`}>
+                {/* 닫기 버튼 (모바일용) */}
+                <div className="md:hidden p-4 flex justify-end">
+                    <button onClick={toggleSidebar} className="text-white text-2xl">
+                        ✕
+                    </button>
                 </div>
-            )}
+                <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+            </div>
 
             {/* 햄버거 메뉴 버튼 (모바일에서만 표시) */}
             {!sidebarOpen && (
                 <button
-                    className="absolute top-4 left-4 z-50 bg-blue-600 text-white px-3 py-2 rounded-md shadow-md md:hidden"
+                    className="absolute top-4 left-7 z-50 bg-blue-600 text-white px-3 py-2 rounded-md shadow-md md:hidden"
                     onClick={toggleSidebar}
                 >
                     ☰
