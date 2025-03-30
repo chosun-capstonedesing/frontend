@@ -40,7 +40,7 @@ function Layout({ children, activeTab, setActiveTab }) {
             )}
 
             {/* Main Content */}
-            <main className={`flex-1 bg-gray-100 mt-4 mb-4 mx-4
+            <main className={`flex-1 bg-gray-100 mt-4 mb-4 mx-4 h-[80vh]
             overflow-y-auto transition-all duration-300 ${sidebarOpen ? "ml-4" : "ml-4"}`}>
                 {children}
             </main>

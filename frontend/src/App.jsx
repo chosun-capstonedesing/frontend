@@ -16,7 +16,7 @@ function App() {
   };
 
   return (
-    <div className='min-h-screen bg-gray-100 p-3 overflow-hidden'>
+    <div className='min-h-screen bg-gray-100 p-3 overflow-hidd'>
 
       {/* 탭 전환 UI */}
       <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -24,7 +24,7 @@ function App() {
       {/* 사이드바 레이아웃 컴포넌트 */}
       <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
         {activeTab === 'analysis' && (
-          <div className="max-w-md mx-auto bg-white shadow-md rounded p-6">
+          <div className="w-full max-w-3x1 min-h-[100px] mx-auto bg-white shadow-md rounded p-6">
             <h1 className='text-xl font-bold mb-4'>파일 분석</h1>
             <FileUpload onFileSelect={handleFileSelect} />
             {uploadedFile && (
