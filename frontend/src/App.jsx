@@ -5,6 +5,7 @@ import PerformanceSection from './components/PerformanceSection';
 import GuideSection from './components/GuideSection';
 import TabNavigation from './components/TabNavigation';
 
+
 function App() {
   const [activeTab, setActiveTab] = useState('analysis');
   const [uploadedFile, setUploadedFile] = useState(null);
@@ -15,7 +16,7 @@ function App() {
   };
 
   return (
-    <div className='min-h-screen bg-gray-100 p-4'>
+    <div className='min-h-screen bg-gray-100 p-3 overflow-hidden'>
 
       {/* 탭 전환 UI */}
       <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />

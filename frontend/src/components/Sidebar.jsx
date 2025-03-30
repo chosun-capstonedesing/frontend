@@ -11,7 +11,7 @@ import { FaChartLine, FaDatabase, FaCogs, FaHome } from 'react-icons/fa';
 
 function Sidebar ({ activeTab, setActiveTab }) {
     return (
-        <aside className="w-64 bg-blue-600 text-white flex flex-col">
+        <aside className="w-64 h-[15vh] bg-blue-600 text-white flex flex-col">
             {/** 로고 / 타이틀 영역 */}
             <div className="p-4 text-2xl font-bold border-b border-blue-400">
                 CSEC
