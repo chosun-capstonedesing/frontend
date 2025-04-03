@@ -25,7 +25,7 @@ function App() {
       <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
         {activeTab === 'analysis' && (
           <div className="w-full max-w-3x1 min-h-[100px] mx-auto bg-white shadow-md rounded p-6">
-            <h1 className='text-xl font-bold mb-4'>파일 분석</h1>
+            <h1 className='text-2xl font-bold mb-4'>파일 분석</h1>
             <FileUpload onFileSelect={handleFileSelect} />
             {uploadedFile && (
               <p className='mt-2 text-green-600'>

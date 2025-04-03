@@ -8,16 +8,16 @@ import React from "react";
 function PerformanceSection() {
     return (
         <div className="bg-white shadow-sm rounded p-6">
-            <h2 className="text-xl font-bold mb-4">모델 성능 검증</h2>
+            <h2 className="text-2xl font-bold mb-4">모델 성능 검증</h2>
             <table className="min-w-full divide-y divide-gray-200 mb-4">
-                <thead>
+                <thead className="border-b pb-2">
                     <tr className="px-6 py-3 text-left">샘플</tr>
                     <tr className="px-6 py-3 text-left">예측 결과</tr>
                     <tr className="px-6 py-3 text-left">실제 정답</tr>
                 </thead>
                 
-                <tbody className="bg-white divide-y divide-gray-200">
-                    <tr>
+                <tbody className="mt-5 bg-white divide-y divide-gray-200">
+                    <tr className="pt-4">
                         <td className="px-6 py-4">Sample 1</td>
                         <td className="px-6 py-4">정상</td>
                         <td className="px-6 py-4">정상</td>
