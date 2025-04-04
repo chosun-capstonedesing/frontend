@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import Layout from './components/Layout';
-import FileUpload from './components/FileUpload';
-import PerformanceSection from './components/PerformanceSection';
-import GuideSection from './components/GuideSection';
-import TabNavigation from './components/TabNavigation';
+import Layout from './components/layout/Layout';
+import FileUpload from './components/upload/FileUpload';
+import PerformanceSection from './components/performance/PerformanceSection';
+import GuideSection from './components/guide/GuideSection';
+import TabNavigation from './components/layout/TabNavigation';
 
 
 function App() {
