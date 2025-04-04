@@ -10,7 +10,7 @@ import Sidebar from './Sidebar';
  */
 
 function Layout({ children, activeTab, setActiveTab }) {
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const toggleSidebar = () => setSidebarOpen(prev => !prev);
 
 
