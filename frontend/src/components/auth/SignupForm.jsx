@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 
+/**
+ * 아이디/비밀번호 입력 및 회원가입 처리
+ */
+
 function SignupForm() {
-    // 살려주세요 이렇게 일이 많을 줄이야 이번주 프론트 쉬라면서.. 개발 고생했다고 쉬라고 했자나요...
     const [form, setForm] = useState({ username: '', password: ''});
 
     const handleChange = e => {
