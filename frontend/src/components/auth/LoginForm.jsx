@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 /**
  * 로그인 폼 제작
@@ -8,8 +9,10 @@ import React, { useState } from 'react';
  * - Login 버튼 생성
  */
 
-function LoginFrom() {
+function LoginForm({ onLoginSucces }) {
     const [form, setForm] = useState({ username: '', password: '' });
+
+    const navigate = useNavigate();
 
     const handleChange = e => {
         const { name, value } = e.target;
@@ -18,9 +21,15 @@ function LoginFrom() {
 
     const handleSubmit = e => {
         e.preventDefault();
-        // TODO: 로그인 요청 API 연결
+        // TODO: 로그인 로직 및 API 연결
         console.log('로그인 정보:', form);
+
+        // 로그인 성공 시
+        if (onLoginSucces) onLoginSucces();
+        navigate('/mypage');
     };
+
+
 
     return (
         <form onSubmit={handleSubmit} className='space-y-2 p-4 border rounded'>
@@ -48,4 +57,4 @@ function LoginFrom() {
     );
 }
 
-export default LoginFrom;
+export default LoginForm;
