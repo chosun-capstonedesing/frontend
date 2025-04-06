@@ -3,6 +3,12 @@ import TabNavigation from '../components/layout/TabNavigation';
 import FileUpload from '../components/upload/FileUpload';
 import PerformanceSection from '../components/performance/PerformanceSection';
 import GuideSection from '../components/guide/GuideSection';
+import QRSearchPage from './QRSearchPage';
+import QRScanner from '../components/search/QRScanner';
+import QRUploader from '../components/search/QRUploader';
+import URLSearchForm from '../components/search/URLSearchForm';
+import QRSearchBlock from '../components/search/QRSearchBlock';
+import { useState } from 'react';
 
 export default function MainLayout({
   isLoggedIn,
@@ -11,12 +17,27 @@ export default function MainLayout({
   activeTab,
   setActiveTab
 }) {
+  const [decodedText, setDecodedText] = useState('');
+
+  const handleQRResult = (result) => {
+    setDecodedText(result);
+  };
+
+  const handleQRSearch = () => {
+    if (!decodedText) {
+      alert("QR 또는 URL 정보를 먼저 입력해주세요.");
+      return;
+    }
+    console.log("🔍 QR 분석 시작:", decodedText);
+    // 분석 또는 이동 로직 추가 가능
+  };
+
   return (
     <>
       <TabNavigation
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        tabs={['analysis', 'performance', 'guide', 'mypage', 'dataset']}
+        tabs={['analysis', 'performance', 'guide', 'mypage', 'dataset', 'qr']}
       />
 
       <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
@@ -27,6 +48,10 @@ export default function MainLayout({
             {uploadedFile && (
               <p className="mt-2 text-green-600">파일: {uploadedFile.name}</p>
             )}
+            <div className="mt-8 border-t pt-6">
+              <h2 className="text-xl font-semibold mb-4">🔍 QR / URL 검색</h2>
+              <QRSearchBlock />
+            </div>
           </div>
         )}
 
@@ -59,6 +84,12 @@ export default function MainLayout({
             ) : (
               <p className="text-red-500 text-lg font-semibold">로그인 후 이용해주세요.</p>
             )}
+          </div>
+        )}
+
+        {activeTab === 'qr' && (
+          <div className="mt-4">
+            <QRSearchPage />
           </div>
         )}
       </Layout>

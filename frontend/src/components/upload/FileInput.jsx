@@ -13,7 +13,6 @@ function FileInput ({ onFileChange, inputRef, id }) {
         <input
             ref={inputRef}
             type="file"
-            accept=".exe, .dll"
             onChange={onFileChange}
             className="hidden"
             id={id}
