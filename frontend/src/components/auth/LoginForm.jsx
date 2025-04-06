@@ -26,7 +26,7 @@ function LoginForm({ onLoginSucces }) {
 
         // 로그인 성공 시
         if (onLoginSucces) onLoginSucces();
-        navigate('/mypage');
+        navigate('/');
     };
 
 

@@ -4,9 +4,11 @@ import LoginPage from './routes/LoginPage';
 import SignupPage from './routes/SignupPage';
 import MainLayout from './routes/MainLayout';
 import LogoutButton from './components/auth/LogoutButton';
+import MyPage from './routes/Mypage';
+
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(import.meta.env.DEV);
   const [uploadedFile, setUploadedFile] = useState(null);
   const [activeTab, setActiveTab] = useState('analysis');
 
@@ -18,19 +20,23 @@ function App() {
     <Router>
       <div className="min-h-screen bg-gray-100 p-3 overflow-hidden">
         <div className="flex justify-end space-x-4 mb-4">
-          {!isLoggedIn ? (
+          {isLoggedIn ? (
+            <>
+              <Link to="/mypage" className="text-sm hover:underline">My Page</Link>
+              <LogoutButton onLogout={handleLogout} />
+            </>
+          ) : (
             <>
               <Link to="/login" className="text-sm hover:underline">Login</Link>
               <Link to="/signup" className="text-sm hover:underline">SignUp</Link>
             </>
-          ) : (
-            <LogoutButton onLogout={handleLogout} />
           )}
         </div>
 
         <Routes>
           <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
           <Route path="/signup" element={<SignupPage onSignupSuccess={handleLoginSuccess} />} />
+          <Route path='/mypage' element={<MyPage />}/>
           <Route
             path="*"
             element={
@@ -43,6 +49,7 @@ function App() {
               />
             }
           />
+          
         </Routes>
       </div>
     </Router>
