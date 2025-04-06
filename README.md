@@ -60,7 +60,9 @@ frontend/
 │   │   │   └── FileInfoDisplay.jsx
 │   │   ├── search/                     # 🔍 검색 기능 (URL, QR 등)(예정)
 │   │   │   ├── QRScanner.jsx
-│   │   │   └── URLSearchForm.jsx
+│   │   │   ├── QRSearchBlock.jsx
+│   │   │   ├── QRUploader.jsx
+│   │   │   └── URLSearchForm.jsx 
 │   │   ├── layout/                     # 🧩 레이아웃 및 공통 UI
 │   │   │   ├── Layout.jsx
 │   │   │   ├── Sidebar.jsx
@@ -72,8 +74,11 @@ frontend/
 │   │       └── PerformanceSection.jsx
 │   ├── routes/                         # 🗂️ 페이지 라우팅 단위
 │   │   ├── LoginPage.jsx
-│   │   ├── SignupPage.jsx
-│   │   └── MainLayout.jsx
+│   │   ├── MainLayout.jsx
+│   │   ├── MyPage.jsx
+│   │   ├── MyPageDetail.jsx
+│   │   ├── QRSearchPage.jsx
+│   │   └── SignupPage.jsx
 │   ├── App.css
 │   ├── App.jsx
 │   ├── index.css
