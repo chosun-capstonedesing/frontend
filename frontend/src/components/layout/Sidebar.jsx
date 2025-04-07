@@ -1,69 +1,72 @@
-import React from "react";
-import { FaChartLine, FaDatabase, FaCogs, FaHome } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import {
+    FaHome,
+    FaChartLine,
+    FaDatabase,
+    FaCogs,
+    FaTachometerAlt,
+    FaInfoCircle,
+} from 'react-icons/fa';
 
-/**
- * 왼쪽에 고정된 SideBar UI
- * 메뉴 버튼 클릭 시 activeTab을 변경하여 App에서 다른 화면을 렌더링
- * 
- * - activeTab: 현재 선택된 탭('analysis', 'dataset', 'learning', 'model')
- * - setActiveTab: 탭 전환 함수
- */
 
-function Sidebar ({ activeTab, setActiveTab }) {
+const Sidebar = () => {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const navigate = useNavigate();
+    const location = useLocation();
+    const currentTab = location.pathname;
+
+    const handleToggle = () => setIsExpanded(!isExpanded);
+
     return (
-        <aside className="w-64 h-[15vh] bg-blue-600 text-white flex flex-col">
-            {/** 로고 / 타이틀 영역 */}
-            <div className="p-4 text-2xl font-bold border-b border-blue-400">
-                CSEC
+        <div>
+            <div className={`fixed left-0 top-0 h-full bg-gray-50 border-r border-gray-200 transition-all duration-300 ${isExpanded ? 'w-64' : 'w-16'}`}>
+                <div className="flex items-center h-16 px-4 border-b border-gray-200">
+                    <div className="w-8 h-8 rounded-lg" />
+                    <h1 className={`ml-2 mt-1 text-lg font-semibold text-black overflow-hidden whitespace-nowrap transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
+                        SideBar
+                    </h1>
+                </div>
+
+                <nav className="p-4 space-y-3 px-2">
+                    <SidebarItem icon={<FaHome />} label="분석" path="/" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} />
+                    <SidebarItem icon={<FaDatabase />} label="데이터셋" path="/dataset" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} />
+                    <SidebarItem icon={<FaChartLine />} label="학습 상태" path="/learning" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} />
+                    <SidebarItem icon={<FaCogs />} label="모델" path="/model" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} />
+                    <SidebarItem icon={<FaTachometerAlt />} label="성능" path="/perfromance" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} />
+                    <SidebarItem icon={<FaInfoCircle />} label="정보" path="./performance/PerformanceSection.jsx" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} />
+                </nav>
+
+                <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
+                    <div className="flex items-center">
+                        <img src="/CSEC.PNG" alt="Profile" className="w-8 h-8 rounded-full" />
+                        {isExpanded && (
+                            <div className={`ml-3 overflow-hidden`}>
+                                <p className="text-sm font-medium text-black truncate">CSEC</p>
+                                <p className="text-xs text-gray-500 break-words leading-snug">Chosun University <br /> Information Security Project</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
 
-            {/** 네비게이션 영역 */}
-            <nav className="flex-1 p-4">
-                <ul className="space-y-2">
-                    <li>
-                        <button
-                            onClick={() => setActiveTab('analysis')}
-                            className={`flex itmes-center w-full p-2 rounded hover:bg-blue-500 transition-colors ${activeTab === 'analysis' ? 'bg-blue-700' : ''}`}
-                        >
-                        
-                            <FaHome className="mr-2" />
-                            분석
-                        </button>
-                    </li>
-
-                    <li>
-                        <button
-                            onClick={() => setActiveTab('dataset')}
-                            className={`flex items-center w-full p-2 rounded hover:bg-blue-500 transition-colors ${activeTab === 'dataset' ? 'bg-blue-700' : ''}`}
-                        >
-                            <FaDatabase className="mr-2" />
-                            데이터셋
-                        </button>
-                    </li>
-
-                    <li>
-                        <button
-                            onClick={() => setActiveTab('learning')}
-                            className={`flex items-center w-full p-2 rounded hover:bg-blue-500 transition-colors ${activeTab === 'learning' ? 'bg-blue-700' : ''}`}
-                        >
-                            <FaChartLine className="mr-2"/>
-                            학습 상태
-                        </button>
-                    </li>
-
-                    <li>
-                        <button
-                            onClick={() => setActiveTab('model')}
-                            className={`flex items-center w-full p-2 rounded hover:bg-blue-500 transition-colors ${activeTab === 'model' ? 'bg-blue-700' : ''}`}
-                        >
-                            <FaCogs className="mr-2"/>
-                            모델
-                        </button>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
+            <button onClick={handleToggle} className="fixed left-4 top-4 z-50 w-8 h-8 flex items-center justify-center text-blue-600 hover:text-blue-400 focus:outline-none">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
     );
-}
+};
+
+const SidebarItem = ({ icon, label, path, currentTab, navigate, isExpanded }) => (
+    <button
+        onClick={() => navigate(path)}
+        className={`flex items-center w-full h-10 px-3 rounded-lg hover:bg-blue-100 transition-colors ${currentTab === path ? 'bg-blue-200' : ''}`}
+    >
+        <span className="w-5 h-5 text-xl text-blue-600">{icon}</span>
+        <span className={`ml-3 mt-1 text-black whitespace-nowrap transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>{label}</span>
+    </button>
+);
 
 export default Sidebar;
