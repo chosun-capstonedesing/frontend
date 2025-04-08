@@ -1,52 +1,46 @@
-import React, { useState } from 'react'
-import Layout from './components/Layout';
-import FileUpload from './components/FileUpload';
-import PerformanceSection from './components/PerformanceSection';
-import GuideSection from './components/GuideSection';
-import TabNavigation from './components/TabNavigation';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import LoginPage from './routes/LoginPage';
+import MainLayout from './routes/MainLayout';
+import LogoutButton from './components/auth/LogoutButton';
+import MyPage from './routes/Mypage';
+import GuideSection from './routes/GuideSection';
+import PerformanceSection from './routes/PerformanceSection';
+import AnalysisPage from './routes/AnalysisPage';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('analysis');
-  const [uploadedFile, setUploadedFile] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const handleFileSelect = (file) => {
-    console.log('선택된 파일: ', file);
-    setUploadedFile(file);
-  };
+  const handleLoginSuccess = () => setIsLoggedIn(true);
+  const handleLogout = () => setIsLoggedIn(false);
 
   return (
-    <div className='min-h-screen bg-gray-100 p-4'>
+    <Router>
+      <div className="min-h-screen bg-gray-100 p-3 overflow-hidden">
+        <div className="flex justify-end space-x-4 mb-4">
+          {isLoggedIn ? (
+            <>
+              <Link to="/mypage" className="text-sm hover:underline">My Page</Link>
+              <LogoutButton onLogout={handleLogout} />
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="text-sm hover:underline">Login/SignUp</Link>
+            </>
+          )}
+        </div>
 
-      {/* 탭 전환 UI */}
-      <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
-
-      {/* 사이드바 레이아웃 컴포넌트 */}
-      <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
-        {activeTab === 'analysis' && (
-          <div className="max-w-md mx-auto bg-white shadow-md rounded p-6">
-            <h1 className='text-xl font-bold mb-4'>파일 분석</h1>
-            <FileUpload onFileSelect={handleFileSelect} />
-            {uploadedFile && (
-              <p className='mt-2 text-green-600'>
-                파일: {uploadedFile.name}
-              </p>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'performance' && (
-          <div className='mt-4'>
-            <PerformanceSection />
-          </div>
-        )}
-
-        {activeTab === 'guide' && (
-          <div className='mt-4'>
-            <GuideSection />
-          </div>
-        )}
-      </Layout>
-    </div>
+        <Routes>
+          <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
+          <Route path="/" element={<MainLayout />}>
+            <Route index element={<AnalysisPage />} />
+            <Route path="mypage" element={<MyPage />} />
+            <Route path="performance" element={<PerformanceSection />} />
+            <Route path="guide" element={<GuideSection />} />
+          </Route>
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

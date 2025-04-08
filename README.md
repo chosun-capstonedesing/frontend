@@ -36,35 +36,49 @@ AI 기반 악성코드 탐지 시스템의 프론트엔드 웹 페이지입니�
 ```
 frontend/
 ├── public/
-│   ├── robots.txt              # 배포 -> 검색 차단
-│   └── vite.svg                # 웹 상단 아이콘 -> 변경 예정
+│   ├── robots.txt                      # 배포 -> 검색 차단 설정
+│   └── CSEC.PNG                        # 도메인 로고
 ├── src/
-│   ├── components/             # UI 기능 단위 컴포넌트들
-│   │   ├── DragAndDrop.jsx
-│   │   ├── FileInfoDisplay.jsx
-│   │   ├── FileInput.jsx
-│   │   ├── FileUpload.jsx
-│   │   ├── FileUploadView.jsx
+│   ├── components/
+│   │   ├── auth/                       # 🔐 인증 관련 컴포넌트
+│   │   │   ├── AuthFrom.jsx
+│   │   │   └── LogoutButton.jsx
+│   │   ├── layout/                     # 🧩 레이아웃 및 공통 UI
+│   │   │   ├── Layout.jsx
+│   │   │   └── Sidebar.jsx
+│   │   ├── search/                     # 🔍 검색 기능 (URL, QR 등)
+│   │   │   ├── QRScanner.jsx
+│   │   │   ├── QRSearchBlock.jsx
+│   │   │   ├── QRUploader.jsx
+│   │   │   └── URLSearchForm.jsx 
+│   │   ├── upload/                     # 📁 파일 업로드 UI
+│   │   │   ├── DragAndDrop.jsx
+│   │   │   ├── FileinfoDisplay.jsx
+│   │   │   ├── FileInput.jsx
+│   │   │   ├── FileUpload.jsx
+│   │   │   ├── FileUploadView.jsx
+│   │   │   └── ProgressBar.jsx
+│   ├── routes/                         # 🗂️ 페이지 라우팅 단위
+│   │   ├── AnalysisPage.jsx
 │   │   ├── GuideSection.jsx
-│   │   ├── Layout.jsx
-│   │   ├── PerformanceSection.jsx
-│   │   ├── ProgressBar.jsx
-│   │   ├── Sidebar.jsx
-│   │   ├── TabNavigation.jsx
-│   │   └── UtilityBar.jsx
-│   ├── App.css                 # App 전용 스타일
-│   ├── App.jsx                 # 메인 앱 컴포넌트
-│   ├── index.css               # 전역 스타일 (Tailwind 포함)
-│   └── main.jsx                # React 진입점
+│   │   ├── LoginPage.jsx
+│   │   ├── MainLayout.jsx
+│   │   ├── MyPage.jsx
+│   │   ├── MyPageDetail.jsx
+│   │   ├── PerformanceSection.jsx.jsx
+│   │   └── QRSearchPage.jsx
+│   ├── App.css
+│   ├── App.jsx
+│   ├── index.css
+│   └── main.jsx
 ├── .gitignore
 ├── eslint.config.js
-├── index.html                  # 전역 html
-├── package-lock.json           
-├── package.json                # 프로젝트 메타 정보 및 스크립트
+├── index.html
+├── package.json
+├── package-lock.json
 ├── postcss.config.js
-├── README.md
-├── tailwind.config.js          # Tailwind 설정
-└── vite.config.js              # Vite 설정
+├── tailwind.config.js
+└── vite.config.js
 ```
 
 
