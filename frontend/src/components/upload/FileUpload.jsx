@@ -60,7 +60,11 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
             />
 
             <div className="mt-4 text-center">
-                <button className="analyze-button" onClick={handleAnalyze}>분석하기</button>
+                <button
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+                    onClick={handleAnalyze}>
+                    분석하기
+                </button>
             </div>
         </div>
     );
