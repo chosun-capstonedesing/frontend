@@ -5,16 +5,15 @@ import SignupPage from './routes/SignupPage';
 import MainLayout from './routes/MainLayout';
 import LogoutButton from './components/auth/LogoutButton';
 import MyPage from './routes/Mypage';
-
+import GuideSection from './routes/GuideSection';
+import PerformanceSection from './routes/PerformanceSection';
+import AnalysisPage from './routes/AnalysisPage';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(import.meta.env.DEV);
-  const [uploadedFile, setUploadedFile] = useState(null);
-  const [activeTab, setActiveTab] = useState('analysis');
 
   const handleLoginSuccess = () => setIsLoggedIn(true);
   const handleLogout = () => setIsLoggedIn(false);
-  const handleFileSelect = (file) => setUploadedFile(file);
 
   return (
     <Router>
@@ -36,20 +35,12 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
           <Route path="/signup" element={<SignupPage onSignupSuccess={handleLoginSuccess} />} />
-          <Route path='/mypage' element={<MyPage />}/>
-          <Route
-            path="*"
-            element={
-              <MainLayout
-                isLoggedIn={isLoggedIn}
-                uploadedFile={uploadedFile}
-                handleFileSelect={handleFileSelect}
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
-              />
-            }
-          />
-          
+          <Route path="/" element={<MainLayout />}>
+            <Route index element={<AnalysisPage />} />
+            <Route path="mypage" element={<MyPage />} />
+            <Route path="performance" element={<PerformanceSection />} />
+            <Route path="guide" element={<GuideSection />} />
+          </Route>
         </Routes>
       </div>
     </Router>

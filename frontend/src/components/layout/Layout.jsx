@@ -9,12 +9,13 @@ import Sidebar from './Sidebar';
 
 function Layout({ children }) {
     return (
-        <div className="flex">
+        <div className="flex w-full">
             <div className="w-16 md:w-16">
                 <Sidebar />
             </div>
 
-            <main className="flex-1 size-auto bg-gray-100 overflow-y-auto transition-all duration-300 px-4 py-4">
+            <main className="flex-1 w-full size-auto bg-gray-100 overflow-y-auto
+            transition-all duration-300 px-4 py-4">
                 {children}
             </main>
         </div>

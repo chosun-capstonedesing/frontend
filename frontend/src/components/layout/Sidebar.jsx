@@ -33,8 +33,8 @@ const Sidebar = () => {
                     <SidebarItem icon={<FaDatabase />} label="데이터셋" path="/dataset" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} />
                     <SidebarItem icon={<FaChartLine />} label="학습 상태" path="/learning" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} />
                     <SidebarItem icon={<FaCogs />} label="모델" path="/model" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} />
-                    <SidebarItem icon={<FaTachometerAlt />} label="성능" path="/perfromance" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} />
-                    <SidebarItem icon={<FaInfoCircle />} label="정보" path="./performance/PerformanceSection.jsx" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} />
+                    <SidebarItem icon={<FaTachometerAlt />} label="성능" path="/performance" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} />
+                    <SidebarItem icon={<FaInfoCircle />} label="정보" path="/guide" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} />
                 </nav>
 
                 <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
