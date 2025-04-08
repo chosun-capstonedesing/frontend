@@ -29,7 +29,7 @@ function FileUploadView ({
                     id="file-upload-input"
                 />
 
-                <label htmlFor="file-upload-input" className="cursor-pointer">
+                <label htmlFor="file-upload-input" className="cursor-pointer bg-transparent text-gray-800 hover:text-gray-500 font-semibold py-2 px-4 rounded">
                     📁 파일 선택하기 (또는 여기에 드래그 앤 드롭)
                 </label>
             </DragAndDrop>
