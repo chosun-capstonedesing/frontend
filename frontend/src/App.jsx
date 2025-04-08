@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import LoginPage from './routes/LoginPage';
-import SignupPage from './routes/SignupPage';
 import MainLayout from './routes/MainLayout';
 import LogoutButton from './components/auth/LogoutButton';
 import MyPage from './routes/Mypage';
@@ -10,7 +9,7 @@ import PerformanceSection from './routes/PerformanceSection';
 import AnalysisPage from './routes/AnalysisPage';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(import.meta.env.DEV);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const handleLoginSuccess = () => setIsLoggedIn(true);
   const handleLogout = () => setIsLoggedIn(false);
@@ -26,15 +25,13 @@ function App() {
             </>
           ) : (
             <>
-              <Link to="/login" className="text-sm hover:underline">Login</Link>
-              <Link to="/signup" className="text-sm hover:underline">SignUp</Link>
+              <Link to="/login" className="text-sm hover:underline">Login/SignUp</Link>
             </>
           )}
         </div>
 
         <Routes>
           <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
-          <Route path="/signup" element={<SignupPage onSignupSuccess={handleLoginSuccess} />} />
           <Route path="/" element={<MainLayout />}>
             <Route index element={<AnalysisPage />} />
             <Route path="mypage" element={<MyPage />} />
