@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import FileUploadView from "./FileUploadView";
-import './FileUploadView.css';
+
 
 /**
  * 파일 업로드 로직(컨테이너) 컴포넌트
