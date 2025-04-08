@@ -25,8 +25,7 @@ function QRSearchBlock() {
       {!showScanner ? (
         <button
           onClick={() => setShowScanner(true)}
-          className="px-4 py-2 bg-green-500 text-white rounded"
-        >
+          className="px-4 py-2 bg-green-500 text-white rounded">
           QR 스캔 시작
         </button>
       ) : (
@@ -43,8 +42,7 @@ function QRSearchBlock() {
         </div>
         <button
           onClick={handleQRSearch}
-          className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
+          className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
           분석 시작
         </button>
       </div>
