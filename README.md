@@ -47,38 +47,32 @@ frontend/
 ├── src/
 │   ├── components/
 │   │   ├── auth/                       # 🔐 인증 관련 컴포넌트
-│   │   │   ├── LoginForm.jsx
-│   │   │   ├── SignupForm.jsx
+│   │   │   ├── AuthFrom.jsx
 │   │   │   └── LogoutButton.jsx
-│   │   ├── user/                       # 👤 마이페이지 관련(예정)
-│   │   │   └── MyPage.jsx
-│   │   ├── upload/                     # 📁 파일 업로드 UI
-│   │   │   ├── FileUploader.jsx
-│   │   │   ├── DragAndDrop.jsx
-│   │   │   ├── FileInput.jsx
-│   │   │   ├── FileUploadView.jsx
-│   │   │   └── FileInfoDisplay.jsx
-│   │   ├── search/                     # 🔍 검색 기능 (URL, QR 등)(예정)
+│   │   ├── layout/                     # 🧩 레이아웃 및 공통 UI
+│   │   │   ├── Layout.jsx
+│   │   │   └── Sidebar.jsx
+│   │   ├── search/                     # 🔍 검색 기능 (URL, QR 등)
 │   │   │   ├── QRScanner.jsx
 │   │   │   ├── QRSearchBlock.jsx
 │   │   │   ├── QRUploader.jsx
 │   │   │   └── URLSearchForm.jsx 
-│   │   ├── layout/                     # 🧩 레이아웃 및 공통 UI
-│   │   │   ├── Layout.jsx
-│   │   │   ├── Sidebar.jsx
-│   │   │   ├── TabNavigation.jsx
-│   │   │   └── UtilityBar.jsx
-│   │   ├── guide/                      # ❓ 사용자 가이드
-│   │   │   └── GuideSection.jsx
-│   │   └── performance/                # ⚙️ 모델 성능
-│   │       └── PerformanceSection.jsx
+│   │   ├── upload/                     # 📁 파일 업로드 UI
+│   │   │   ├── DragAndDrop.jsx
+│   │   │   ├── FileinfoDisplay.jsx
+│   │   │   ├── FileInput.jsx
+│   │   │   ├── FileUpload.jsx
+│   │   │   ├── FileUploadView.jsx
+│   │   │   └── ProgressBar.jsx
 │   ├── routes/                         # 🗂️ 페이지 라우팅 단위
+│   │   ├── AnalysisPage.jsx
+│   │   ├── GuideSection.jsx
 │   │   ├── LoginPage.jsx
 │   │   ├── MainLayout.jsx
 │   │   ├── MyPage.jsx
 │   │   ├── MyPageDetail.jsx
-│   │   ├── QRSearchPage.jsx
-│   │   └── SignupPage.jsx
+│   │   ├── PerformanceSection.jsx.jsx
+│   │   └── QRSearchPage.jsx
 │   ├── App.css
 │   ├── App.jsx
 │   ├── index.css
