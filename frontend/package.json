@@ -11,6 +11,7 @@
     "deploy": "npm run build && netlify deploy --prod --dir=dist"
   },
   "dependencies": {
+    "@zxing/browser": "^0.1.5",
     "html5-qrcode": "^2.3.8",
     "jsqr": "^1.4.0",
     "react": "^19.0.0",
