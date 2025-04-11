@@ -9,7 +9,9 @@ import PerformanceSection from './routes/PerformanceSection';
 import AnalysisPage from './routes/AnalysisPage';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // 사용자 로그인 상태 설정 코드
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  //const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const handleLoginSuccess = () => setIsLoggedIn(true);
   const handleLogout = () => setIsLoggedIn(false);
