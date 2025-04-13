@@ -1,6 +1,7 @@
 import Sidebar from '../components/layout/Sidebar';
 import Layout from '../components/layout/Layout';
 import { Outlet } from 'react-router-dom';
+import GlobalStats from '../components/layout/GlobalStats';
 
 export default function MainLayout() {
   return (
