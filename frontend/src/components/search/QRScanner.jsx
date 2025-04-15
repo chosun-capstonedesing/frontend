@@ -1,53 +1,44 @@
-import React, { useEffect } from "react";
-import { Html5Qrcode, Html5QrcodeScannerState } from "html5-qrcode";
+import React, { useEffect, useRef } from "react";
+import QrScanner from "qr-scanner";
 
 function QRScanner({ onScanSuccess }) {
+  const videoRef = useRef(null);
+  const scannerRef = useRef(null);
+
   useEffect(() => {
-    const html5QrCode = new Html5Qrcode("qr-reader");
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
 
-    const startScanner = async () => {
-      try {
-        const cameras = await Html5Qrcode.getCameras();
-        if (!cameras || cameras.length === 0) {
-          console.error("📷 No cameras found.");
-          return;
-        }
-
-        const cameraId = cameras[0].id;
-        await html5QrCode.start(
-          cameraId,
-          { fps: 10, qrbox: 250 },
-          (decodedText) => {
-            onScanSuccess(decodedText);
-          },
-          (errorMessage) => {
-            console.log("QR scan error:", errorMessage);
-          }
-        );
-      } catch (err) {
-        console.error("Camera start failed:", err);
+    scannerRef.current = new QrScanner(
+      videoEl,
+      result => {
+        onScanSuccess(result?.data);
+      },
+      {
+        highlightScanRegion: true,
+        highlightCodeOutline: true,
+        preferredCamera: 'environment'
       }
-    };
+    );
 
-    startScanner();
+    QrScanner.hasCamera().then(hasCamera => {
+      if (hasCamera) {
+        scannerRef.current.start().catch(err => {
+          console.error("Failed to start QR scanner:", err);
+        });
+      } else {
+        console.error("No camera found.");
+      }
+    });
 
     return () => {
-      html5QrCode.getState().then((state) => {
-        if (
-          state === Html5QrcodeScannerState.SCANNING ||
-          state === Html5QrcodeScannerState.PAUSED
-        ) {
-          html5QrCode.stop().catch((err) =>
-            console.warn("Stop error (ignored):", err)
-          );
-        }
-      });
+      scannerRef.current?.stop();
     };
   }, [onScanSuccess]);
 
   return (
-    <div>
-      <div id="qr-reader" className="w-full max-w-sm h-64 border" />
+    <div className="w-full max-w-sm mx-auto border rounded">
+      <video ref={videoRef} className="w-full aspect-video" />
     </div>
   );
 }
