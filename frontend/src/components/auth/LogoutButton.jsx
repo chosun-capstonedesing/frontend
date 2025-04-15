@@ -8,7 +8,7 @@ function LogoutButton() {
     };
 
     return (
-        <button onClick={handleLogout} className="text-sm hover:underline text-red-500">
+        <button onClick={handleLogout} className="text-base hover:underline text-red-500">
             Logout
         </button>
     );

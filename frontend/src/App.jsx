@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import LoginPage from './routes/LoginPage';
 import MainLayout from './routes/MainLayout';
 import LogoutButton from './components/auth/LogoutButton';
-import MyPage from './routes/Mypage';
+import MyPage from './routes/MyPage';
 import GuideSection from './routes/GuideSection';
 import PerformanceSection from './routes/PerformanceSection';
 import AnalysisPage from './routes/AnalysisPage';
@@ -18,16 +18,16 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen bg-gray-100 p-3 overflow-hidden">
-        <div className="flex justify-end space-x-4 mb-4">
+      <div className="min-h-screen bg-gray-100 p-5 overflow-hidden">
+        <div className="flex justify-end space-x-4 mb-2 mr-5">
           {isLoggedIn ? (
             <>
-              <Link to="/mypage" className="text-sm hover:underline">My Page</Link>
+              <Link to="/mypage" className="text-base hover:underline">My Page</Link>
               <LogoutButton onLogout={handleLogout} />
             </>
           ) : (
             <>
-              <Link to="/login" className="text-sm hover:underline">Login/SignUp</Link>
+              <Link to="/login" className="text-base hover:underline">Login/SignUp</Link>
             </>
           )}
         </div>

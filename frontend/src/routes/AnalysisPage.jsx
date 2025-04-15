@@ -5,7 +5,7 @@ import GlobalStats from '../components/layout/GlobalStats';
 
 export default function AnalysisPage({ uploadedFile, handleFileSelect }) {
   return (
-    <div className="w-full sm:max-w-3xl md:max-w-6xl lg:max-w-7xl xl:max-w-8xl mx-auto bg-white shadow-md rounded p-5 sm:p-7 md:p-9 transition-all duration-400">
+    <div className="w-full bg-white shadow-md rounded p-9">
       <GlobalStats/>
       <h1 className="text-2xl font-bold mb-4">🗂️ 파일 분석</h1>
       <FileUpload onFileSelect={handleFileSelect} />
