@@ -29,7 +29,17 @@ function QRSearchBlock() {
           QR 스캔 시작
         </button>
       ) : (
-        <QRScanner onScanSuccess={handleQRResult} />
+        <>
+          <QRScanner onScanSuccess={(result) => {
+            setDecodedText(result);
+            setShowScanner(false);
+          }} scanning={showScanner} />
+          <button
+            onClick={() => setShowScanner(false)}
+            className="mt-2 px-4 py-2 bg-red-500 text-white rounded">
+            QR 스캔 취소
+          </button>
+        </>
       )}
 
       <QRUploader onDecode={handleQRResult} />

@@ -4,6 +4,7 @@ import QrScanner from "qr-scanner";
 function QRScanner({ onScanSuccess }) {
   const videoRef = useRef(null);
   const scannerRef = useRef(null);
+  const scannedRef = useRef(false);
 
   useEffect(() => {
     const videoEl = videoRef.current;
@@ -12,7 +13,11 @@ function QRScanner({ onScanSuccess }) {
     scannerRef.current = new QrScanner(
       videoEl,
       result => {
-        onScanSuccess(result?.data);
+        if (!scannedRef.current && result?.data) {
+          scannedRef.current = true;
+          onScanSuccess(result.data);
+          scannerRef.current?.stop();
+        }
       },
       {
         highlightScanRegion: true,
