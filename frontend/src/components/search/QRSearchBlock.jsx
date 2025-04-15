@@ -17,7 +17,7 @@ function QRSearchBlock() {
       return;
     }
     console.log("🔍 분석 시작:", decodedText);
-    // 여기에 분석 로직 추가 가능
+    // TODO: 여기에 분석 로직 추가
   };
 
   return (
