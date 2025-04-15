@@ -14,7 +14,7 @@ function Layout({ children }) {
                 <Sidebar />
             </div>
 
-            <main className="flex-1 w-auto bg-gray-100 overflow-y-auto
+            <main className="flex-1 bg-gray-100 overflow-y-auto overflow-x-hidden
             transition-all duration-300 px-4 py-4">
                 {children}
             </main>
