@@ -43,14 +43,14 @@ const Sidebar = () => {
     }, [isExpanded]);
 
     return (
-        <div className="relative z-50">
-            <div ref={sidebarRef} className={`fixed left-0 top-0 h-full bg-gray-50 border-r border-gray-200 transition-all duration-300 flex flex-col ${isExpanded ? 'w-64' : 'w-20'}`}>
+        <div className="relative z-50 overflow-x-hidden">
+            <div ref={sidebarRef} className={`fixed left-0 top-0 h-full bg-gray-50 border-r border-gray-200 transition-all duration-300 flex flex-col overflow-x-hidden ${isExpanded ? 'w-64' : 'w-20'}`}>
                 <div className="flex items-center h-16 px-6 border-b border-gray-200">
                     <div className="w-8 h-8 rounded-lg" />
                     <h1 className={`ml-4 mt-1 text-lg font-semibold text-black overflow-hidden whitespace-nowrap transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>Sidebar</h1>
                 </div>
 
-                <nav className="p-4 space-y-4 px-4 flex-1 overflow-y-auto">
+                <nav className="p-4 space-y-4 px-4 flex-1 overflow-y-auto overflow-x-hidden">
                     <SidebarItem icon={<FaHome />} label="분석" path="/" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
                     <SidebarItem icon={<FaDatabase />} label="데이터셋" path="/dataset" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
                     <SidebarItem icon={<FaChartLine />} label="학습 상태" path="/learning" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
