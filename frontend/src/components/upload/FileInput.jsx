@@ -1,4 +1,5 @@
 import React from "react";
+import { isLoggedIn } from "../../utils/isLoggedIn";
 
 /** 
  * FileInput 컴포넌트 역할
@@ -9,11 +10,25 @@ import React from "react";
  */
 
 function FileInput ({ onFileChange, inputRef, id }) {
+    const handleChange = (e) => {
+        const files = Array.from(e.target.files);
+        const maxCount = isLoggedIn() ? Infinity : 10;
+
+        if (files.length > maxCount) {
+            alert(`비로그인 사용자는 최대 ${maxCount}개 파일까지만 업로드할 수 있습니다.`);
+            return;
+        }
+
+        if (onFileChange) {
+            onFileChange(e);
+        }
+    };
+
     return (
         <input
             ref={inputRef}
             type="file"
-            onChange={onFileChange}
+            onChange={handleChange}
             className="hidden"
             id={id}
         />

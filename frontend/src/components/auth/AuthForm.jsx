@@ -3,7 +3,9 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 /* 로그인/회원가입 폼 통합
-- 로그인 중 계정이 없을 경우, 회원가입 버튼 활성화 -> 바로 회원가입 가능 */
+- 로그인 중 계정이 없을 경우, 회원가입 버튼 활성화 -> 바로 회원가입 가능
+- ✅ 로그인/회원가입 성공 시 토큰을 localStorage에 저장하도록 추가
+*/
 
 function AuthForm({ onAuthSuccess }) {
     const [form, setForm] = useState({ username: '', password: '' });
@@ -21,7 +23,14 @@ function AuthForm({ onAuthSuccess }) {
         try {
             const res = await axios.post('/auth', form);
             setMessage(res.data.message);
+
             if (res.data.message.includes("성공")) {
+                // ✅ 로그인 성공 시 토큰 저장
+                // 👉 [주의] 나중에 백엔드가 token 키 이름을 다르게 줄 수도 있음
+                // 예시: res.data.token, res.data.access_token 등
+                if (res.data.token) { 
+                    localStorage.setItem('access_token', res.data.token);
+                }
                 if (onAuthSuccess) onAuthSuccess(res.data);
                 navigate('/');
             }
@@ -35,6 +44,12 @@ function AuthForm({ onAuthSuccess }) {
         try {
             const res = await axios.post('/auth', form);
             setMessage("회원가입 성공! 자동 로그인됩니다.");
+
+            // ✅ 회원가입 성공 시 토큰 저장
+            // 👉 [주의] 백엔드 응답 구조에 따라 token 키 확인 필요
+            if (res.data.token) {
+                localStorage.setItem('access_token', res.data.token);
+            }
             if (onAuthSuccess) onAuthSuccess(res.data);
             navigate('/');
         } catch (err) {
@@ -43,7 +58,7 @@ function AuthForm({ onAuthSuccess }) {
     };
 
     return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded">
+        <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded">
             <input
                 name="username"
                 placeholder="ID"
