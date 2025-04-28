@@ -67,6 +67,8 @@ frontend/
 │   │   ├── MyPageDetail.jsx
 │   │   ├── PerformanceSection.jsx.jsx
 │   │   └── QRSearchPage.jsx
+│   ├── utils/                         # ⛓️‍💥 로그인 상태 확인 함수
+│   │   └── isLoggedIn.js
 │   ├── App.css
 │   ├── App.jsx
 │   ├── index.css
