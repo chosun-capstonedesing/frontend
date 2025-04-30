@@ -12,36 +12,62 @@ import { isLoggedIn } from "../../utils/isLoggedIn";
 
 function DragAndDrop({ onDrop, onDragOver, children }) {
     const [uploadedFiles, setUploadedFiles] = useState([]);
+    const [isDragging, setIsDragging] = useState(false);
 
-    const handleDrop = (e) => {
-        e.preventDefault();
-        const files = Array.from(e.dataTransfer.files);
+    const handleFiles = (files) => {
         const maxCount = isLoggedIn() ? Infinity : 3;
         const totalCount = uploadedFiles.length + files.length;
 
         if (totalCount > maxCount) {
             alert(`비로그인 사용자는 최대 ${maxCount}개 파일까지만 업로드할 수 있습니다.`);
-            return;
+            return false;
         }
 
         setUploadedFiles(prev => [...prev, ...files]);
+        return true;
+    };
 
-        if (onDrop) {
+    const handleDrop = (e) => {
+        e.preventDefault();
+        setIsDragging(false);
+        const files = Array.from(e.dataTransfer.files);
+
+        if (handleFiles(files) && onDrop) {
             onDrop(e);
         }
     };
 
-    const maxDisplay = isLoggedIn() ? '무제한' : '10개';
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        if (!isDragging) setIsDragging(true);
+        if (onDragOver) onDragOver(e);
+    };
+
+    const handleDragLeave = () => {
+        setIsDragging(false);
+    };
+
+    const maxDisplay = isLoggedIn() ? '무제한' : '3개';
 
     return (
-        <div className="flex flex-col items-center space-y-2">
-            <div
-                onDrop={handleDrop}
-                onDragOver={onDragOver}
-                className="border-dashed border-2 border-gray-300 p-4 rounded mb-4 text-center w-full h-64 flex items-center justify-center text-gray-400"
+        <div
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            className={`group border-dashed border-2 mb-4 p-4 rounded-2xl text-center w-full h-40 flex items-center justify-center transition-colors duration-200 ${
+                isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-500'
+            }`}
+        >
+            {children}
+            <label
+              htmlFor="file-upload-input"
+              className="cursor-pointer bg-transparent text-gray-800 group-hover:text-blue-600 hover:text-gray-500 font-semibold py-2 px-4 rounded flex flex-col items-center space-y-1"
             >
-                {children}
-            </div>
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 mb-1 text-gray-500 group-hover:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+              파일 선택하기<br />(또는 여기에 드래그 앤 드롭)
+            </label>
         </div>
     );
 }
