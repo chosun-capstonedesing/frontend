@@ -8,6 +8,7 @@ import GuideSection from './routes/GuideSection';
 import PerformanceSection from './routes/PerformanceSection';
 import AnalysisPage from './routes/AnalysisPage';
 import { isLoggedIn as checkLoginStatus } from './utils/isLoggedIn';
+import { ToastProvider } from './context/ToastContext';
 
 function App() {
   const isDev = import.meta.env.DEV;
@@ -27,30 +28,32 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen bg-gray-100 p-5 overflow-hidden">
-        <div className="flex justify-end space-x-4 mb-2 mr-5">
-          {isLoggedIn ? (
-            <>
-              <Link to="/mypage" className="text-base hover:underline">My Page</Link>
-              <LogoutButton onLogout={handleLogout} />
-            </>
-          ) : (
-            <>
-              <Link to="/login" className="text-base hover:underline">Login/SignUp</Link>
-            </>
-          )}
-        </div>
+      <ToastProvider>
+        <div className="min-h-screen bg-gray-100 p-5 overflow-hidden">
+          <div className="flex justify-end space-x-4 mb-2 mr-5">
+            {isLoggedIn ? (
+              <>
+                <Link to="/mypage" className="text-base hover:underline">My Page</Link>
+                <LogoutButton onLogout={handleLogout} />
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="text-base hover:underline">Login/SignUp</Link>
+              </>
+            )}
+          </div>
 
-        <Routes>
-          <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
-          <Route path="/" element={<MainLayout />}>
-            <Route index element={<AnalysisPage />} />
-            <Route path="mypage" element={<MyPage />} />
-            <Route path="performance" element={<PerformanceSection />} />
-            <Route path="guide" element={<GuideSection />} />
-          </Route>
-        </Routes>
-      </div>
+          <Routes>
+            <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
+            <Route path="/" element={<MainLayout />}>
+              <Route index element={<AnalysisPage />} />
+              <Route path="mypage" element={<MyPage />} />
+              <Route path="performance" element={<PerformanceSection />} />
+              <Route path="guide" element={<GuideSection />} />
+            </Route>
+          </Routes>
+        </div>
+      </ToastProvider>
     </Router>
   );
 }
