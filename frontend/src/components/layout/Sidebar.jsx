@@ -92,7 +92,7 @@ const SidebarItem = ({ icon, label, path, currentTab, navigate, isExpanded, setI
         className={`flex items-center w-full h-12 px-3 rounded-lg hover:bg-blue-100 transition-colors ${currentTab === path ? 'bg-blue-200' : ''}`}
     >
         <span className="w-5 h-5 text-2xl text-blue-600">{icon}</span>
-        <span className={`ml-5 mt-1 text-black whitespace-nowrap transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>{label}</span>
+        <span className={`ml-5 mt-2 text-black whitespace-nowrap transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>{label}</span>
     </button>
 );
 
