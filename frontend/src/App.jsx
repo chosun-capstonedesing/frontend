@@ -4,6 +4,7 @@ import LoginPage from './routes/LoginPage';
 import MainLayout from './routes/MainLayout';
 import LogoutButton from './components/auth/LogoutButton';
 import MyPage from './routes/MyPage';
+import MyPageDetail from './routes/MyPageDetail';
 import GuideSection from './routes/GuideSection';
 import PerformanceSection from './routes/PerformanceSection';
 import AnalysisPage from './routes/AnalysisPage';
@@ -50,6 +51,7 @@ function App() {
               <Route path="mypage" element={<MyPage />} />
               <Route path="performance" element={<PerformanceSection />} />
               <Route path="guide" element={<GuideSection />} />
+              <Route path="mypage/detail/:id" element={<MyPageDetail />} />
             </Route>
           </Routes>
         </div>
