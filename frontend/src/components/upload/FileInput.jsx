@@ -12,7 +12,7 @@ import { isLoggedIn } from "../../utils/isLoggedIn";
 function FileInput ({ onFileChange, inputRef, id }) {
     const handleChange = (e) => {
         const files = Array.from(e.target.files);
-        const maxCount = isLoggedIn() ? Infinity : 3;
+        const maxCount = true ? Infinity : 3; // 개발 중 항상 로그인으로 간주, 프로덕션에서는 isLoggedIn()으로 변경
 
         if (files.length > maxCount) {
             alert(`비로그인 사용자는 최대 ${maxCount}개 파일까지만 업로드할 수 있습니다.`);
@@ -31,6 +31,7 @@ function FileInput ({ onFileChange, inputRef, id }) {
             onChange={handleChange}
             className="hidden"
             id={id}
+            multiple
         />
     );
 }

@@ -25,6 +25,7 @@ function FileUploadView({
           onFileChange={onFileChange}
           inputRef={fileinputRef}
           id="file-upload-input"
+          multiple
         />
       </DragAndDrop>
 

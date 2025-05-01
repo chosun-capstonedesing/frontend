@@ -47,6 +47,21 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
         } else {
             setFileList(savedFiles); // 로그인 사용자는 그냥 유지
         }
+
+        // Listen for storage and custom fileListUpdated events to sync fileList (e.g., after deleting file from MyPage)
+        const syncFromLocalStorage = () => {
+          const files = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
+          const trimmed = files.slice(0, maxCount);
+          setFileList(trimmed);
+          sessionStorage.setItem('uploadedFiles', JSON.stringify(trimmed));
+          sessionStorage.setItem('uploadedCount', String(trimmed.length));
+        };
+        window.addEventListener("storage", syncFromLocalStorage);
+        window.addEventListener("fileListUpdated", syncFromLocalStorage);
+        return () => {
+          window.removeEventListener("storage", syncFromLocalStorage);
+          window.removeEventListener("fileListUpdated", syncFromLocalStorage);
+        };
     }, []);
 
 
@@ -60,10 +75,17 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
         }));
 
         const updatedFiles = [...fileList, ...enhancedFiles].slice(0, maxCount);
+
+        // Update sessionStorage
         sessionStorage.setItem('uploadedFiles', JSON.stringify(updatedFiles));
         sessionStorage.setItem('uploadedCount', String(updatedFiles.length));
         sessionStorage.setItem('uploadedTime', String(now));
         setFileList(updatedFiles);
+
+        // Also update localStorage to persist across sessions (used in MyPage)
+        const localSaved = JSON.parse(localStorage.getItem("uploadedFiles") || "[]");
+        const combinedLocal = [...localSaved, ...enhancedFiles].slice(0, 50); // Optional limit
+        localStorage.setItem("uploadedFiles", JSON.stringify(combinedLocal));
     };
 
     // 파일 선택 시 처리
@@ -146,6 +168,20 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
                 return newMap;
             });
             updateToastStatus(index);
+
+            // 분석 결과를 localStorage에도 반영
+            const updateLocalStorageResult = (fileName, result) => {
+              const localFiles = JSON.parse(localStorage.getItem("uploadedFiles") || "[]");
+              const updatedLocal = localFiles.map(file => {
+                if (file.name === fileName) {
+                  return { ...file, result };
+                }
+                return file;
+              });
+              localStorage.setItem("uploadedFiles", JSON.stringify(updatedLocal));
+            };
+
+            updateLocalStorageResult(updatedFiles[index].name, "정상"); // 현재는 임시로 "정상" 처리
         }, 2000);
 
         analysisTimers.current[index] = { timeoutId, intervalId };
@@ -160,6 +196,7 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
                 onDragOver={handleDragOver}
                 onFileChange={handleFileChange}
                 uploadProgress={onUploadProgress}
+                multiple
             />
 
             {/* ✅ 최근 업로드된 파일 3개 미리보기 */}
@@ -170,7 +207,24 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
                       .slice(-3)
                       .reverse()
                       .map(({ file, originalIndex }) => (
-                        <li key={originalIndex} className="p-4 flex flex-col space-y-2">
+                        <li key={originalIndex} className="relative group p-3 flex flex-col space-y-2">
+                            <button
+                              onClick={() => {
+                                const updated = [...fileList];
+                                updated.splice(originalIndex, 1);
+                                setFileList(updated);
+                                sessionStorage.setItem("uploadedFiles", JSON.stringify(updated));
+                                sessionStorage.setItem("uploadedCount", String(updated.length));
+                                localStorage.setItem("uploadedFiles", JSON.stringify(updated));
+                                window.dispatchEvent(new Event("fileListUpdated"));
+                              }}
+                              className="absolute -top-2 -left-2 bg-gray-400 hover:bg-gray-600 text-white rounded-full w-5 h-5 flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                              title="파일 삭제"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 011.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                              </svg>
+                            </button>
                             <div className="flex items-center space-x-3">
                                 <div className="flex-shrink-0">
                                     {(file.status || "done") === "done" ? (
