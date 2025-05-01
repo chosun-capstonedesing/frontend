@@ -2,18 +2,23 @@ import React, { createContext, useContext, useState } from "react";
 import { createPortal } from "react-dom";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 
+// ✅ ToastContext 생성 - 전역에서 알림을 호출/관리하기 위해 사용
 const ToastContext = createContext();
 
+// ✅ useToast: 다른 컴포넌트에서 토스트 함수를 쉽게 사용하기 위한 커스텀 훅
 export const useToast = () => useContext(ToastContext);
 
+// ✅ ToastProvider: 알림 상태와 렌더링을 제공하는 Context Provider
 export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
 
+  // ✅ showToast: 새 토스트 알림을 추가하는 함수
   const showToast = (message, status = "done", fileIndex = null, progress = 0) => {
     const id = Date.now();
     setToasts(prev => [...prev, { id, message, status, fileIndex, progress }]);
   };
 
+  // ✅ updateProgress: 진행 중인 토스트의 퍼센트를 업데이트
   const updateProgress = (fileIndex, progress) => {
     setToasts(prev =>
       prev.map(t =>
@@ -24,6 +29,7 @@ export const ToastProvider = ({ children }) => {
     );
   };
 
+  // ✅ updateToastStatus: 분석 중에서 완료 상태로 변경하고 퍼센트를 100%로 설정
   const updateToastStatus = (fileIndex, status = "done") => {
     setToasts(prev =>
       prev.map(t =>
@@ -34,6 +40,7 @@ export const ToastProvider = ({ children }) => {
     );
   };
 
+  // ✅ removeToast: 사용자가 수동으로 알림을 제거할 때 사용
   const removeToast = (id) => {
     setToasts(prev => prev.filter(t => t.id !== id));
   };
@@ -41,14 +48,17 @@ export const ToastProvider = ({ children }) => {
   return (
     <ToastContext.Provider value={{ showToast, updateProgress, updateToastStatus }}>
       {children}
+      {/* ✅ createPortal: 알림을 최상위 DOM(body)에 렌더링 */}
       {createPortal(
-        <div className="fixed top-5 right-5 space-y-3 z-50">
+        <div className="fixed top-20 right-5 space-y-3 z-50">
           {toasts.map((toast) => (
+            // ✅ 알림 카드: 상태에 따라 테두리와 색상 변경
             <div
               key={toast.id}
               className={`relative w-72 bg-white shadow-md rounded-md p-3 
                 ${toast.status === 'done' ? 'border border-green-200' : 'border border-yellow-300'}`}
             >
+              {/* ✅ 닫기 버튼: 알림 수동 제거용 */}
               <button
                 onClick={() => removeToast(toast.id)}
                 className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-gray-400 hover:bg-gray-500 text-white flex items-center justify-center shadow"
@@ -60,6 +70,7 @@ export const ToastProvider = ({ children }) => {
               </button>
 
               <div className="flex items-center space-x-2">
+                {/* ✅ 아이콘 표시: 완료이면 체크, 진행 중이면 시계 아이콘 */}
                 <div className={`${toast.status === 'done' ? 'bg-green-100' : 'bg-yellow-100'} p-1.5 rounded-full`}>
                   {toast.status === "done" ? (
                     <CheckCircleIcon className="h-5 w-5 text-green-500" />
@@ -75,6 +86,7 @@ export const ToastProvider = ({ children }) => {
 
                   <div className="text-xs text-gray-600">{toast.message}</div>
 
+                  {/* ✅ 분석 중일 때: 프로그래스 바 표시 */}
                   {toast.status === "processing" && (
                     <div className="w-full mt-2">
                       <div className="flex items-center space-x-2">
@@ -89,6 +101,7 @@ export const ToastProvider = ({ children }) => {
                     </div>
                   )}
 
+                  {/* ✅ 분석 완료일 때: 결과 보기 링크 표시 */}
                   {toast.status === "done" && (
                     <p className="text-xs text-green-600 mt-1 font-medium cursor-pointer hover:underline">
                       결과 보기 →
