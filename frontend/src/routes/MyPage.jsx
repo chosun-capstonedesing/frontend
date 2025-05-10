@@ -138,12 +138,12 @@ return (
                     </svg>
                   </span>
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{file.name}</p>
+                <div className="max-w-[180px]">
+                  <p className="text-sm font-medium text-gray-900 break-all whitespace-normal">{file.name}</p>
                   <p className="text-sm text-gray-500">{file.date}</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-4">
+              <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-4 min-w-[180px]">
                 <span className={`text-sm font-semibold rounded-full px-3 py-1 ${
                   file.result === '정상' 
                     ? 'bg-green-100 text-green-700' 
@@ -178,7 +178,6 @@ return (
           breakLabel="..."
           nextLabel={
             <span className="relative inline-flex items-center px-2 h-8 border border-gray-200 rounded-r-md text-gray-500 hover:border-indigo-500 hover:text-indigo-500 transition-colors duration-200 text-sm">
-              Next
               <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
               </svg>
@@ -189,7 +188,6 @@ return (
               <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
               </svg>
-              Previous
             </span>
           }
           onPageChange={handlePageClick}
@@ -205,9 +203,13 @@ return (
         />
       </div>
       <div className="mt-4 text-xs text-gray-500 text-center">
-        Page <span className="font-semibold text-gray-600">{currentPage + 1}</span> of <span className="font-semibold text-gray-600">{pageCount}</span>
-        <span className="mx-4">|</span>
-        Total items: <span className="font-semibold text-gray-600">{visibleFiles.length}</span>
+        <span>
+          Page <span className="font-semibold text-gray-600">{currentPage + 1}</span> of <span className="font-semibold text-gray-600">{pageCount}</span>
+        </span>
+        <span className='mr-4 ml-4'>|</span>
+        <span>
+          Total items: <span className="font-semibold text-gray-600">{visibleFiles.length}</span>
+        </span>
       </div>
   </div>
 );
