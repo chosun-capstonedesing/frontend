@@ -1,5 +1,7 @@
 import React from "react";
 import Sidebar from './Sidebar';
+import { useEffect } from "react";
+import { useToast } from "../../context/ToastContext";
 
 /**
  * 사이드바와 메인 콘텐츠 영역을 나누는 레이아웃
@@ -9,13 +11,12 @@ import Sidebar from './Sidebar';
 
 function Layout({ children }) {
     return (
-        <div className="flex w-full">
-            <div className="w-16 md:w-16">
+        <div className="relative flex w-full">
+            <div className="w-16">
                 <Sidebar />
             </div>
 
-            <main className="flex-1 w-full size-auto bg-gray-100 overflow-y-auto
-            transition-all duration-300 px-4 py-4">
+            <main className="flex-1 bg-gray-100 overflow-y-auto px-4 py-4">
                 {children}
             </main>
         </div>

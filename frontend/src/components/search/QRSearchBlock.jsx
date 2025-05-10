@@ -17,7 +17,7 @@ function QRSearchBlock() {
       return;
     }
     console.log("🔍 분석 시작:", decodedText);
-    // 여기에 분석 로직 추가 가능
+    // TODO: 여기에 분석 로직 추가
   };
 
   return (
@@ -25,11 +25,21 @@ function QRSearchBlock() {
       {!showScanner ? (
         <button
           onClick={() => setShowScanner(true)}
-          className="px-4 py-2 bg-green-500 text-white rounded">
+          className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded">
           QR 스캔 시작
         </button>
       ) : (
-        <QRScanner onScanSuccess={handleQRResult} />
+        <>
+          <QRScanner onScanSuccess={(result) => {
+            setDecodedText(result);
+            setShowScanner(false);
+          }} scanning={showScanner} />
+          <button
+            onClick={() => setShowScanner(false)}
+            className="mt-2 px-4 py-2 bg-red-500 text-white rounded">
+            QR 스캔 취소
+          </button>
+        </>
       )}
 
       <QRUploader onDecode={handleQRResult} />

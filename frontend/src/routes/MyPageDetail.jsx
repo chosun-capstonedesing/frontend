@@ -1,40 +1,39 @@
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
 
-// 📌 실제 환경에서는 아래 데이터를 API 호출로 받아와야함.
-const dummyDetails = {
-  1: {
-    name: 'report1.pdf',
-    date: '2024-04-01',
-    result: '정상',
-    details: '해당 파일은 이상이 없는 것으로 분석되었습니다.'
-  },
-  2: {
-    name: 'virus_sample.hwp',
-    date: '2024-04-02',
-    result: '악성',
-    details: '악성 코드로 의심되는 스크립트가 포함되어 있습니다.'
-  }
-};
-
-export default function MyPageDetail() {
-  const { fileId } = useParams();
-  const fileData = dummyDetails[fileId];
-
-  if (!fileData) {
-    return <div className="p-6 text-red-500">해당 파일의 정보를 찾을 수 없습니다.</div>;
+export default function FileAccordionDetail({ file }) {
+  if (!file) {
+    return <div className="p-4 text-red-500">파일 정보가 없습니다.</div>;
   }
 
   return (
-    <div className="p-6 max-w-2xl mx-auto bg-white rounded shadow">
-      <Link to="/mypage" className="text-blue-500 hover:underline">← 내 파일 목록으로</Link>
-      <h2 className="text-2xl font-bold mt-4 mb-4">파일 분석 결과</h2>
+    <div className="mt-4 bg-gray-50 border border-gray-200 rounded p-4">
+      <h2 className="text-lg font-semibold mb-2">파일 분석 결과</h2>
+      <ul className="space-y-1 text-sm">
+        <li className='pb-2.5'><strong className='text-base'>파일 분석 정보 (File Analysis Information)</strong>
+          <ul className="mt-1 space-y-1 pl-1">
+            <li><strong>- 파일 이름: </strong>{file.name}</li>
+            <li><strong>- 파일 크기: </strong>{file.size ? file.size.toLocaleString() : 'N/A'} MB</li>
+            <li><strong>- 확장자: </strong>{file.name?.split('.').pop() || 'N/A'}</li>
+            <li><strong>- SHA-256 Hash: </strong>{file.hash || 'N/A'}</li>
+          </ul>
+        </li>
 
-      <ul className="space-y-2">
-        <li><strong>파일명:</strong> {fileData.name}</li>
-        <li><strong>업로드 날짜:</strong> {fileData.date}</li>
-        <li><strong>분석 결과:</strong> <span className={fileData.result === '악성' ? 'text-red-500' : 'text-green-600'}>{fileData.result}</span></li>
-        <li><strong>분석 내용:</strong> {fileData.details}</li>
+        <li className='pb-2'><strong className='text-base'>업로드 날짜 (Upload Date):</strong> {(file.uploadedAt || new Date().toLocaleDateString())}</li>
+
+        <li className='pb-2.5'><strong className='text-base'>탐지 결과 (Detection result)</strong>
+          <p className='mt-1 pl-1'> 해당 "<strong>{file.name}</strong>" 파일은 <strong>{file.result}</strong>으로 탐지되었으며, <strong>{file.probability || 'N/A'}%</strong>의 탐지 확률을 기반으로 판단됩니다.</p>
+          <p className="text-xs text-gray-500 mt-1 pl-1">※ 악성 확률이 60% 이상일 경우 '악성'으로 판별합니다.</p>
+        </li>
+
+        <li className='pb-2.5'>
+          <strong className='text-base'>분석 로그 요약 (Analysis Log Summary)</strong>
+          <ul className="mt-1 space-y-1 pl-1">
+            <li><strong>- 분석 시작 시간: </strong>{file.analysisStartedAt || 'N/A'}</li>
+            <li><strong>- 모델 로딩 시간: </strong>{file.modelLoadTime || 'N/A'}초</li>
+            <li><strong>- 파일 전처리 시간: </strong>{file.preprocessTime || 'N/A'}초</li>
+            <li><strong>- 추론 시간: </strong>{file.inferenceTime || 'N/A'}초</li>
+          </ul>
+        </li>
       </ul>
     </div>
   );

@@ -1,14 +1,22 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
-function LogoutButton() {
+function LogoutButton({ onLogout }) {
+    const navigate = useNavigate();
+
     const handleLogout = () => {
-        //TODO: 로그아웃 로직 제작
-        console.log('Logout');
-        if(onLogout) onLogout();
+        // ✅ 1. 토큰 삭제
+        localStorage.removeItem('access_token');
+
+        // ✅ 2. onLogout 콜백 실행 (로그인 상태 초기화)
+        if (onLogout) onLogout();
+
+        // ✅ 3. 메인 페이지로 이동
+        navigate('/');
     };
 
     return (
-        <button onClick={handleLogout} className="text-sm hover:underline text-red-500">
+        <button onClick={handleLogout} className="text-base hover:underline text-red-500">
             Logout
         </button>
     );

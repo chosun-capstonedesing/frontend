@@ -3,45 +3,61 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import LoginPage from './routes/LoginPage';
 import MainLayout from './routes/MainLayout';
 import LogoutButton from './components/auth/LogoutButton';
-import MyPage from './routes/Mypage';
+import MyPage from './routes/MyPage';
+import MyPageDetail from './routes/MyPageDetail';
 import GuideSection from './routes/GuideSection';
 import PerformanceSection from './routes/PerformanceSection';
 import AnalysisPage from './routes/AnalysisPage';
+import { isLoggedIn as checkLoginStatus } from './utils/isLoggedIn';
+import { ToastProvider } from './context/ToastContext';
+import AnalysisResults from './routes/AnalysisResults';
 
 function App() {
-  // 사용자 로그인 상태 설정 코드
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
-  //const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const isDev = import.meta.env.DEV;
+  const [isLoggedIn, setIsLoggedIn] = useState(isDev ? true : checkLoginStatus());
 
-  const handleLoginSuccess = () => setIsLoggedIn(true);
-  const handleLogout = () => setIsLoggedIn(false);
+  const handleLoginSuccess = () => {
+    localStorage.setItem('access_token', 'mock_token_value'); // 로그인 성공 시 토큰 저장
+    sessionStorage.removeItem('uploadedFiles');               // ✅ 업로드 기록 삭제
+    sessionStorage.removeItem('uploadedCount');               // ✅ 업로드 개수 삭제
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('access_token'); // 로그아웃 시 토큰 삭제
+    setIsLoggedIn(false);
+  };
 
   return (
     <Router>
-      <div className="min-h-screen bg-gray-100 p-3 overflow-hidden">
-        <div className="flex justify-end space-x-4 mb-4">
-          {isLoggedIn ? (
-            <>
-              <Link to="/mypage" className="text-sm hover:underline">My Page</Link>
-              <LogoutButton onLogout={handleLogout} />
-            </>
-          ) : (
-            <>
-              <Link to="/login" className="text-sm hover:underline">Login/SignUp</Link>
-            </>
-          )}
-        </div>
+      <ToastProvider>
+        <div className="min-h-screen bg-gray-100 p-5 overflow-hidden">
+          <div className="flex justify-end space-x-4 mb-2 mr-5">
+            {isLoggedIn ? (
+              <>
+                <Link to="/mypage" className="text-base hover:underline">My Page</Link>
+                <LogoutButton onLogout={handleLogout} />
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="text-base hover:underline">Login/SignUp</Link>
+              </>
+            )}
+          </div>
 
-        <Routes>
-          <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
-          <Route path="/" element={<MainLayout />}>
-            <Route index element={<AnalysisPage />} />
-            <Route path="mypage" element={<MyPage />} />
-            <Route path="performance" element={<PerformanceSection />} />
-            <Route path="guide" element={<GuideSection />} />
-          </Route>
-        </Routes>
-      </div>
+          <Routes>
+            <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
+            <Route path="/" element={<MainLayout />}>
+              <Route index element={<AnalysisPage />} />
+              <Route path="mypage" element={<MyPage />} />
+              <Route path="analysis_results" element={<AnalysisResults />} />
+              <Route path="performance" element={<PerformanceSection />} />
+              <Route path="guide" element={<GuideSection />} />
+              <Route path="mypage/detail/:id" element={<MyPageDetail />} />
+            </Route>
+          </Routes>
+        </div>
+      </ToastProvider>
     </Router>
   );
 }

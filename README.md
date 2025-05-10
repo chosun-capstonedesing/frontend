@@ -44,6 +44,7 @@ frontend/
 │   │   │   ├── AuthFrom.jsx
 │   │   │   └── LogoutButton.jsx
 │   │   ├── layout/                     # 🧩 레이아웃 및 공통 UI
+│   │   │   ├── GlobalStats.jsx
 │   │   │   ├── Layout.jsx
 │   │   │   └── Sidebar.jsx
 │   │   ├── search/                     # 🔍 검색 기능 (URL, QR 등)
@@ -53,11 +54,13 @@ frontend/
 │   │   │   └── URLSearchForm.jsx 
 │   │   ├── upload/                     # 📁 파일 업로드 UI
 │   │   │   ├── DragAndDrop.jsx
-│   │   │   ├── FileinfoDisplay.jsx
 │   │   │   ├── FileInput.jsx
 │   │   │   ├── FileUpload.jsx
 │   │   │   ├── FileUploadView.jsx
 │   │   │   └── ProgressBar.jsx
+│   ├── context/                        # ⛓️‍💥 전역 상태 관리
+│   │   ├── AuthContext.jsx.
+│   │   └── ToastContext.jsx
 │   ├── routes/                         # 🗂️ 페이지 라우팅 단위
 │   │   ├── AnalysisPage.jsx
 │   │   ├── GuideSection.jsx
@@ -65,8 +68,10 @@ frontend/
 │   │   ├── MainLayout.jsx
 │   │   ├── MyPage.jsx
 │   │   ├── MyPageDetail.jsx
-│   │   ├── PerformanceSection.jsx.jsx
+│   │   ├── PerformanceSection.jsx
 │   │   └── QRSearchPage.jsx
+│   ├── utils/                          # ⛓️‍💥 로그인 상태 확인 함수
+│   │   └── isLoggedIn.js
 │   ├── App.css
 │   ├── App.jsx
 │   ├── index.css
