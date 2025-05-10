@@ -2,11 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
     FaHome,
-    FaChartLine,
-    FaDatabase,
-    FaCogs,
-    FaTachometerAlt,
+    FaChartPie,
     FaInfoCircle,
+    FaClipboardList,
 } from 'react-icons/fa';
 
 const Sidebar = () => {
@@ -52,10 +50,8 @@ const Sidebar = () => {
 
                 <nav className="p-4 space-y-4 px-4 flex-1 overflow-y-auto overflow-x-hidden">
                     <SidebarItem icon={<FaHome />} label="분석" path="/" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
-                    <SidebarItem icon={<FaDatabase />} label="데이터셋" path="/dataset" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
-                    <SidebarItem icon={<FaChartLine />} label="학습 상태" path="/learning" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
-                    <SidebarItem icon={<FaCogs />} label="모델" path="/model" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
-                    <SidebarItem icon={<FaTachometerAlt />} label="성능" path="/performance" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
+                    <SidebarItem icon={<FaClipboardList />} label="분석 결과" path="/analysis_results" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
+                    <SidebarItem icon={<FaChartPie />} label="분석 환경" path="/performance" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
                     <SidebarItem icon={<FaInfoCircle />} label="정보" path="/guide" currentTab={currentTab} navigate={navigate} isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
                 </nav>
 
