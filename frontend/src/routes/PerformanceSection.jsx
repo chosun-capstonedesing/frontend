@@ -73,11 +73,11 @@ function PerformanceSection() {
 
     return (
         <div className="bg-white shadow-sm rounded p-6">
-            <h2 className="text-2xl font-bold mb-4">모델 성능</h2>
+            <h2 className="text-2xl font-bold mb-6">모델 성능</h2>
 
             <div>
-                <h3 className="text-lg font-bold mb-2">성능 지표</h3>
-                <ul className="list-disc list-inside">
+                <h3 className="text-xl font-semibold mb-2">성능 지표</h3>
+                <ul className="list-disc list-inside text-base leading-relaxed">
                     <li>정확도: {performance?.overallAccuracy ?? 'N/A'}%</li>
                     <li>처리 속도: {performance?.processingTime ?? 'N/A'}초</li>
                     <li>리포트 생성 시간: {performance?.reportGenerationTime ?? 'N/A'}초</li>
@@ -86,18 +86,18 @@ function PerformanceSection() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                 <div>
-                    <h3 className="text-lg font-bold mb-2">예측 결과 분포</h3>
+                    <h3 className="text-xl font-semibold mb-2">예측 결과 분포</h3>
                     <Bar data={predictionData} options={chartOptions} />
                 </div>
                 <div>
-                    <h3 className="text-lg font-bold mb-2">모델 성능 요약</h3>
+                    <h3 className="text-xl font-semibold mb-2">모델 성능 요약</h3>
                     <Bar data={accuracyData} options={chartOptions} />
                 </div>
             </div>
 
             <div className="mt-6">
-                <h3 className="text-lg font-bold mb-2">분석 환경</h3>
-                <ul className="list-disc list-inside text-gray-700">
+                <h3 className="text-xl font-semibold mb-2">분석 환경</h3>
+                <ul className="list-disc list-inside text-gray-700 text-base leading-relaxed">
                     <li>모델명: {performance?.environment?.modelName ?? 'N/A'}</li>
                     <li>학습 데이터셋: {performance?.environment?.dataset ?? 'N/A'}</li>
                     <li>학습 에폭 수: {performance?.environment?.epochs ?? 'N/A'}</li>
