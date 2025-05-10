@@ -10,6 +10,7 @@ import PerformanceSection from './routes/PerformanceSection';
 import AnalysisPage from './routes/AnalysisPage';
 import { isLoggedIn as checkLoginStatus } from './utils/isLoggedIn';
 import { ToastProvider } from './context/ToastContext';
+import AnalysisResults from './routes/AnalysisResults';
 
 function App() {
   const isDev = import.meta.env.DEV;
@@ -49,6 +50,7 @@ function App() {
             <Route path="/" element={<MainLayout />}>
               <Route index element={<AnalysisPage />} />
               <Route path="mypage" element={<MyPage />} />
+              <Route path="analysis_results" element={<AnalysisResults />} />
               <Route path="performance" element={<PerformanceSection />} />
               <Route path="guide" element={<GuideSection />} />
               <Route path="mypage/detail/:id" element={<MyPageDetail />} />
