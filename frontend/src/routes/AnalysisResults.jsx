@@ -9,6 +9,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { FaLock } from "react-icons/fa";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -61,6 +62,10 @@ function AnalysisResults({
     },
   };
 
+  if (import.meta.env.MODE === "development") {
+    isLoggedIn = true;
+  }
+
   return (
     <div className="bg-white shadow-md rounded p-6">
       <h2 className="text-2xl font-bold mb-4">파일 분석 결과</h2>
@@ -112,25 +117,32 @@ function AnalysisResults({
             />
           </div>
           <div className="mt-8 flex justify-end">
-            <button
-              className="inline-flex items-center px-5 py-2 text-base bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
-              onClick={() => alert("PDF 다운로드 기능은 백엔드 연동 후 구현됩니다.")}
-            >
-              <svg
-                className="w-5 h-5 mr-2"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
+            {isLoggedIn ? (
+              <button
+                className="inline-flex items-center px-5 py-2 text-base bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
+                onClick={() => alert("PDF 다운로드 기능은 백엔드 연동 후 구현됩니다.")}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                />
-              </svg>
-              분석 결과 PDF 다운로드 
-            </button>
+                <svg
+                  className="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                  />
+                </svg>
+                분석 결과 PDF 다운로드
+              </button>
+            ) : (
+              <div className="inline-flex items-center px-5 py-2 text-base bg-blue-100 text-blue-400 rounded-lg cursor-not-allowed border border-blue-200 backdrop-blur-sm bg-opacity-70">
+                <FaLock className="w-5 h-5 mr-2 text-blue-300" />
+                로그인 시 PDF 다운로드 가능
+              </div>
+            )}
           </div>
         </div>
       </div>
