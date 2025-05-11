@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { registerUser, loginUser } from '../../api/auth';
 
 /* 로그인/회원가입 폼 통합
 - 로그인 중 계정이 없을 경우, 회원가입 버튼 활성화 -> 바로 회원가입 가능
@@ -21,39 +21,32 @@ function AuthForm({ onAuthSuccess }) {
     const handleSubmit = async e => {
         e.preventDefault();
         try {
-            const res = await axios.post('/auth', form);
-            setMessage(res.data.message);
+            const data = await loginUser(form);
+            setMessage("로그인 성공");
 
-            if (res.data.message.includes("성공")) {
-                // ✅ 로그인 성공 시 토큰 저장
-                // 👉 [주의] 나중에 백엔드가 token 키 이름을 다르게 줄 수도 있음
-                // 예시: res.data.token, res.data.access_token 등
-                if (res.data.token) { 
-                    localStorage.setItem('access_token', res.data.token);
-                }
-                if (onAuthSuccess) onAuthSuccess(res.data);
-                navigate('/');
+            if (data.token) {
+                localStorage.setItem('access_token', data.token);
             }
-        } catch (err) {
-            setMessage(err.response?.data?.detail || '계정이 없거나 찾을 수 없습니다.');
+            if (onAuthSuccess) onAuthSuccess(data);
+            navigate('/');
+        } catch (errMsg) {
+            setMessage(errMsg);
             setIsSignupPrompt(true);
         }
     };
 
     const handleSignup = async () => {
         try {
-            const res = await axios.post('/auth', form);
+            const data = await registerUser(form);
             setMessage("회원가입 성공! 자동 로그인됩니다.");
 
-            // ✅ 회원가입 성공 시 토큰 저장
-            // 👉 [주의] 백엔드 응답 구조에 따라 token 키 확인 필요
-            if (res.data.token) {
-                localStorage.setItem('access_token', res.data.token);
+            if (data.token) {
+                localStorage.setItem('access_token', data.token);
             }
-            if (onAuthSuccess) onAuthSuccess(res.data);
+            if (onAuthSuccess) onAuthSuccess(data);
             navigate('/');
-        } catch (err) {
-            setMessage("회원가입 실패: " + (err.response?.data?.detail || '오류'));
+        } catch (errMsg) {
+            setMessage("회원가입 실패: " + errMsg);
         }
     };
 
