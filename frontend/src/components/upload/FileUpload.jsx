@@ -21,6 +21,15 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
   const { showToast, updateProgress, updateToastStatus } = useToast();
   const [progressMap, setProgressMap] = useState({});
 
+  // ✅ client_uuid 쿠키 생성 및 도메인 명시적으로 설정
+  useEffect(() => {
+    if (!document.cookie.includes("client_uuid")) {
+      const uuid = crypto.randomUUID();
+      document.cookie = `client_uuid=${uuid}; path=/; max-age=86400`;
+      console.log("✅ client_uuid 쿠키 생성됨:", uuid);
+    }
+  }, []);
+
   const isActuallyLoggedIn = () => {
     if (import.meta.env.DEV) {
       return true; // 개발 중 사용자 상태 설정 (파일 업로드 제한 기능에만 영향) -> true / false
@@ -33,8 +42,8 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
   useEffect(() => {
     const fetchRemaining = async () => {
       try {
-        const response = await axios.get("http://13.125.214.199:8000/limit/upload-remaining", {
-          withCredentials: true
+        const response = await axios.get("/api/limit/upload-remaining", {
+          withCredentials: true,
         });
         setRemainingInfo(response.data);
       } catch (err) {
@@ -83,6 +92,7 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
   const updateSession = (newFiles) => {
     const now = Date.now();
     const enhancedFiles = newFiles.map((file) => ({
+      file, // 실제 File 객체 포함
       name: file.name,
       size: file.size,
       status: "pending",
@@ -133,6 +143,8 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
   const handleDragOver = (e) => e.preventDefault();
 
   const handleAnalyzeFile = (index) => {
+    // 쿠키 상태 로그
+    console.log("📦 현재 document.cookie:", document.cookie);
     const updatedFiles = [...fileList];
     const currentStatus = updatedFiles[index].status;
 
@@ -182,12 +194,14 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
         delete newMap[index];
         return newMap;
       });
-      updateToastStatus(index);
 
-      // 🔽 파일 분석 요청
+      // 🔽 파일 분석 요청 (Content-Type은 axios가 자동 설정)
       // 실제 file 객체로 대체 필요
       const formData = new FormData();
-      formData.append("file", new File([], updatedFiles[index].name));
+      const realFile = updatedFiles[index].file instanceof File
+        ? updatedFiles[index].file
+        : new File([], updatedFiles[index].name);
+      formData.append("file", realFile);
       const updateLocalStorageResult = (fileName, result) => {
         const localFiles = JSON.parse(localStorage.getItem("uploadedFiles") || "[]");
         const updatedLocal = localFiles.map(file => {
@@ -200,29 +214,43 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
       };
       try {
         const token = localStorage.getItem("access_token");
-        const headers = {
-          "Content-Type": "multipart/form-data",
-        };
-
-        if (token) {
-          headers["Authorization"] = `Bearer ${token}`;
-        }
-
-        const res = await axios.post("http://13.125.214.199:8000/analyze-full", formData, {
+        const headers = token
+          ? { Authorization: `Bearer ${token}` }
+          : {};
+        console.log([...formData.entries()]); // Debug formData content
+        await axios.post("/api/analyze-full", formData, {
           headers,
           withCredentials: true,
+        })
+        .then(res => {
+          console.log("분석 결과:", res.data);
+          // 응답 결과를 localStorage에도 반영
+          updateLocalStorageResult(updatedFiles[index].name, res.data.result);
+        })
+        .catch(err => {
+          if (err.response) {
+            console.error("파일 분석 요청 실패:", err.response.status, err.response.data);
+          } else {
+            console.error("파일 분석 요청 실패:", err.message);
+          }
+          showToast(`${updatedFiles[index].name} 분석 실패`, "error", index);
         });
-        console.log("분석 결과:", res.data);
-        // 응답 결과를 localStorage에도 반영
-        updateLocalStorageResult(updatedFiles[index].name, res.data.result);
       } catch (err) {
-        console.error("파일 분석 요청 실패:", err);
+        console.error("파일 분석 요청 중 예외 발생:", err);
         showToast(`${updatedFiles[index].name} 분석 실패`, "error", index);
       }
     }, 2000);
 
     analysisTimers.current[index] = { timeoutId, intervalId };
   };
+
+  useEffect(() => {
+    fileList.forEach((file, index) => {
+      if (file.status === 'done') {
+        updateToastStatus(index);
+      }
+    });
+  }, [fileList]);
 
   return (
     <div>

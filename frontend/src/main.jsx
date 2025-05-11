@@ -4,6 +4,12 @@ import './index.css';
 import App from './App.jsx';
 import { ToastProvider } from './context/ToastContext';
 
+// Generate client_uuid cookie if not present
+if (!document.cookie.includes("client_uuid")) {
+  const uuid = crypto.randomUUID?.() || Math.random().toString(36).substring(2, 15);
+  document.cookie = `client_uuid=${uuid}; path=/; max-age=86400`;
+}
+
 if (import.meta.env.DEV) {
   const originalLog = console.log;
   console.log = function (...args) {

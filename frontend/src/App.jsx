@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import LoginPage from './routes/LoginPage';
 import MainLayout from './routes/MainLayout';
@@ -14,9 +14,11 @@ import AnalysisResults from './routes/AnalysisResults';
 import { v4 as uuidv4 } from 'uuid';
 
 function App() {
-  if (!document.cookie.includes("client_uuid")) {
-    document.cookie = `client_uuid=${uuidv4()}; path=/; max-age=86400`;  // 1일 유지
-  }
+  useEffect(() => {
+    if (!document.cookie.includes("client_uuid")) {
+      document.cookie = `client_uuid=${uuidv4()}; path=/; max-age=86400`;  // 1일 유지
+    }
+  }, []);
 
   const isDev = import.meta.env.DEV;
   const [isLoggedIn, setIsLoggedIn] = useState(isDev ? true : checkLoginStatus());
