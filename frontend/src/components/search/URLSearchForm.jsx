@@ -15,7 +15,7 @@ function URLSearchForm({ onSearch }) {
     const maxCount = isLoggedIn() ? Infinity : 10;
 
     if (searchedUrls.length >= maxCount) {
-      alert(`비로그인 사용자는 최대 ${maxCount}개 URL까지만 등록할 수 있습니다.`);
+      alert(`비로그인 사용자는 하루 최대 ${maxCount}개 URL까지만 등록할 수 있습니다.`);
       return;
     }
 

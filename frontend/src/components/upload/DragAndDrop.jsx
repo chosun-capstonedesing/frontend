@@ -4,7 +4,7 @@ import { isLoggedIn } from "../../utils/isLoggedIn";
 /**
  * DragAndDrop 컴포넌트
  * - 드래그 앤 드롭 영역 전용 컴포넌트
- * - 파일 수 제한: 비로그인 사용자는 최대 10개 파일 업로드 가능
+ * - 파일 수 제한: 비로그인 사용자는 하루 최대 3개 파일 업로드 가능
  * - onDrop: 파일이 드롭되었을 때 호출되는 핸들러
  * - onDragOver: 드래그 오버 시 호출되는 핸들러 -> 기본 동작 방지
  * - children: 내부에 표시할 컨텐츠 -> 파일 선택 버튼 등
@@ -19,7 +19,7 @@ function DragAndDrop({ onDrop, onDragOver, children }) {
         const totalCount = uploadedFiles.length + files.length;
 
         if (totalCount > maxCount) {
-            alert(`비로그인 사용자는 최대 ${maxCount}개 파일까지만 업로드할 수 있습니다.`);
+            alert(`비로그인 사용자는 하루 최대 ${maxCount}개 파일까지만 업로드할 수 있습니다.`);
             return false;
         }
 

@@ -35,7 +35,7 @@ function PerformanceSection() {
     }, []);
 
     if (!performance) {
-        return <div className="p-6">로딩 중...</div>;
+        console.log("성능 데이터 없음. 현재 상태:", performance);
     }
 
     const predictionData = {

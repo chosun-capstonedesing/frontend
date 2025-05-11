@@ -118,7 +118,7 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
     const selectedFiles = Array.from(e.target.files);
 
     if (fileList.length + selectedFiles.length > maxCount) {
-      alert(`비로그인 사용자는 최대 ${maxCount}개 파일까지만 업로드할 수 있습니다.`);
+      alert(`비로그인 사용자는 하루 최대 ${maxCount}개 파일까지만 업로드할 수 있습니다.`);
       return;
     }
 
@@ -132,7 +132,7 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
     const droppedFiles = Array.from(e.dataTransfer.files);
 
     if (fileList.length + droppedFiles.length > maxCount) {
-      alert(`비로그인 사용자는 최대 ${maxCount}개 파일까지만 업로드할 수 있습니다.`);
+      alert(`비로그인 사용자는 하루 최대 ${maxCount}개 파일까지만 업로드할 수 있습니다.`);
       return;
     }
 
@@ -222,19 +222,19 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
           headers,
           withCredentials: true,
         })
-        .then(res => {
-          console.log("분석 결과:", res.data);
-          // 응답 결과를 localStorage에도 반영
-          updateLocalStorageResult(updatedFiles[index].name, res.data.result);
-        })
-        .catch(err => {
-          if (err.response) {
-            console.error("파일 분석 요청 실패:", err.response.status, err.response.data);
-          } else {
-            console.error("파일 분석 요청 실패:", err.message);
-          }
-          showToast(`${updatedFiles[index].name} 분석 실패`, "error", index);
-        });
+          .then(res => {
+            console.log("분석 결과:", res.data);
+            // 응답 결과를 localStorage에도 반영
+            updateLocalStorageResult(updatedFiles[index].name, res.data.result);
+          })
+          .catch(err => {
+            if (err.response) {
+              console.error("파일 분석 요청 실패:", err.response.status, err.response.data);
+            } else {
+              console.error("파일 분석 요청 실패:", err.message);
+            }
+            showToast(`${updatedFiles[index].name} 분석 실패`, "error", index);
+          });
       } catch (err) {
         console.error("파일 분석 요청 중 예외 발생:", err);
         showToast(`${updatedFiles[index].name} 분석 실패`, "error", index);
@@ -339,12 +339,11 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
       </div>
 
       {/* ✅ 업로드한 파일 수 표시 */}
-      <div className="mt-6 text-sm text-center text-gray-600">
-        업로드한 파일: {fileList.length}개 / {isActuallyLoggedIn() ? '무제한' : '3개'}
-      </div>
       {remainingInfo && (
         <div className="mt-2 text-sm text-center text-gray-500">
-          남은 업로드 횟수: {remainingInfo.remaining} / {remainingInfo.limit}
+          업로드 파일 수: {isActuallyLoggedIn()
+            ? `${fileList.length} / 제한 없음`
+            : `${remainingInfo.remaining} / ${remainingInfo.limit}`}
         </div>
       )}
     </div>
