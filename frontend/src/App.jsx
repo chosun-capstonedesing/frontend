@@ -11,8 +11,13 @@ import AnalysisPage from './routes/AnalysisPage';
 import { isLoggedIn as checkLoginStatus } from './utils/isLoggedIn';
 import { ToastProvider } from './context/ToastContext';
 import AnalysisResults from './routes/AnalysisResults';
+import { v4 as uuidv4 } from 'uuid';
 
 function App() {
+  if (!document.cookie.includes("client_uuid")) {
+    document.cookie = `client_uuid=${uuidv4()}; path=/; max-age=86400`;  // 1일 유지
+  }
+
   const isDev = import.meta.env.DEV;
   const [isLoggedIn, setIsLoggedIn] = useState(isDev ? true : checkLoginStatus());
 
