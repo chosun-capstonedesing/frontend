@@ -26,11 +26,16 @@ dist-ssr
 .turbo/
 .cache/
 coverage/
+.vercel
+netlify.toml
 
 # Local environment files
 *.local
 .env
 .env.*.local
+.env.local
+.env.development.local
+.env.production.local
 
 # Editor directories and files
 .vscode/*
@@ -53,3 +58,11 @@ yarn.lock
 
 # Local Netlify folder
 .netlify
+
+# Test and debug utilities
+*.test.js
+__tests__/
+__mocks__/
+playwright-report/
+cypress/videos/
+cypress/screenshots/
