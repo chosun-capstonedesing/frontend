@@ -6,11 +6,31 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+debug.log
+test-output.log
 
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
 node_modules
+
+# Build outputs
 dist
 dist-ssr
+.vite
+.next/
+.turbo/
+.cache/
+coverage/
+
+# Local environment files
 *.local
+.env
+.env.*.local
 
 # Editor directories and files
 .vscode/*
@@ -23,13 +43,13 @@ dist-ssr
 *.sln
 *.sw?
 
-# Build outputs
-.vite
+# Database and temp files
+*.sqlite3
+*.bak
+*.tmp
+
 # Lock files
 yarn.lock   
 
 # Local Netlify folder
 .netlify
-
-# .env
-.env
