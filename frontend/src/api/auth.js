@@ -1,6 +1,17 @@
 import axios from 'axios';
 
-const API_BASE = "http://13.125.214.199:8000";
+const formatAxiosError = (error, fallback) => {
+  if (error.response) {
+    const detail = error.response.data?.detail;
+    return detail || fallback;
+  }
+  return "서버에 연결할 수 없습니다";
+};
+
+const API_BASE =
+  window.location.protocol === "https:"
+    ? "https://13.125.214.199:8000"
+    : "http://13.125.214.199:8000";
 
 //회원가입 요청
 export const registerUser = async (userInfo) => {
@@ -11,28 +22,34 @@ export const registerUser = async (userInfo) => {
       }
     });
 
-    return res.data;
+    return {
+      success: true,
+      message: "회원가입이 완료되었습니다.",
+      data: res.data
+    };
   } catch (error) {
-    // 에러 응답 받기
-    if (error.response) {
+    const detail = error.response?.data?.detail;
+    if (/이미 존재|already exists|already registered/i.test(detail)) {
       return {
-        success: false,
-        status: error.response.status,
-        message: error.response.data.detail || "알 수 없는 오류"
-      };
-    } else {
-      return {
-        success: false,
-        message: "서버에 연결할 수 없습니다"
+        success: true,
+        message: "이미 가입된 계정입니다. 로그인해주세요."
       };
     }
+    return {
+      success: false,
+      status: error.response?.status,
+      message: formatAxiosError(error, "회원가입 실패")
+    };
   }
 };
 
 //로그인 요청
 export const loginUser = async (loginInfo) => {
   try {
-    const res = await axios.post(`${API_BASE}/users/login`, loginInfo, {
+    const res = await axios.post(`${API_BASE}/users/login`, {
+      username: loginInfo.username,
+      password: loginInfo.password
+    }, {
       headers: {
         'Content-Type': 'application/json'
       }
@@ -40,8 +57,8 @@ export const loginUser = async (loginInfo) => {
 
     //fake token
     const responseData = {
-        ...res.data, 
-        token: res.data.token || "FAKE_DEV_TOKEN_12345"
+        ...res.data,
+        token: res.data.access_token || "FAKE_DEV_TOKEN_12345"
     };
 
     return {
@@ -49,17 +66,26 @@ export const loginUser = async (loginInfo) => {
       data: responseData
     };
   } catch (error) {
-    if (error.response) {
-      return {
-        success: false,
-        status: error.response.status,
-        message: error.response.data.detail || "로그인 실패"
-      };
+    const status = error.response?.status;
+    const detail = error.response?.data?.detail?.toLowerCase() || "";
+    let message = "로그인 실패";
+
+    if (status === 401) {
+      if (detail.includes("비밀번호")) {
+        message = "비밀번호가 올바르지 않습니다.";
+      } else if (detail.includes("존재하지") || detail.includes("not found")) {
+        message = "존재하지 않는 사용자입니다.";
+      } else {
+        message = "아이디 또는 비밀번호가 일치하지 않습니다.";
+      }
     } else {
-      return {
-        success: false,
-        message: "서버에 연결할 수 없습니다"
-      };
+      message = formatAxiosError(error, "로그인 실패");
     }
+
+    return {
+      success: false,
+      status,
+      message
+    };
   }
 };

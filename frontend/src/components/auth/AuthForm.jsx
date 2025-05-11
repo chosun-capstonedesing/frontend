@@ -21,31 +21,75 @@ function AuthForm({ onAuthSuccess }) {
     const handleSubmit = async e => {
         e.preventDefault();
         try {
-            const data = await loginUser(form);
-            setMessage("로그인 성공");
+            const res = await loginUser(form);
 
-            if (data.token) {
-                localStorage.setItem('access_token', data.token);
+            if (res.success && res.data?.token) {
+                alert("성공적으로 로그인되었습니다.");
+                localStorage.setItem('access_token', res.data.token);
+                if (onAuthSuccess) onAuthSuccess(res.data);
+                navigate('/');
+            } else {
+                alert("아이디나 비밀번호가 올바르지 않습니다.");
+                setIsSignupPrompt(false);
             }
-            if (onAuthSuccess) onAuthSuccess(data);
-            navigate('/');
-        } catch (errMsg) {
-            setMessage(errMsg);
-            setIsSignupPrompt(true);
+        } catch (error) {
+            const detail = error?.response?.data?.detail?.toLowerCase() || "";
+            const status = error?.response?.status;
+            let errMsg = "로그인 실패";
+
+            if (status === 401) {
+                if (detail.includes("비밀번호")) {
+                    errMsg = "비밀번호가 올바르지 않습니다.";
+                } else if (detail.includes("존재하지") || detail.includes("not found")) {
+                    errMsg = "존재하지 않는 사용자입니다.";
+                    setIsSignupPrompt(true);
+                } else {
+                    errMsg = "아이디 또는 비밀번호가 일치하지 않습니다.";
+                }
+
+                alert(errMsg);
+                setMessage("");  // 클리어 메시지
+                return;
+            }
+
+            // fallback for non-401 errors
+            alert(errMsg);
+            setMessage("");
+            setIsSignupPrompt(false);
         }
     };
 
     const handleSignup = async () => {
         try {
-            const data = await registerUser(form);
-            setMessage("회원가입 성공! 자동 로그인됩니다.");
+            const res = await registerUser(form);
 
-            if (data.token) {
-                localStorage.setItem('access_token', data.token);
+            if (res.success) {
+                if (res.message?.includes("이미 가입된")) {
+                    alert("이미 가입된 계정입니다. 로그인해주세요.");
+                    return;
+                }
+
+                alert("회원가입 성공! 자동 로그인됩니다.");
+                const loginRes = await loginUser(form);
+
+                if (loginRes.success && loginRes.data?.token) {
+                    localStorage.setItem('access_token', loginRes.data.token);
+                    if (onAuthSuccess) onAuthSuccess(loginRes.data);
+                    navigate('/');
+                } else {
+                    alert("자동 로그인 실패: 알 수 없는 응답입니다.");
+                }
+            } else {
+                setMessage("회원가입 실패: " + res.message);
             }
-            if (onAuthSuccess) onAuthSuccess(data);
-            navigate('/');
-        } catch (errMsg) {
+        } catch (error) {
+            const errMsg = error?.response?.data?.detail || error?.message || "회원가입 실패";
+
+            if (/이미 존재|already exists|already registered/i.test(errMsg)) {
+                setMessage("이미 존재하는 아이디입니다.");
+                return;
+            }
+
             setMessage("회원가입 실패: " + errMsg);
         }
     };
@@ -76,23 +120,25 @@ function AuthForm({ onAuthSuccess }) {
             </button>
 
             {message && (
-                <p className={`text-sm text-center ${message.includes("계정이 없거나") ? "text-red-500" : "text-gray-700"}`}>
+                <p className={`text-sm text-center ${
+                    /회원가입 실패|로그인 실패|알 수 없는|존재하지 않|비밀번호|invalid/i.test(message)
+                        ? "text-red-500"
+                        : "text-gray-700"
+                }`}>
                     {message}
                 </p>
             )}
 
-            {isSignupPrompt && (
-                <div className="text-sm text-center space-y-2 text-blue-500 animate-[pulse_3s_ease-in-out_infinite]">
-                    <p>회원가입 하시겠습니까?</p>
-
-                    <button
-                        type="button"
-                        onClick={handleSignup}
-                        className="px-6 py-1.5 bg-blue-500 text-white rounded hover:bg-blue-600 font-bold">
-                        Sign Up
-                    </button>
-                </div>
-            )}
+            <div className="text-sm text-center space-y-2 text-blue-500">
+                <p>계정이 없으신가요?</p>
+                <button
+                    type="button"
+                    onClick={handleSignup}
+                    className="px-6 py-1.5 bg-blue-500 text-white rounded hover:bg-blue-600 font-bold"
+                >
+                    Sign Up
+                </button>
+            </div>
         </form>
     );
 }
