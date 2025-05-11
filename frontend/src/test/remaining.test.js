@@ -5,7 +5,7 @@ export async function runRemainingTest() {
 
     try {
         console.log("🍪 현재 document.cookie:", document.cookie);
-        const response = await axios.get("http://13.125.214.199:8000/limit/upload-remaining", {
+        const response = await axios.get("http://13.125.214.199:8000/api/limit/upload-remaining", {
             withCredentials: true,
             headers: {
                 "Content-Type": "application/json"
