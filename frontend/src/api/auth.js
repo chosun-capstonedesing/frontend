@@ -8,10 +8,12 @@ const formatAxiosError = (error, fallback) => {
   return "서버에 연결할 수 없습니다";
 };
 
-const API_BASE =
-  window.location.protocol === "https:"
-    ? "https://13.125.214.199:8000"
-    : "http://13.125.214.199:8000";
+// const API_BASE =
+//   window.location.protocol === "https:"
+//     ? "https://13.125.214.199:8000"
+//     : "http://13.125.214.199:8000";
+
+const API_BASE = '/api';
 
 //회원가입 요청
 export const registerUser = async (userInfo) => {
