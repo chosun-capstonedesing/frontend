@@ -156,7 +156,7 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
           업로드 파일 수:{" "}
           {isActuallyLoggedIn()
             ? `${fileList.length} / 제한 없음`
-            : `${remainingInfo.remaining} / ${remainingInfo.limit}`}
+            : `${fileList.length} / ${remainingInfo.limit}`}
         </div>
       )}
     </div>

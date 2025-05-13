@@ -52,8 +52,12 @@ export function useUploadSession(isActuallyLoggedIn, maxCount) {
   const updateSession = (newFiles) => {
     const now = Date.now();
     const enhancedFiles = newFiles.map((file) => ({
-      ...file,
+      name: file.name || "이름 없는 파일",
+      size: file.size || 0,
+      type: file.type || "",
+      status: "pending",
       uploadedAt: new Date().toLocaleString(),
+      file, // preserve original File object
     }));
 
     const updatedFiles = [...fileList, ...enhancedFiles].slice(0, maxCount);
