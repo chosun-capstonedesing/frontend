@@ -125,7 +125,7 @@ export const ToastProvider = ({ children }) => {
                       <div className="flex items-center space-x-2">
                         <div className="flex-1 bg-gray-200 h-2 rounded-full">
                           <div
-                            className="h-2 bg-yellow-400 rounded-full transition-all duration-1000"
+                            className="h-2 bg-yellow-400 rounded-full transition-all duration-500"
                             style={{ width: `${toast.progress || 0}%` }}
                           />
                         </div>

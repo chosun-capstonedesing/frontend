@@ -218,7 +218,7 @@ export function FileUploadPreviewList({
                       <div className="flex items-center space-x-2">
                         <div className="flex-1 bg-gray-200 h-2 rounded-full">
                           <div
-                            className={`h-2 rounded-full transition-all duration-[2500ms] ease-linear ${barColor}`}
+                            className={`h-1.5 rounded-full transition-all duration-[200ms] ease-linear ${barColor}`}
                             style={{ width: `${progress}%` }}
                           />
                         </div>
