@@ -51,11 +51,18 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
   };
 
   useEffect(() => {
-    fileList.forEach((file, index) => {
-      if (file.status === "done") {
+    const updatedList = fileList.map((file, index) => {
+      if (file.status === "done" && !file.toastUpdated) {
         updateToastStatus(index);
+        return { ...file, toastUpdated: true };
       }
+      return file;
     });
+
+    // Only update state if there was at least one change
+    if (JSON.stringify(updatedList) !== JSON.stringify(fileList)) {
+      setFileList(updatedList);
+    }
   }, [fileList, updateToastStatus]);
 
   return (
