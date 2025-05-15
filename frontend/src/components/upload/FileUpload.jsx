@@ -79,7 +79,7 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
         onAnalyzeFile={handleAnalyzeFileClick}
       />
 
-      <div className="mt-2 text-sm text-center text-gray-500">
+      <div className="mt-3 text-sm text-center text-gray-500">
         업로드 파일 수:{" "}
         {isLoggedIn
           ? `${fileList.length} / 제한 없음`
