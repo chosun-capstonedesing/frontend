@@ -5,8 +5,14 @@ import axios from "axios";
 
 // 로그인 여부 판단 함수
 function isActuallyLoggedIn() {
+  if (import.meta.env.DEV) return true;
   const token = localStorage.getItem("access_token");
   return !!token;
+}
+
+function getCookie(name) {
+  const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
+  return match ? match[2] : null;
 }
 
 // 업로드 제한 관련 커스텀 훅
@@ -15,7 +21,7 @@ export function useUploadLimit() {
 
   // client_uuid 쿠키 생성 (없을 경우)
   useEffect(() => {
-    if (!document.cookie.includes("client_uuid")) {
+    if (!getCookie("client_uuid")) {
       const uuid = crypto.randomUUID();
       document.cookie = `client_uuid=${uuid}; path=/; max-age=86400`;
       console.log("✅ client_uuid 쿠키 생성됨:", uuid);

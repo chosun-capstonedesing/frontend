@@ -1,5 +1,3 @@
-// useUploadSession.js
-
 import { useState, useEffect } from "react";
 
 /**
@@ -27,7 +25,7 @@ export function useUploadSession(isActuallyLoggedIn, maxCount) {
         setFileList(savedFiles.slice(0, maxCount));
       }
     } else {
-      setFileList(savedFiles);
+      setFileList(savedFiles); // 로그인 시 제한 없이 전체 파일 유지
     }
 
     // storage, 커스텀 이벤트로 타 탭 변경사항 반영
@@ -56,11 +54,13 @@ export function useUploadSession(isActuallyLoggedIn, maxCount) {
       size: file.size || 0,
       type: file.type || "",
       status: "pending",
-      uploadedAt: new Date().toLocaleString(),
+      uploadedAt: new Date().toISOString(),
       file, // preserve original File object
     }));
 
-    const updatedFiles = [...fileList, ...enhancedFiles].slice(0, maxCount);
+    const updatedFiles = isActuallyLoggedIn()
+      ? [...fileList, ...enhancedFiles]
+      : [...fileList, ...enhancedFiles].slice(0, maxCount);
 
     sessionStorage.setItem("uploadedFiles", JSON.stringify(updatedFiles));
     sessionStorage.setItem("uploadedCount", String(updatedFiles.length));
@@ -68,9 +68,9 @@ export function useUploadSession(isActuallyLoggedIn, maxCount) {
     setFileList(updatedFiles);
 
     // 로컬스토리지에도 동일하게 반영 (마이페이지 등 다른 탭 반영용)
-    const combinedLocal = JSON.parse(localStorage.getItem("uploadedFiles") || "[]")
-      .concat(enhancedFiles)
-      .slice(0, maxCount);
+    const combinedLocal = isActuallyLoggedIn()
+      ? [...JSON.parse(localStorage.getItem("uploadedFiles") || "[]"), ...enhancedFiles]
+      : [...JSON.parse(localStorage.getItem("uploadedFiles") || "[]"), ...enhancedFiles].slice(0, maxCount);
     localStorage.setItem("uploadedFiles", JSON.stringify(combinedLocal));
   };
 
