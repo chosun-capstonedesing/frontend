@@ -1,6 +1,6 @@
-// handleAnalyzeFile.js
-
 import axios from "axios";
+
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 export async function handleAnalyzeFile(
   index,
@@ -86,12 +86,13 @@ export async function handleAnalyzeFile(
 
     try {
       const token = localStorage.getItem("access_token");
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      console.log([...formData.entries()]); // 디버깅용
 
-      const res = await axios.post("/api/analyze-full", formData, {
-        headers,
-        withCredentials: true,
+      const res = await axios.post(`${API_BASE}/analyze-full`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          ...(token && { 'Authorization': `Bearer ${token}` })  // 로그인 시 토큰 자동 포함
+        },
+        withCredentials: true  // client_uuid 쿠키 포함
       });
 
       console.log("분석 결과:", res.data);
