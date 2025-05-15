@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 
@@ -40,13 +40,36 @@ export const ToastProvider = ({ children }) => {
     );
   };
 
+  // ✅ cancelToastStatus: 분석 중 상태를 즉시 "cancelled"로 바꿔줌
+  const cancelToastStatus = (fileIndex) => {
+    setToasts(prev =>
+      prev.map(t =>
+        t.fileIndex === fileIndex && t.status === "processing"
+          ? { ...t, status: "cancelled" }
+          : t
+      )
+    );
+  };
+
   // ✅ removeToast: 사용자가 수동으로 알림을 제거할 때 사용
   const removeToast = (id) => {
     setToasts(prev => prev.filter(t => t.id !== id));
   };
 
+  // ✅ Listen for custom cancelAnalysis event to sync cancel from file list
+  useEffect(() => {
+    const handleCancelAnalysis = (e) => {
+      const { fileIndex } = e.detail;
+      cancelToastStatus(fileIndex);
+    };
+    window.addEventListener("cancelAnalysis", handleCancelAnalysis);
+    return () => {
+      window.removeEventListener("cancelAnalysis", handleCancelAnalysis);
+    };
+  }, []);
+
   return (
-    <ToastContext.Provider value={{ showToast, updateProgress, updateToastStatus }}>
+    <ToastContext.Provider value={{ showToast, updateProgress, updateToastStatus, cancelToastStatus }}>
       {children}
       {/* ✅ createPortal: 알림을 최상위 DOM(body)에 렌더링 */}
       {createPortal(
@@ -56,7 +79,11 @@ export const ToastProvider = ({ children }) => {
             <div
               key={toast.id}
               className={`relative w-72 bg-white shadow-md rounded-md p-3 
-                ${toast.status === 'done' ? 'border border-green-200' : 'border border-yellow-300'}`}
+                ${toast.status === 'done' 
+                  ? 'border border-green-200' 
+                  : toast.status === 'cancelled' 
+                  ? 'border border-red-200' 
+                  : 'border border-yellow-300'}`}
             >
               {/* ✅ 닫기 버튼: 알림 수동 제거용 */}
               <button
@@ -70,10 +97,12 @@ export const ToastProvider = ({ children }) => {
               </button>
 
               <div className="flex items-center space-x-2">
-                {/* ✅ 아이콘 표시: 완료이면 체크, 진행 중이면 시계 아이콘 */}
-                <div className={`${toast.status === 'done' ? 'bg-green-100' : 'bg-yellow-100'} p-1.5 rounded-full`}>
+                {/* ✅ 아이콘 표시: 완료, 중지, 진행 중 상태에 따른 아이콘 및 배경 색상 */}
+                <div className={`${toast.status === 'done' ? 'bg-green-100' : toast.status === 'cancelled' ? 'bg-red-100' : 'bg-yellow-100'} p-1.5 rounded-full`}>
                   {toast.status === "done" ? (
                     <CheckCircleIcon className="h-5 w-5 text-green-500" />
+                  ) : toast.status === "cancelled" ? (
+                    <ClockIcon className="h-5 w-5 text-red-500 rotate-45" />
                   ) : (
                     <ClockIcon className="h-5 w-5 text-yellow-500" />
                   )}
@@ -81,7 +110,11 @@ export const ToastProvider = ({ children }) => {
 
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-gray-800">
-                    {toast.status === "done" ? "분석 완료" : "분석 중"}
+                    {toast.status === "done"
+                      ? "분석 완료"
+                      : toast.status === "cancelled"
+                      ? "분석 중지됨"
+                      : "분석 중"}
                   </p>
 
                   <div className="text-xs text-gray-600">{toast.message}</div>
@@ -92,11 +125,21 @@ export const ToastProvider = ({ children }) => {
                       <div className="flex items-center space-x-2">
                         <div className="flex-1 bg-gray-200 h-2 rounded-full">
                           <div
-                            className="h-2 bg-yellow-400 rounded-full transition-all duration-200"
+                            className="h-2 bg-yellow-400 rounded-full transition-all duration-1000"
                             style={{ width: `${toast.progress || 0}%` }}
                           />
                         </div>
                         <div className="text-xs text-gray-500">{toast.progress || 0}%</div>
+                      </div>
+                      
+                      {/* ✅ 분석 중 상태일 때: 중지 버튼 표시 */}
+                      <div className="flex justify-end mt-2">
+                        <button
+                          onClick={() => cancelToastStatus(toast.fileIndex)}
+                          className="text-xs text-red-500 font-medium hover:underline"
+                        >
+                          분석 중지
+                        </button>
                       </div>
                     </div>
                   )}

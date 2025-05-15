@@ -1,4 +1,5 @@
 import React from "react";
+import { useParams } from "react-router-dom";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -28,6 +29,8 @@ function AnalysisResults({
   maliciousProbability,
   recommendation
 }) {
+  const { id } = useParams();
+  console.log("분석 결과 페이지 - 파일 ID:", id);
 
   const defaultMaliciousProbability = maliciousProbability ?? 65; // 예: 기본값 65%
 

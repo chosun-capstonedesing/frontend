@@ -5,15 +5,31 @@ import { useUploadLimit } from "./useUploadLimit";
 import { useUploadSession } from "./useUploadSession";
 import { handleAnalyzeFile } from "./handleAnalyzeFile";
 
+// ✅ 파일 업로드 및 분석을 담당하는 최상위 컴포넌트
 function FileUpload({ onFileSelect, onUploadProgress }) {
+  // 파일 input 요소에 접근하기 위한 ref (드래그앤드롭/파일선택 트리거용)
   const fileInputRef = useRef();
+
+  // 토스트 알림 관련 함수 및 상태 제공 (알림 표시, 진행률 갱신 등)
   const { showToast, updateProgress, updateToastStatus } = useToast();
+
+  // 업로드 제한(최대 개수), 남은 업로드 정보, 로그인 여부 제공
   const { maxCount, remainingInfo, isActuallyLoggedIn } = useUploadLimit();
+
+  // 업로드된 파일 리스트 및 세션 관리 (로그인 여부 및 제한 적용)
   const [fileList, setFileList, updateSession] = useUploadSession(isActuallyLoggedIn, maxCount);
+
+  // 각 파일별 업로드/분석 진행률 저장 객체
   const [progressMap, setProgressMap] = useState({});
 
+  // 로그인 여부 확인(개발 환경에선 항상 true)
   const isLoggedIn = import.meta.env.DEV ? true : isActuallyLoggedIn();
 
+  // ---------------------------
+  // 파일 선택(input) 시 처리 함수
+  // - 업로드 제한 초과 시 경고
+  // - 선택 파일 세션에 추가 및 콜백 호출
+  // ---------------------------
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     if (!isLoggedIn && fileList.length + selectedFiles.length > maxCount) {
@@ -24,6 +40,11 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
     onFileSelect?.(selectedFiles);
   };
 
+  // ---------------------------
+  // 파일 드롭(Drag & Drop) 시 처리 함수
+  // - 업로드 제한 초과 시 경고
+  // - 드롭 파일 세션에 추가 및 콜백 호출
+  // ---------------------------
   const handleDrop = (e) => {
     e.preventDefault();
     const droppedFiles = Array.from(e.dataTransfer.files);
@@ -35,8 +56,16 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
     onFileSelect?.(droppedFiles);
   };
 
+  // ---------------------------
+  // 드래그 오버 시 기본 동작 방지 (드롭 가능하게)
+  // ---------------------------
   const handleDragOver = (e) => e.preventDefault();
 
+  // ---------------------------
+  // 파일 분석 버튼 클릭 시 분석 실행 트리거
+  // - handleAnalyzeFile 유틸 호출
+  // - 진행률, 토스트, 결과 등 상태 갱신
+  // ---------------------------
   const handleAnalyzeFileClick = (index) => {
     handleAnalyzeFile(
       index,
@@ -50,6 +79,10 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
     );
   };
 
+  // ---------------------------
+  // 분석 완료된 파일의 토스트 상태 갱신
+  // - fileList의 각 파일 상태를 확인하고, 완료 시 토스트 업데이트
+  // ---------------------------
   useEffect(() => {
     const updatedList = fileList.map((file, index) => {
       if (file.status === "done" && !file.toastUpdated) {
@@ -59,14 +92,21 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
       return file;
     });
 
-    // Only update state if there was at least one change
+    // 변경사항이 있을 때만 fileList 상태 갱신
     if (JSON.stringify(updatedList) !== JSON.stringify(fileList)) {
       setFileList(updatedList);
     }
   }, [fileList, updateToastStatus]);
 
+  // ===============================
+  // UI 렌더링
+  // - 파일 선택/드래그앤드롭 영역
+  // - 파일 목록 및 분석 버튼/진행률
+  // - 업로드 개수 안내
+  // ===============================
   return (
     <div>
+      {/* 파일 선택 및 드래그앤드롭 영역 */}
       <FileUploadView
         fileList={fileList}
         fileinputRef={fileInputRef}
@@ -77,6 +117,7 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
         multiple
       />
 
+      {/* 업로드된 파일 목록(미리보기), 분석 버튼, 진행률 표시 */}
       <FileUploadPreviewList
         fileList={fileList}
         setFileList={setFileList}
@@ -86,6 +127,7 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
         onAnalyzeFile={handleAnalyzeFileClick}
       />
 
+      {/* 업로드 카운트 및 제한 안내 */}
       <div className="mt-3 text-sm text-center text-gray-500">
         업로드 파일 수:{" "}
         {isLoggedIn

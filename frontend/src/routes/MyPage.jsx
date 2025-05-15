@@ -118,7 +118,7 @@ export default function MyPage() {
             key={file.id}
             className="group relative p-4 flex flex-col hover:bg-gray-50 transition-colors duration-200 rounded-md cursor-default"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
               <div className="flex items-center space-x-3">
                 <button
                   onClick={() => handleDelete(file.id)}
@@ -142,7 +142,7 @@ export default function MyPage() {
                     </svg>
                   </span>
                 </div>
-                <div className="max-w-[180px]">
+                <div className="max-w-[180px] md:max-w-[240px] lg:max-w-[320px]">
                   <p className="text-sm font-medium text-gray-900 break-all whitespace-normal">{file.name}</p>
                   <p className="text-sm text-gray-500">
                     {(() => {
@@ -152,16 +152,23 @@ export default function MyPage() {
                   </p>
                 </div>
               </div>
-              <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-4 min-w-[180px]">
-                <span className={`text-sm font-semibold rounded-full px-3 py-1 ${file.result === '정상'
+              <div className="flex flex-wrap items-center justify-start sm:justify-end gap-2 sm:gap-4 min-w-[180px]">
+                <span className={`text-sm font-semibold rounded-full px-2 py-1 whitespace-nowrap text-center ${
+                  file.result === '정상'
                     ? 'bg-green-100 text-green-700'
                     : file.result === '악성'
                       ? 'bg-red-100 text-red-700'
                       : file.result === '분석중'
                         ? 'bg-orange-100 text-orange-700'
                         : 'bg-gray-100 text-gray-700'
-                  }`}>
-                  {file.result}
+                }`}>
+                  {file.result === '정상'
+                    ? '정상'
+                    : file.result === '악성'
+                      ? '악성'
+                      : file.result === '분석중'
+                        ? '분석중'
+                        : '정보 없음'}
                 </span>
                 <button
                   onClick={() => setFileList(prev =>
