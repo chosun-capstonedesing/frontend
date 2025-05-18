@@ -117,7 +117,7 @@ export const ToastProvider = ({ children }) => {
                       : "분석 중"}
                   </p>
 
-                  <div className="text-xs text-gray-600">{toast.message}</div>
+                  <div className="text-xs text-gray-600 break-all whitespace-pre-wrap max-w-full">{toast.message}</div>
 
                   {/* ✅ 분석 중일 때: 프로그래스 바 표시 */}
                   {toast.status === "processing" && (
@@ -146,7 +146,14 @@ export const ToastProvider = ({ children }) => {
 
                   {/* ✅ 분석 완료일 때: 결과 보기 링크 표시 */}
                   {toast.status === "done" && (
-                    <p className="text-xs text-green-600 mt-1 font-medium cursor-pointer hover:underline">
+                    <p
+                      onClick={() => {
+                        if (toast.fileIndex !== null) {
+                          window.location.href = `/analysis_results?id=${toast.fileIndex}`;
+                        }
+                      }}
+                      className="text-xs text-green-600 mt-1 font-medium cursor-pointer hover:underline"
+                    >
                       결과 보기 →
                     </p>
                   )}

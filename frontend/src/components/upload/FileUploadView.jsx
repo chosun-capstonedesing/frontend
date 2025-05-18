@@ -146,7 +146,9 @@ export function FileUploadPreviewList({
 
               {/* 파일 이름과 업로드 날짜, 크기 표시 */}
               <div className="flex-1">
-                <p className="text-lg font-semibold text-black">{file.name}</p>
+                <p className="text-lg font-semibold text-black break-all whitespace-pre-wrap max-w-full">
+                  {file.name}
+                </p>
                 <p className="text-xs text-gray-500">
                   {file.uploadedAt || new Date().toLocaleDateString()} ·{" "}
                   {(file.size / 1024).toFixed(2)} KB
