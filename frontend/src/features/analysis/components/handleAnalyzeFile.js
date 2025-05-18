@@ -48,6 +48,15 @@ export async function handleAnalyzeFile(
   }
 
   // --- 분석 시작 처리 ---
+  // Prevent re-triggering analysis if result already exists
+  const storedFiles = JSON.parse(localStorage.getItem("uploadedFiles") || "[]");
+  const storedFile = storedFiles.find((f) => f.name === updatedFiles[index].name);
+  if (storedFile && storedFile.result) {
+    updatedFiles[index].status = "done";
+    setFileList(updatedFiles);
+    return; // 이미 완료된 분석은 다시 요청하지 않음
+  }
+
   // 상태를 'processing'으로 변경하여 분석 중임 표시
   updatedFiles[index].status = "processing";
   setFileList(updatedFiles);

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { BrowserQRCodeReader } from "@zxing/browser";
-import { isLoggedIn } from "../../utils/isLoggedIn";
+import { isLoggedIn } from "../../../utils/isLoggedIn";
 
 function QRUploader({ onDecode }) {
   const [qrFiles, setQrFiles] = useState([]);

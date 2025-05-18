@@ -1,7 +1,7 @@
 import React from 'react';
-import FileUpload from '../components/upload/FileUpload';
-import QRSearchBlock from '../components/search/QRSearchBlock';
-import GlobalStats from '../components/layout/GlobalStats';
+import FileUpload from '../components/FileUpload';
+import QRSearchBlock from '../../search/components/QRSearchBlock';
+import GlobalStats from '../../../components/layout/GlobalStats';
 
 export default function AnalysisPage({ uploadedFile, handleFileSelect }) {
   return (

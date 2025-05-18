@@ -31,10 +31,12 @@ export function useUploadSession(isActuallyLoggedIn, maxCount) {
     // storage, 커스텀 이벤트로 타 탭 변경사항 반영
     const syncFromLocalStorage = () => {
       const files = JSON.parse(localStorage.getItem("uploadedFiles") || "[]");
+      const uploadedTime = parseInt(localStorage.getItem("uploadedTime") || String(Date.now()), 10);
       const trimmed = files.slice(0, maxCount);
       setFileList(trimmed);
       sessionStorage.setItem("uploadedFiles", JSON.stringify(trimmed));
       sessionStorage.setItem("uploadedCount", String(trimmed.length));
+      sessionStorage.setItem("uploadedTime", String(uploadedTime));
     };
 
     window.addEventListener("storage", syncFromLocalStorage);

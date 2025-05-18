@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import FileUploadView, { FileUploadPreviewList } from "./FileUploadView";
-import { useToast } from "../../context/ToastContext";
-import { useUploadLimit } from "./useUploadLimit";
-import { useUploadSession } from "./useUploadSession";
+import { useToast } from "../../../context/ToastContext";
+import { useUploadLimit } from "../components/useUploadLimit";
+import { useUploadSession } from "../components/useUploadSession";
 import { handleAnalyzeFile } from "./handleAnalyzeFile";
 
 // ✅ 파일 업로드 및 분석을 담당하는 최상위 컴포넌트

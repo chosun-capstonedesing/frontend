@@ -3,7 +3,7 @@ import DragAndDrop from "./DragAndDrop";
 import FileInput from "./FileInput";
 import ProgressBar from "./ProgressBar";
 import { useNavigate } from "react-router-dom";
-import { getProgressBarInfo } from "../upload/handleAnalyzeFile";
+import { getProgressBarInfo } from "./handleAnalyzeFile";
 
 // 파일 업로드 뷰 컴포넌트 - 드래그앤드롭과 업로드 프로그레스바 포함
 function FileUploadView({

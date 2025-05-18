@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { isLoggedIn } from "../../utils/isLoggedIn";
+import { isLoggedIn } from "../../../utils/isLoggedIn";
 
 /**
  * DragAndDrop 컴포넌트

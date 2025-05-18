@@ -1,5 +1,5 @@
 import React from "react";
-import { isLoggedIn } from "../../utils/isLoggedIn";
+import { isLoggedIn } from "../../../utils/isLoggedIn";
 
 /** 
  * FileInput 컴포넌트 역할

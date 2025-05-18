@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import AuthForm from '../components/auth/AuthForm';
+import AuthForm from '../../auth/components/AuthForm';
 import { FaHome } from 'react-icons/fa';
 
 export default function LoginPage({ onLoginSuccess }) {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Bar } from "react-chartjs-2";
 import {
@@ -34,14 +34,47 @@ function AnalysisResults({
   const { id } = useParams();
   console.log("분석 결과 페이지 - 파일 ID:", id);
 
-  const defaultMaliciousProbability = maliciousProbability ?? 65; // 예: 기본값 65%
+  const [fileData, setFileData] = useState(null);
+
+  useEffect(() => {
+    const savedResults = localStorage.getItem("analysis_results");
+    if (savedResults) {
+      const parsed = JSON.parse(savedResults);
+      if (parsed && id && parsed[id]) {
+        setFileData(parsed[id]);
+      }
+    }
+  }, [id]);
+
+  const fileName = name ?? fileData?.name ?? 'N/A';
+  const fileSize = size ?? fileData?.size ?? 'N/A';
+  const fileExtension = extension ?? fileData?.extension ?? 'N/A';
+  const resultLabel = result ?? fileData?.result ?? 'N/A';
+  const confidenceValue = confidence ?? fileData?.confidence ?? 'N/A';
+  const sha256 = hash ?? fileData?.hash ?? 'N/A';
+  const startTime = analysisStartTime ?? fileData?.analysisStartTime ?? 'N/A';
+  const modelLoad = modelLoadingTime ?? fileData?.modelLoadingTime ?? 'N/A';
+  const preprocess = preprocessingTime ?? fileData?.preprocessingTime ?? 'N/A';
+  const inference = inferenceTime ?? fileData?.inferenceTime ?? 'N/A';
+  const probability = maliciousProbability ?? fileData?.maliciousProbability ?? 'N/A';
+  const modelType = modelInfo?.type ?? fileData?.modelInfo?.type ?? 'N/A';
+  const modelInput = modelInfo?.input ?? fileData?.modelInfo?.input ?? 'N/A';
+
+  const defaultMaliciousProbability = probability !== 'N/A' ? probability : 65; // 예: 기본값 65%
 
   const barData = {
     labels: ["정상 확률", "악성 확률"],
     datasets: [
       {
         label: "탐지 확률 (%)",
-        data: [100 - defaultMaliciousProbability, defaultMaliciousProbability],
+        data: [
+          defaultMaliciousProbability !== 'N/A'
+            ? 100 - defaultMaliciousProbability
+            : 0,
+          defaultMaliciousProbability !== 'N/A'
+            ? defaultMaliciousProbability
+            : 0
+        ],
         backgroundColor: ["#4ade80", "#f87171"], // green and red
         borderRadius: 5,
       },
@@ -77,22 +110,23 @@ function AnalysisResults({
       <div className="flex flex-col md:grid md:grid-cols-[1fr_1.2fr] gap-4 mt-4">
         <div>
           <div className="mt-4">
-            <p className="text-base"><strong>파일 이름:</strong> {name ?? 'N/A'}</p>
-            <p className="text-base"><strong>파일 크기:</strong> {size != null ? size.toLocaleString() : 'N/A'} MB</p>
-            <p className="text-base"><strong>확장자:</strong> {extension ?? 'N/A'}</p>
-            <p className="text-base"><strong>탐지 결과:</strong> {result ?? 'N/A'}</p>
-            <p className="text-base"><strong>신뢰도:</strong> {confidence ?? 'N/A'}%</p>
+            <p className="text-base"><strong>분석 ID:</strong> {id ?? 'N/A'}</p>
+            <p className="text-base"><strong>파일 이름:</strong> {fileName}</p>
+            <p className="text-base"><strong>파일 크기:</strong> {fileSize !== 'N/A' ? (typeof fileSize === 'number' ? fileSize.toLocaleString() : fileSize) : 'N/A'} MB</p>
+            <p className="text-base"><strong>확장자:</strong> {fileExtension}</p>
+            <p className="text-base"><strong>탐지 결과:</strong> {resultLabel}</p>
+            <p className="text-base"><strong>신뢰도:</strong> {confidenceValue}{confidenceValue !== 'N/A' ? '%' : ''}</p>
           </div>
           {isLoggedIn && (
             <div className="space-y-2 border-t pt-4">
-              <p className="text-base"><strong>SHA-256 해시:</strong> {hash ?? 'N/A'}</p>
-              <p className="text-base"><strong>분석 시작 시간:</strong> {analysisStartTime ?? 'N/A'}</p>
-              <p className="text-base"><strong>모델 로딩 시간:</strong> {modelLoadingTime ?? 'N/A'}</p>
-              <p className="text-base"><strong>전처리 시간:</strong> {preprocessingTime ?? 'N/A'}</p>
-              <p className="text-base"><strong>추론 시간:</strong> {inferenceTime ?? 'N/A'}</p>
-              <p className="text-base"><strong>악성 확률:</strong> {maliciousProbability ?? 'N/A'}%</p>
-              <p className="text-base"><strong>모델 종류:</strong> {modelInfo?.type ?? 'N/A'}</p>
-              <p className="text-base"><strong>입력 정보:</strong> {modelInfo?.input ?? 'N/A'}</p>
+              <p className="text-base"><strong>SHA-256 해시:</strong> {sha256}</p>
+              <p className="text-base"><strong>분석 시작 시간:</strong> {startTime}</p>
+              <p className="text-base"><strong>모델 로딩 시간:</strong> {modelLoad}</p>
+              <p className="text-base"><strong>전처리 시간:</strong> {preprocess}</p>
+              <p className="text-base"><strong>추론 시간:</strong> {inference}</p>
+              <p className="text-base"><strong>악성 확률:</strong> {probability}{probability !== 'N/A' ? '%' : ''}</p>
+              <p className="text-base"><strong>모델 종류:</strong> {modelType}</p>
+              <p className="text-base"><strong>입력 정보:</strong> {modelInput}</p>
             </div>
           )}
         </div>
@@ -104,7 +138,10 @@ function AnalysisResults({
                 datasets: [
                   {
                     label: "탐지 확률 (%)",
-                    data: maliciousProbability != null ? [100 - maliciousProbability, maliciousProbability] : [0, 0],
+                    data:
+                      probability !== 'N/A'
+                        ? [100 - probability, probability]
+                        : [0, 0],
                     backgroundColor: ["#4ade80", "#f87171"],
                     borderRadius: 5,
                   },

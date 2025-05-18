@@ -2,18 +2,8 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
-
-// 로그인 여부 판단 함수
-function isActuallyLoggedIn() {
-  if (import.meta.env.DEV) return true;
-  const token = localStorage.getItem("access_token");
-  return !!token;
-}
-
-function getCookie(name) {
-  const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
-  return match ? match[2] : null;
-}
+import isActuallyLoggedIn from "../../../utils/isLoggedIn";
+import { getCookie } from "../../../utils/getCookie";
 
 // 업로드 제한 관련 커스텀 훅
 export function useUploadLimit() {
@@ -22,7 +12,7 @@ export function useUploadLimit() {
   // client_uuid 쿠키 생성 (없을 경우)
   useEffect(() => {
     if (!getCookie("client_uuid")) {
-      const uuid = crypto.randomUUID();
+      const uuid = crypto.randomUUID?.() || Math.random().toString(36).substring(2, 15);
       document.cookie = `client_uuid=${uuid}; path=/; max-age=86400`;
       console.log("✅ client_uuid 쿠키 생성됨:", uuid);
     }
@@ -45,10 +35,12 @@ export function useUploadLimit() {
 
   // 업로드 제한 수 설정
   const maxCount = isActuallyLoggedIn() ? Infinity : 3;
+  const remainingCount = remainingInfo?.remaining ?? maxCount;
 
   return {
     maxCount,
     remainingInfo,
-    isActuallyLoggedIn,
+    remainingCount,
+    isActuallyLoggedIn: isActuallyLoggedIn,
   };
 }

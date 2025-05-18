@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import LoginPage from './routes/LoginPage';
+import LoginPage from './features/auth/pages/LoginPage';
 import MainLayout from './routes/MainLayout';
-import LogoutButton from './components/auth/LogoutButton';
-import MyPage from './routes/MyPage';
-import MyPageDetail from './routes/MyPageDetail';
-import GuideSection from './routes/GuideSection';
-import PerformanceSection from './routes/PerformanceSection';
-import AnalysisPage from './routes/AnalysisPage';
+import LogoutButton from './features/auth/components/LogoutButton';
+import MyPage from './features/mypage/pages/MyPage';
+import MyPageDetail from './features/mypage/pages/MyPageDetail';
+import GuideSection from './features/guide/pages/GuideSection';
+import PerformanceSection from './features/performance/pages/PerformanceSection';
+import AnalysisPage from './features/analysis/pages/AnalysisPage';
 import { isLoggedIn as checkLoginStatus } from './utils/isLoggedIn';
 import { ToastProvider } from './context/ToastContext';
-import AnalysisResults from './routes/AnalysisResults';
+import AnalysisResults from './features/analysis/pages/AnalysisResults';
 import { v4 as uuidv4 } from 'uuid';
 
 function App() {

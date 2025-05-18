@@ -66,3 +66,8 @@ __mocks__/
 playwright-report/
 cypress/videos/
 cypress/screenshots/
+
+# Scripts and VSCode settings (excluded from Git)
+restructure.sh
+setup-vscode-settings.sh
+frontend/.vscode/settings.json

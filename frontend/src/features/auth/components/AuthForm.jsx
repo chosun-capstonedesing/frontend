@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { registerUser, loginUser } from '../../api/auth';
+import { registerUser, loginUser } from '../../../api/auth';
 
 /* 로그인/회원가입 폼 통합
 - 로그인 중 계정이 없을 경우, 회원가입 버튼 활성화 -> 바로 회원가입 가능
