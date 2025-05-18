@@ -27,7 +27,9 @@ function AnalysisResults({
   preprocessingTime,
   inferenceTime,
   maliciousProbability,
-  recommendation
+  recommendation,
+  performance = {},
+  modelInfo = {}
 }) {
   const { id } = useParams();
   console.log("분석 결과 페이지 - 파일 ID:", id);
@@ -89,14 +91,8 @@ function AnalysisResults({
               <p className="text-base"><strong>전처리 시간:</strong> {preprocessingTime ?? 'N/A'}</p>
               <p className="text-base"><strong>추론 시간:</strong> {inferenceTime ?? 'N/A'}</p>
               <p className="text-base"><strong>악성 확률:</strong> {maliciousProbability ?? 'N/A'}%</p>
-              <div>
-                <strong>권장 조치:</strong>
-                <ul className="list-disc list-inside ml-4 mt-1 text-base text-gray-700 dark:text-gray-300">
-                  {(recommendation ?? []).map((action, index) => (
-                    <li key={index}>{action}</li>
-                  ))}
-                </ul>
-              </div>
+              <p className="text-base"><strong>모델 종류:</strong> {modelInfo?.type ?? 'N/A'}</p>
+              <p className="text-base"><strong>입력 정보:</strong> {modelInfo?.input ?? 'N/A'}</p>
             </div>
           )}
         </div>

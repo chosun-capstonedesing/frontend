@@ -79,6 +79,11 @@ function PerformanceSection() {
                 <h3 className="text-xl font-semibold mb-2">성능 지표</h3>
                 <ul className="list-disc list-inside text-base leading-relaxed">
                     <li>정확도: {performance?.overallAccuracy ?? 'N/A'}%</li>
+                    <li>정밀도 (Precision): {performance?.precision ?? 'N/A'}%</li>
+                    <li>재현율 (Recall): {performance?.recall ?? 'N/A'}%</li>
+                    <li>F1-score: {performance?.f1Score ?? 'N/A'}%</li>
+                    <li>정상 탐지 정확도: {performance?.benignAccuracy ?? 'N/A'}%</li>
+                    <li>악성 탐지 정확도: {performance?.malwareAccuracy ?? 'N/A'}%</li>
                     <li>처리 속도: {performance?.processingTime ?? 'N/A'}초</li>
                     <li>리포트 생성 시간: {performance?.reportGenerationTime ?? 'N/A'}초</li>
                 </ul>
