@@ -61,9 +61,9 @@ function AnalysisResults({
   const preprocess = fileData?.log?.preprocess ?? preprocessingTime ?? 'N/A';
   const inference = fileData?.log?.inference ?? inferenceTime ?? 'N/A';
   const sha256 = fileData?.sha256 ?? hash ?? 'N/A';
-  const probability = fileData?.maliciousProbability ?? maliciousProbability ?? 'N/A';
-  const modelType = fileData?.modelInfo?.type ?? modelInfo?.type ?? 'N/A';
-  const modelInput = fileData?.modelInfo?.input ?? modelInfo?.input ?? 'N/A';
+  const probability = fileData?.malicious ?? maliciousProbability ?? 'N/A';
+  const modelType = fileData?.model_info?.type ?? modelInfo?.type ?? 'N/A';
+  const modelInput = fileData?.model_info?.input ?? modelInfo?.input ?? 'N/A';
 
   const finalProbability = probability !== 'N/A' ? probability :
                            fileData?.maliciousProbability ?? 'N/A';
