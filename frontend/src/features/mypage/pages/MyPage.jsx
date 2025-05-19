@@ -14,41 +14,48 @@ export default function MyPage() {
   useEffect(() => {
     const savedFiles = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
     const merged = savedFiles.map((file, i) => ({
-      id: file.id || `${file.name}-${file.date || i}`,
+      analysis_id: file.analysis_id || `${file.name}-${file.date || i}`,
       result: file.result || '분석중',
       ...file,
     }));
     setFileList(merged);
   }, []);
 
-  const filteredFiles = fileList.filter(file => {
-    if (activeTab === '전체') return true;
-    return file.result === activeTab;
-  });
-
-  const sortedFiles = [...filteredFiles].sort((a, b) => {
-    const dateA = new Date(a.date);
-    const dateB = new Date(b.date);
-    return sortOption === '최신순' ? dateB - dateA : dateA - dateB;
-  });
-
-  const visibleFiles = sortedFiles.filter(file =>
-    file.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const visibleFiles = [...fileList]
+    .filter(file => {
+      if (activeTab === '전체') return true;
+      return file.result === activeTab;
+    })
+    .filter(file => file.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .sort((a, b) => {
+      const dateA = new Date(a.uploadedAt || a.date || 0);
+      const dateB = new Date(b.uploadedAt || b.date || 0);
+      if (isNaN(dateA) || isNaN(dateB)) return 0;
+      return sortOption === '최신순' ? dateB - dateA : dateA - dateB;
+    });
 
   const pageCount = Math.ceil(visibleFiles.length / itemsPerPage);
   const handlePageClick = ({ selected }) => {
     setCurrentPage(selected);
   };
 
-  const paginatedFiles = visibleFiles.slice(
-    currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
-  );
+  const sortedAndPaginatedFiles = [...fileList]
+    .filter(file => {
+      if (activeTab === '전체') return true;
+      return file.result === activeTab;
+    })
+    .filter(file => file.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .sort((a, b) => {
+      const dateA = new Date(a.uploadedAt || a.date || 0);
+      const dateB = new Date(b.uploadedAt || b.date || 0);
+      if (isNaN(dateA) || isNaN(dateB)) return 0;
+      return sortOption === '최신순' ? dateB - dateA : dateA - dateB;
+    })
+    .slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
 
   // 파일 삭제 핸들러
   const handleDelete = (id) => {
-    const updated = fileList.filter(file => file.id !== id);
+    const updated = fileList.filter(file => file.analysis_id !== id);
     setFileList(updated);
     localStorage.setItem('uploadedFiles', JSON.stringify(updated));
     sessionStorage.setItem('uploadedFiles', JSON.stringify(updated));
@@ -56,8 +63,8 @@ export default function MyPage() {
     window.dispatchEvent(new Event("fileListUpdated")); // Notify other components in same tab
   };
 
-return (
-  <div className="bg-white min-h-screen py-8 px-8 rounded-x">
+  return (
+    <div className="bg-white min-h-screen py-8 px-8 rounded-x">
       <h2 className="text-3xl font-bold mb-4">내 업로드 내역</h2>
 
       {/* 탭 메뉴 및 검색바 */}
@@ -67,11 +74,10 @@ return (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`pb-2 text-sm font-medium border-b-2 ${
-                activeTab === tab
+              className={`pb-2 text-sm font-medium border-b-2 ${activeTab === tab
                   ? 'text-blue-600 border-blue-600'
                   : 'border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-400'
-              }`}
+                }`}
             >
               {tab === '전체' ? '전체' : `${tab} 파일`}
             </button>
@@ -107,15 +113,15 @@ return (
       </div>
 
       <ul className="bg-white rounded-lg shadow-[0_4px_16px_0_rgba(0,0,0,0.08)] divide-y divide-gray-200">
-          {paginatedFiles.map(file => (
+        {sortedAndPaginatedFiles.map(file => (
           <li
-            key={file.id}
+            key={file.analysis_id}
             className="group relative p-4 flex flex-col hover:bg-gray-50 transition-colors duration-200 rounded-md cursor-default"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
               <div className="flex items-center space-x-3">
                 <button
-                  onClick={() => handleDelete(file.id)}
+                  onClick={() => handleDelete(file.analysis_id)}
                   className="absolute -top-1.5 -left-1.5 bg-gray-400 hover:bg-gray-600 text-white rounded-full w-4 h-4 flex items-center justify-center shadow opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                   title="파일 삭제"
                 >
@@ -124,12 +130,10 @@ return (
                   </svg>
                 </button>
                 <div className="flex-shrink-0">
-                  <span className={`h-8 w-8 rounded-full flex items-center justify-center ${
-                    file.result === '정상' ? 'bg-green-100' : file.result === '악성' ? 'bg-red-100' : 'bg-orange-100'
-                  }`}>
-                    <svg className={`h-5 w-5 ${
-                      file.result === '정상' ? 'text-green-600' : file.result === '악성' ? 'text-red-600' : 'text-orange-600'
-                    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <span className={`h-8 w-8 rounded-full flex items-center justify-center ${file.result === '정상' ? 'bg-green-100' : file.result === '악성' ? 'bg-red-100' : 'bg-orange-100'
+                    }`}>
+                    <svg className={`h-5 w-5 ${file.result === '정상' ? 'text-green-600' : file.result === '악성' ? 'text-red-600' : 'text-orange-600'
+                      }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={
                         file.result === '정상'
                           ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
@@ -138,26 +142,37 @@ return (
                     </svg>
                   </span>
                 </div>
-                <div className="max-w-[180px]">
+                <div className="max-w-[180px] md:max-w-[240px] lg:max-w-[320px]">
                   <p className="text-sm font-medium text-gray-900 break-all whitespace-normal">{file.name}</p>
-                  <p className="text-sm text-gray-500">{file.date}</p>
+                  <p className="text-sm text-gray-500">
+                    {(() => {
+                      const date = new Date(file.date || file.uploadedAt);
+                      return file.uploadedAt || new Date().toLocaleDateString();
+                    })()}
+                  </p>
                 </div>
               </div>
-              <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-4 min-w-[180px]">
-                <span className={`text-sm font-semibold rounded-full px-3 py-1 ${
-                  file.result === '정상' 
-                    ? 'bg-green-100 text-green-700' 
-                    : file.result === '악성' 
-                    ? 'bg-red-100 text-red-700' 
-                    : file.result === '분석중'
-                    ? 'bg-orange-100 text-orange-700'
-                    : 'bg-gray-100 text-gray-700'
+              <div className="flex flex-wrap items-center justify-start sm:justify-end gap-2 sm:gap-4 min-w-[180px]">
+                <span className={`text-sm font-semibold rounded-full px-2 py-1 whitespace-nowrap text-center ${
+                  file.result === '정상'
+                    ? 'bg-green-100 text-green-700'
+                    : file.result === '악성'
+                      ? 'bg-red-100 text-red-700'
+                      : file.result === '분석중'
+                        ? 'bg-orange-100 text-orange-700'
+                        : 'bg-gray-100 text-gray-700'
                 }`}>
-                  {file.result}
+                  {file.result === '정상'
+                    ? '정상'
+                    : file.result === '악성'
+                      ? '악성'
+                      : file.result === '분석중'
+                        ? '분석중'
+                        : '정보 없음'}
                 </span>
                 <button
                   onClick={() => setFileList(prev =>
-                    prev.map(f => f.id === file.id ? { ...f, expanded: !f.expanded } : f)
+                    prev.map(f => f.analysis_id === file.analysis_id ? { ...f, expanded: !f.expanded } : f)
                   )}
                   className="text-sm text-blue-500 hover:underline"
                 >
@@ -171,7 +186,7 @@ return (
               <FileAccordionDetail file={file} />
             )}
           </li>
-          ))}
+        ))}
       </ul>
       <div className="mt-6 flex justify-center">
         <ReactPaginate
@@ -211,6 +226,6 @@ return (
           Total items: <span className="font-semibold text-gray-600">{visibleFiles.length}</span>
         </span>
       </div>
-  </div>
-);
+    </div>
+  );
 }
