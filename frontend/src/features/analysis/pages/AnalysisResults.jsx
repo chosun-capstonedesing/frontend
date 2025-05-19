@@ -110,11 +110,11 @@ function AnalysisResults({
   return (
     <div className="bg-white shadow-md rounded p-6">
       <h2 className="text-2xl font-bold mb-4">파일 분석 결과</h2>
-      <div className="flex flex-col md:grid md:grid-cols-[1fr_1.2fr] gap-4 mt-4">
+      <div className="flex flex-col md:grid md:grid-cols-[1fr_1.2fr] gap-4 mt-4 break-words overflow-hidden">
         <div>
           <div className="mt-4">
             <p className="text-base"><strong>분석 ID:</strong> {analysisId ?? 'N/A'}</p>
-            <p className="text-base"><strong>파일 이름:</strong> {fileName}</p>
+            <p className="text-base break-all"><strong>파일 이름:</strong> {fileName}</p>
             <p className="text-base"><strong>파일 크기:</strong> {fileSize !== 'N/A' ? (typeof fileSize === 'number' ? fileSize.toLocaleString() : fileSize) : 'N/A'} MB</p>
             <p className="text-base"><strong>확장자:</strong> {fileExtension}</p>
             <p className="text-base"><strong>탐지 결과:</strong> {resultLabel}</p>
@@ -122,7 +122,7 @@ function AnalysisResults({
           </div>
           {isLoggedIn && (
             <div className="space-y-2 border-t pt-4">
-              <p className="text-base"><strong>SHA-256 해시:</strong> {sha256}</p>
+              <p className="text-base break-all"><strong>SHA-256 해시:</strong> {sha256}</p>
               <p className="text-base"><strong>분석 시작 시간:</strong> {startTime}</p>
               <p className="text-base"><strong>모델 로딩 시간:</strong> {modelLoad}</p>
               <p className="text-base"><strong>전처리 시간:</strong> {preprocess}</p>
