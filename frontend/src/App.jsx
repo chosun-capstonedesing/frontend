@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import LoginPage from './features/auth/pages/LoginPage';
@@ -20,7 +20,14 @@ function App() {
   }
 
   const isDev = import.meta.env.DEV;
-  const [isLoggedIn, setIsLoggedIn] = useState(isDev ? true : checkLoginStatus());
+  const [isLoggedIn, setIsLoggedIn] = useState(checkLoginStatus());
+
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    if (!token || token === "undefined" || token.trim() === "") {
+      setIsLoggedIn(false);
+    }
+  }, []);
 
   const handleLoginSuccess = (accessToken) => {
     localStorage.setItem('access_token', accessToken); // 로그인 성공 시 토큰 저장

@@ -56,12 +56,13 @@ export const loginUser = async (loginInfo) => {
     });
 
     const token = res.data.access_token;
-    if (token) {
+    if (typeof token === "string" && token.length > 0) {
       localStorage.setItem("access_token", token);
     }
 
     return {
       success: true,
+      accessToken: token,
       data: res.data
     };
   } catch (error) {

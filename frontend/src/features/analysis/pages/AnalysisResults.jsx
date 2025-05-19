@@ -107,6 +107,8 @@ function AnalysisResults({
     isLoggedIn = true;
   }
 
+  const actualIsLoggedIn = typeof isLoggedIn !== "undefined" ? isLoggedIn : !!localStorage.getItem("access_token");
+
   return (
     <div className="bg-white shadow-md rounded p-6">
       <h2 className="text-2xl font-bold mb-4">파일 분석 결과</h2>
@@ -120,7 +122,7 @@ function AnalysisResults({
             <p className="text-base"><strong>탐지 결과:</strong> {resultLabel}</p>
             <p className="text-base"><strong>신뢰도:</strong> {confidenceValue}{confidenceValue !== 'N/A' ? '%' : ''}</p>
           </div>
-          {isLoggedIn && (
+          {actualIsLoggedIn && (
             <div className="space-y-2 border-t pt-4">
               <p className="text-base break-all"><strong>SHA-256 해시:</strong> {sha256}</p>
               <p className="text-base"><strong>분석 시작 시간:</strong> {startTime}</p>
@@ -156,7 +158,7 @@ function AnalysisResults({
             />
           </div>
           <div className="mt-8 flex justify-end">
-            {isLoggedIn ? (
+            {actualIsLoggedIn ? (
               <button
                 className="inline-flex items-center px-5 py-2 text-base bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
                 onClick={() => {
