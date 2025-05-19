@@ -63,6 +63,8 @@ function App() {
             <Route index element={<AnalysisPage />} />
             <Route path="mypage" element={<MyPage />} />
             <Route path="analysis_results/:analysis_id" element={<AnalysisResults />} />
+            <Route path="analysis_results" element={<AnalysisResults />} />
+            <Route path="performance/:analysis_id" element={<PerformanceSection />} />
             <Route path="performance" element={<PerformanceSection />} />
             <Route path="guide" element={<GuideSection />} />
             <Route path="mypage/detail/:analysis_id" element={<MyPageDetail />} />

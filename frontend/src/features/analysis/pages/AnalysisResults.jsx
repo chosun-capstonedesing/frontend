@@ -30,25 +30,61 @@ function AnalysisResults({
   modelInfo = {}
 }) {
   const { analysis_id: analysisId } = useParams();
-  console.log("분석 결과 페이지 - 파일 ID:", analysisId);
+  const [recentAnalysisId, setRecentAnalysisId] = useState(null);
+  console.log("분석 결과 페이지 - 파일 ID:", analysisId ?? recentAnalysisId);
 
   const [fileData, setFileData] = useState(null);
 
   useEffect(() => {
-    if (!analysisId) return;
-    const saved = localStorage.getItem(analysisId);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        setFileData(parsed);
-      } catch (e) {
-        console.error("분석 결과 파싱 실패:", e);
+    if (analysisId) {
+      const saved = localStorage.getItem(analysisId);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          setFileData(parsed);
+        } catch (e) {
+          console.error("분석 결과 파싱 실패:", e);
+        }
+      }
+    } else {
+      // fallback: get latest analysisId from localStorage
+      const allKeys = Object.keys(localStorage);
+      const recent = allKeys
+        .filter((key) => {
+          try {
+            const value = JSON.parse(localStorage.getItem(key));
+            return value && value.log?.start_time;
+          } catch {
+            return false;
+          }
+        })
+        .map((key) => ({
+          id: key,
+          time: new Date(JSON.parse(localStorage.getItem(key)).log.start_time),
+        }))
+        .sort((a, b) => b.time - a.time);
+
+      if (recent.length > 0) {
+        const latestId = recent[0].id;
+        setRecentAnalysisId(latestId);
+        const latestData = localStorage.getItem(latestId);
+        try {
+          const parsed = JSON.parse(latestData);
+          setFileData(parsed);
+        } catch (e) {
+          console.error("최근 분석 결과 파싱 실패:", e);
+        }
       }
     }
   }, [analysisId]);
 
   if (!fileData) {
-    return <p className="text-center text-gray-500 mt-10">분석 데이터를 불러오는 중입니다...</p>;
+    return (
+      <div className="bg-white shadow-md rounded p-6 text-center text-gray-800 mt-20">
+        <p className="text-lg font-semibold">분석 결과를 확인할 수 없습니다.</p>
+        <p className="text-sm mt-2">먼저 분석을 진행해주세요.</p>
+      </div>
+    );
   }
 
   const fileName = fileData?.filename ?? name ?? 'N/A';
@@ -114,16 +150,16 @@ function AnalysisResults({
       <h2 className="text-2xl font-bold mb-4">파일 분석 결과</h2>
       <div className="flex flex-col md:grid md:grid-cols-[1fr_1.2fr] gap-4 mt-4 break-words overflow-hidden">
         <div>
-          <div className="mt-4">
+          <div className="space-y-2 mt-4 mb-4">
             <p className="text-base"><strong>분석 ID:</strong> {analysisId ?? 'N/A'}</p>
             <p className="text-base break-all"><strong>파일 이름:</strong> {fileName}</p>
-            <p className="text-base"><strong>파일 크기:</strong> {fileSize !== 'N/A' ? (typeof fileSize === 'number' ? fileSize.toLocaleString() : fileSize) : 'N/A'} MB</p>
+            <p className="text-base"><strong>파일 크기:</strong> {fileSize !== 'N/A' ? (typeof fileSize === 'number' ? fileSize.toLocaleString() : fileSize) : 'N/A'}</p>
             <p className="text-base"><strong>확장자:</strong> {fileExtension}</p>
             <p className="text-base"><strong>탐지 결과:</strong> {resultLabel}</p>
             <p className="text-base"><strong>신뢰도:</strong> {confidenceValue}{confidenceValue !== 'N/A' ? '%' : ''}</p>
           </div>
           {actualIsLoggedIn && (
-            <div className="space-y-2 border-t pt-4">
+            <div className="space-y-2 border-t pt-4 pb-4">
               <p className="text-base break-all"><strong>SHA-256 해시:</strong> {sha256}</p>
               <p className="text-base"><strong>분석 시작 시간:</strong> {startTime}</p>
               <p className="text-base"><strong>모델 로딩 시간:</strong> {modelLoad}</p>
