@@ -29,10 +29,6 @@ if (import.meta.env.DEV) {
   };
 }
 
-if (import.meta.env.MODE === 'development') {
-  import('./test/index.js');
-}
-
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ToastProvider>
