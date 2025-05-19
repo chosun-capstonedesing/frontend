@@ -143,10 +143,22 @@ export async function handleAnalyzeFile(
         : new File([], updatedFiles[index].name);
       formData.append("file", realFile);
 
-      const res = await axios.post(`${API_BASE}/analyze-full`, formData, {
+      // Extract client_uuid from cookies and append to formData if present
+      const clientUuid = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("client_uuid="))
+        ?.split("=")[1];
+
+      // ✅ UUID는 access_token이 없는 경우에만 전송 (비로그인 사용자용)
+      if (!token && clientUuid) {
+        formData.append("uuid", clientUuid);
+      }
+
+      const res = await axios.post(`/api/analyze-full`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          ...(token && { 'Authorization': `Bearer ${token}` })
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+          ...(import.meta.env.DEV && { 'X-Dev-Bypass': 'true' })
         },
         withCredentials: true
       });

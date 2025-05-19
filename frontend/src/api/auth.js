@@ -57,15 +57,14 @@ export const loginUser = async (loginInfo) => {
       }
     });
 
-    //fake token
-    const responseData = {
-        ...res.data,
-        token: res.data.access_token || "FAKE_DEV_TOKEN_12345"
-    };
+    const token = res.data.access_token;
+    if (token) {
+      localStorage.setItem("access_token", token);
+    }
 
     return {
       success: true,
-      data: responseData
+      data: res.data
     };
   } catch (error) {
     const status = error.response?.status;
