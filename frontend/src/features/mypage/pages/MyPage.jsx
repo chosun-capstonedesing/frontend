@@ -14,7 +14,7 @@ export default function MyPage() {
   useEffect(() => {
     const savedFiles = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
     const merged = savedFiles.map((file, i) => ({
-      id: file.id || `${file.name}-${file.date || i}`,
+      analysis_id: file.analysis_id || `${file.name}-${file.date || i}`,
       result: file.result || '분석중',
       ...file,
     }));
@@ -55,7 +55,7 @@ export default function MyPage() {
 
   // 파일 삭제 핸들러
   const handleDelete = (id) => {
-    const updated = fileList.filter(file => file.id !== id);
+    const updated = fileList.filter(file => file.analysis_id !== id);
     setFileList(updated);
     localStorage.setItem('uploadedFiles', JSON.stringify(updated));
     sessionStorage.setItem('uploadedFiles', JSON.stringify(updated));
@@ -115,13 +115,13 @@ export default function MyPage() {
       <ul className="bg-white rounded-lg shadow-[0_4px_16px_0_rgba(0,0,0,0.08)] divide-y divide-gray-200">
         {sortedAndPaginatedFiles.map(file => (
           <li
-            key={file.id}
+            key={file.analysis_id}
             className="group relative p-4 flex flex-col hover:bg-gray-50 transition-colors duration-200 rounded-md cursor-default"
           >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
               <div className="flex items-center space-x-3">
                 <button
-                  onClick={() => handleDelete(file.id)}
+                  onClick={() => handleDelete(file.analysis_id)}
                   className="absolute -top-1.5 -left-1.5 bg-gray-400 hover:bg-gray-600 text-white rounded-full w-4 h-4 flex items-center justify-center shadow opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                   title="파일 삭제"
                 >
@@ -172,7 +172,7 @@ export default function MyPage() {
                 </span>
                 <button
                   onClick={() => setFileList(prev =>
-                    prev.map(f => f.id === file.id ? { ...f, expanded: !f.expanded } : f)
+                    prev.map(f => f.analysis_id === file.analysis_id ? { ...f, expanded: !f.expanded } : f)
                   )}
                   className="text-sm text-blue-500 hover:underline"
                 >

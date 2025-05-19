@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App.jsx';
 import { ToastProvider } from './context/ToastContext';
+import { BrowserRouter } from 'react-router-dom';
 
 const generateUUID = () =>
   crypto.randomUUID?.() || Math.random().toString(36).substring(2, 15);
@@ -31,8 +32,10 @@ if (import.meta.env.DEV) {
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <ToastProvider>
-      <App />
-    </ToastProvider>
+    <BrowserRouter>
+      <ToastProvider>
+        <App />
+      </ToastProvider>
+    </BrowserRouter>
   </React.StrictMode>
 );

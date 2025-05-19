@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link } from 'react-router-dom';
+import Cookies from 'js-cookie';
 import LoginPage from './features/auth/pages/LoginPage';
 import MainLayout from './routes/MainLayout';
 import LogoutButton from './features/auth/components/LogoutButton';
@@ -14,8 +15,8 @@ import AnalysisResults from './features/analysis/pages/AnalysisResults';
 import { v4 as uuidv4 } from 'uuid';
 
 function App() {
-  if (!document.cookie.includes("client_uuid")) {
-    document.cookie = `client_uuid=${uuidv4()}; path=/; max-age=86400`;  // 1일 유지
+  if (!Cookies.get('client_uuid')) {
+    Cookies.set('client_uuid', uuidv4(), { expires: 1, path: '/' }); // 1일 유지
   }
 
   const isDev = import.meta.env.DEV;
@@ -34,36 +35,34 @@ function App() {
   };
 
   return (
-    <Router>
-      <ToastProvider>
-        <div className="min-h-screen bg-gray-100 p-5 overflow-hidden">
-          <div className="flex justify-end space-x-4 mb-2 mr-5">
-            {isLoggedIn ? (
-              <>
-                <Link to="/mypage" className="text-base hover:underline">My Page</Link>
-                <LogoutButton onLogout={handleLogout} />
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="text-base hover:underline">Login/SignUp</Link>
-              </>
-            )}
-          </div>
-
-          <Routes>
-            <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
-            <Route path="/" element={<MainLayout />}>
-              <Route index element={<AnalysisPage />} />
-              <Route path="mypage" element={<MyPage />} />
-              <Route path="analysis_results" element={<AnalysisResults />} />
-              <Route path="performance" element={<PerformanceSection />} />
-              <Route path="guide" element={<GuideSection />} />
-              <Route path="mypage/detail/:id" element={<MyPageDetail />} />
-            </Route>
-          </Routes>
+    <ToastProvider>
+      <div className="min-h-screen bg-gray-100 p-5 overflow-hidden">
+        <div className="flex justify-end space-x-4 mb-2 mr-5">
+          {isLoggedIn ? (
+            <>
+              <Link to="/mypage" className="text-base hover:underline">My Page</Link>
+              <LogoutButton onLogout={handleLogout} />
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="text-base hover:underline">Login/SignUp</Link>
+            </>
+          )}
         </div>
-      </ToastProvider>
-    </Router>
+
+        <Routes>
+          <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
+          <Route path="/" element={<MainLayout />}>
+            <Route index element={<AnalysisPage />} />
+            <Route path="mypage" element={<MyPage />} />
+            <Route path="analysis_results/:analysis_id" element={<AnalysisResults />} />
+            <Route path="performance" element={<PerformanceSection />} />
+            <Route path="guide" element={<GuideSection />} />
+            <Route path="mypage/detail/:analysis_id" element={<MyPageDetail />} />
+          </Route>
+        </Routes>
+      </div>
+    </ToastProvider>
   );
 }
 

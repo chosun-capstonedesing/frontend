@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
+import { useNavigate } from "react-router-dom";
 
 // ✅ ToastContext 생성 - 전역에서 알림을 호출/관리하기 위해 사용
 const ToastContext = createContext();
@@ -11,40 +12,46 @@ export const useToast = () => useContext(ToastContext);
 // ✅ ToastProvider: 알림 상태와 렌더링을 제공하는 Context Provider
 export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
+  const navigate = useNavigate();
 
   // ✅ showToast: 새 토스트 알림을 추가하는 함수
-  const showToast = (message, status = "done", fileIndex = null, progress = 0) => {
+  const showToast = (message, status = "done", analysisId = null, progress = 0) => {
     const id = Date.now();
-    setToasts(prev => [...prev, { id, message, status, fileIndex, progress }]);
+    setToasts(prev => [...prev, { id, message, status, analysisId, progress }]);
   };
 
   // ✅ updateProgress: 진행 중인 토스트의 퍼센트를 업데이트
-  const updateProgress = (fileIndex, progress) => {
+  const updateProgress = (analysisId, progress) => {
     setToasts(prev =>
       prev.map(t =>
-        t.fileIndex === fileIndex && t.status === "processing"
+        t.analysisId === analysisId && t.status === "processing"
           ? { ...t, progress }
           : t
       )
     );
   };
 
-  // ✅ updateToastStatus: 분석 중에서 완료 상태로 변경하고 퍼센트를 100%로 설정
-  const updateToastStatus = (fileIndex, status = "done") => {
+  // ✅ updateToastStatus: 분석 완료 상태로 변경하고 퍼센트를 100%로 설정 (상태에 상관없이 업데이트)
+  const updateToastStatus = (analysisId, status = "done") => {
     setToasts(prev =>
       prev.map(t =>
-        t.fileIndex === fileIndex && t.status === "processing"
+        t.analysisId === analysisId
           ? { ...t, status, progress: 100 }
           : t
       )
     );
+    console.log("[Toast Sync] Updated toast status:", analysisId, status);
+
+    // 추가: 분석 완료 상태를 다른 컴포넌트에 알림
+    const event = new CustomEvent("toastStatusUpdated", { detail: { analysisId, status } });
+    window.dispatchEvent(event);
   };
 
   // ✅ cancelToastStatus: 분석 중 상태를 즉시 "cancelled"로 바꿔줌
-  const cancelToastStatus = (fileIndex) => {
+  const cancelToastStatus = (analysisId) => {
     setToasts(prev =>
       prev.map(t =>
-        t.fileIndex === fileIndex && t.status === "processing"
+        t.analysisId === analysisId && t.status === "processing"
           ? { ...t, status: "cancelled" }
           : t
       )
@@ -56,15 +63,34 @@ export const ToastProvider = ({ children }) => {
     setToasts(prev => prev.filter(t => t.id !== id));
   };
 
-  // ✅ Listen for custom cancelAnalysis event to sync cancel from file list
+  // ✅ Listen for custom cancelAnalysis and viewAnalysisResult events to sync actions from file list
   useEffect(() => {
     const handleCancelAnalysis = (e) => {
-      const { fileIndex } = e.detail;
-      cancelToastStatus(fileIndex);
+      const { analysisId } = e.detail;
+      cancelToastStatus(analysisId);
+    };
+    const handleViewAnalysisResult = (e) => {
+      const { analysisId } = e.detail;
+      if (analysisId) {
+        console.log("[Toast Sync] Navigating to:", analysisId);
+        navigate(`/analysis_results/${analysisId}`);
+      }
     };
     window.addEventListener("cancelAnalysis", handleCancelAnalysis);
+    window.addEventListener("viewAnalysisResult", handleViewAnalysisResult);
     return () => {
       window.removeEventListener("cancelAnalysis", handleCancelAnalysis);
+      window.removeEventListener("viewAnalysisResult", handleViewAnalysisResult);
+    };
+  }, [navigate]);
+
+  useEffect(() => {
+    const logToastUpdate = (e) => {
+      console.log("[Toast Sync] toastStatusUpdated received:", e.detail);
+    };
+    window.addEventListener("toastStatusUpdated", logToastUpdate);
+    return () => {
+      window.removeEventListener("toastStatusUpdated", logToastUpdate);
     };
   }, []);
 
@@ -135,7 +161,10 @@ export const ToastProvider = ({ children }) => {
                       {/* ✅ 분석 중 상태일 때: 중지 버튼 표시 */}
                       <div className="flex justify-end mt-2">
                         <button
-                          onClick={() => cancelToastStatus(toast.fileIndex)}
+                          onClick={() => {
+                            const event = new CustomEvent("cancelAnalysis", { detail: { analysisId: toast.analysisId } });
+                            window.dispatchEvent(event);
+                          }}
                           className="text-xs text-red-500 font-medium hover:underline"
                         >
                           분석 중지
@@ -148,8 +177,11 @@ export const ToastProvider = ({ children }) => {
                   {toast.status === "done" && (
                     <p
                       onClick={() => {
-                        if (toast.fileIndex !== null) {
-                          window.location.href = `/analysis_results?id=${toast.fileIndex}`;
+                        if (toast.analysisId !== null) {
+                          const event = new CustomEvent("viewAnalysisResult", {
+                            detail: { analysisId: toast.analysisId }
+                          });
+                          window.dispatchEvent(event);
                         }
                       }}
                       className="text-xs text-green-600 mt-1 font-medium cursor-pointer hover:underline"

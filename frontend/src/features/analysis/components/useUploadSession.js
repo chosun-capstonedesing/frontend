@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import { useState, useEffect } from "react";
 
 /**
@@ -14,7 +15,14 @@ export function useUploadSession(isActuallyLoggedIn, maxCount) {
     const uploadedTime = parseInt(sessionStorage.getItem("uploadedTime") || "0", 10);
     const now = Date.now();
 
-    // 비로그인 유저의 경우 24시간 지난 데이터 초기화
+    const updatedFiles = savedFiles.map((file) => {
+      const result = localStorage.getItem(file.analysis_id || "");
+      if (result) {
+        return { ...file, status: "done" };
+      }
+      return file;
+    });
+
     if (!isActuallyLoggedIn()) {
       if (now - uploadedTime > 86400000) {
         sessionStorage.removeItem("uploadedFiles");
@@ -22,17 +30,23 @@ export function useUploadSession(isActuallyLoggedIn, maxCount) {
         sessionStorage.removeItem("uploadedTime");
         setFileList([]);
       } else {
-        setFileList(savedFiles.slice(0, maxCount));
+        setFileList(updatedFiles.slice(0, maxCount));
       }
     } else {
-      setFileList(savedFiles); // 로그인 시 제한 없이 전체 파일 유지
+      setFileList(updatedFiles);
     }
 
     // storage, 커스텀 이벤트로 타 탭 변경사항 반영
     const syncFromLocalStorage = () => {
       const files = JSON.parse(localStorage.getItem("uploadedFiles") || "[]");
       const uploadedTime = parseInt(localStorage.getItem("uploadedTime") || String(Date.now()), 10);
-      const trimmed = files.slice(0, maxCount);
+      const trimmed = files.slice(0, maxCount).map((file) => {
+        const result = localStorage.getItem(file.analysis_id || "");
+        if (result) {
+          return { ...file, status: "done" };
+        }
+        return file;
+      });
       setFileList(trimmed);
       sessionStorage.setItem("uploadedFiles", JSON.stringify(trimmed));
       sessionStorage.setItem("uploadedCount", String(trimmed.length));
@@ -52,6 +66,7 @@ export function useUploadSession(isActuallyLoggedIn, maxCount) {
   const updateSession = (newFiles) => {
     const now = Date.now();
     const enhancedFiles = newFiles.map((file) => ({
+      analysis_id: uuidv4(),
       name: file.name || "이름 없는 파일",
       size: file.size || 0,
       type: file.type || "",

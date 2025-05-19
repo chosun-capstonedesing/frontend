@@ -61,7 +61,7 @@ export function FileUploadPreviewList({
         .reverse() // 최신 순 정렬
         .map(({ file, originalIndex }) => (
           <li
-            key={originalIndex}
+            key={file.analysis_id}
             className="relative group p-3 flex flex-col space-y-2"
           >
             {/* 삭제 버튼 */}
@@ -166,7 +166,7 @@ export function FileUploadPreviewList({
                     originalIndex === latestCompleteIndex &&
                     Date.now() <= validUntil;
                   if (isValid) {
-                    navigate(`/analysis_results`);
+                    navigate(`/analysis_results/${file.analysis_id}`);
                   } else if (file.status === "done") {
                     if (isLoggedIn) {
                       alert("분석 결과가 만료되었습니다. 마이페이지에서 확인해주세요.");
@@ -174,7 +174,7 @@ export function FileUploadPreviewList({
                       alert("분석 결과가 만료되었습니다. 로그인 후 마이페이지에서 히스토리를 확인할 수 있습니다.");
                     }
                   } else {
-                    onAnalyzeFile(originalIndex);
+                    onAnalyzeFile(file.analysis_id);
                   }
                 }}
               >
@@ -190,10 +190,10 @@ export function FileUploadPreviewList({
                   onClick={() => {
                     // 중지 처리를 위해 toast 상태와 백엔드 분석을 모두 취소
                     const customCancelEvent = new CustomEvent("cancelAnalysis", {
-                      detail: { fileIndex: originalIndex },
+                      detail: { analysisId: file.analysis_id },
                     });
                     window.dispatchEvent(customCancelEvent);
-                    onAnalyzeFile(originalIndex);
+                    onAnalyzeFile(file.analysis_id);
                   }}
                 >
                   분석 중지
@@ -202,10 +202,10 @@ export function FileUploadPreviewList({
             </div>
             
             {/* 프로그레스 바 시각화 영역 */}
-            {progressMap[originalIndex] !== undefined && (
+            {progressMap[file.analysis_id] !== undefined && (
               <div className="w-full mt-2">
                 {(() => {
-                  const progress = Math.min(progressMap[originalIndex] ?? 0, 100);
+                  const progress = Math.min(progressMap[file.analysis_id] ?? 0, 100);
                   const { label, labelColor, barColor } = getProgressBarInfo(file.status, progress);
 
                   return (
