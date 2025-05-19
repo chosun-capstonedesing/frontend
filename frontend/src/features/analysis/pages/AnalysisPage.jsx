@@ -11,19 +11,6 @@ export default function AnalysisPage({ uploadedFile, handleFileSelect }) {
     setLocalUploadedFile(uploadedFile);
   }, [uploadedFile]);
 
-  const renderFileAnalysisSummary = () => {
-    if (!localUploadedFile) return null;
-    // Example: simple analysis summary with file name and dummy malicious status
-    const isMalicious = localUploadedFile.name.toLowerCase().includes('malware') ? 'Yes' : 'No';
-    return (
-      <div className="mt-4 p-4 border rounded bg-gray-50">
-        <h3 className="text-lg font-semibold mb-2">파일 분석 요약</h3>
-        <p><strong>파일명:</strong> {localUploadedFile.name}</p>
-        <p><strong>악성 여부:</strong> {isMalicious}</p>
-      </div>
-    );
-  };
-
   return (
     <div className="bg-white shadow-md rounded p-6">
       <GlobalStats />
@@ -57,7 +44,6 @@ export default function AnalysisPage({ uploadedFile, handleFileSelect }) {
       {activeTab === 'upload' && (
         <>
           <FileUpload onFileSelect={handleFileSelect} />
-          {renderFileAnalysisSummary()}
         </>
       )}
 
