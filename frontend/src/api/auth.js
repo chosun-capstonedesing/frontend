@@ -48,10 +48,8 @@ export const registerUser = async (userInfo) => {
 //로그인 요청
 export const loginUser = async (loginInfo) => {
   try {
-    const res = await axios.post(`${API_BASE}/users/login`, {
-      username: loginInfo.username,
-      password: loginInfo.password
-    }, {
+    console.log("로그인 요청 정보:", loginInfo);
+    const res = await axios.post(`${API_BASE}/users/login`, loginInfo, {
       headers: {
         'Content-Type': 'application/json'
       }
@@ -67,6 +65,9 @@ export const loginUser = async (loginInfo) => {
       data: res.data
     };
   } catch (error) {
+    console.error("로그인 오류 응답:", error.response);
+    console.error("로그인 전체 에러:", error);
+    console.error("로그인 메시지:", error.message);
     const status = error.response?.status;
     const detail = error.response?.data?.detail?.toLowerCase() || "";
     let message = "로그인 실패";

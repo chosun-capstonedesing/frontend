@@ -22,8 +22,8 @@ function App() {
   const isDev = import.meta.env.DEV;
   const [isLoggedIn, setIsLoggedIn] = useState(isDev ? true : checkLoginStatus());
 
-  const handleLoginSuccess = () => {
-    localStorage.setItem('access_token', 'mock_token_value'); // 로그인 성공 시 토큰 저장
+  const handleLoginSuccess = (accessToken) => {
+    localStorage.setItem('access_token', accessToken); // 로그인 성공 시 토큰 저장
     sessionStorage.removeItem('uploadedFiles');               // ✅ 업로드 기록 삭제
     sessionStorage.removeItem('uploadedCount');               // ✅ 업로드 개수 삭제
     setIsLoggedIn(true);

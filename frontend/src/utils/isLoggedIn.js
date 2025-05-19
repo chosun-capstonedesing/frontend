@@ -1,5 +1,5 @@
 const isActuallyLoggedIn = () => {
-    if (import.meta.env.DEV) return true;
+    if (import.meta.env.VITE_SKIP_AUTH === "true") return true;
     const token = localStorage.getItem("access_token");
     return !!token;
 };

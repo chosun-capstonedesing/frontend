@@ -23,10 +23,10 @@ function AuthForm({ onAuthSuccess }) {
         try {
             const res = await loginUser(form);
 
-            if (res.success && res.data?.token) {
+            if (res.success && res.data?.access_token) {
                 alert("성공적으로 로그인되었습니다.");
-                localStorage.setItem('access_token', res.data.token);
-                if (onAuthSuccess) onAuthSuccess(res.data);
+                localStorage.setItem('access_token', res.data.access_token);
+                if (onAuthSuccess) onAuthSuccess(res.data.access_token);
                 navigate('/');
             } else {
                 alert("아이디나 비밀번호가 올바르지 않습니다.");
@@ -72,9 +72,9 @@ function AuthForm({ onAuthSuccess }) {
                 alert("회원가입 성공! 자동 로그인됩니다.");
                 const loginRes = await loginUser(form);
 
-                if (loginRes.success && loginRes.data?.token) {
-                    localStorage.setItem('access_token', loginRes.data.token);
-                    if (onAuthSuccess) onAuthSuccess(loginRes.data);
+                if (loginRes.success && loginRes.data?.access_token) {
+                    localStorage.setItem('access_token', loginRes.data.access_token);
+                    if (onAuthSuccess) onAuthSuccess(loginRes.data.access_token);
                     navigate('/');
                 } else {
                     alert("자동 로그인 실패: 알 수 없는 응답입니다.");
