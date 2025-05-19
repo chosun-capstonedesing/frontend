@@ -1,7 +1,6 @@
 import React from "react";
 import DragAndDrop from "./DragAndDrop";
 import FileInput from "./FileInput";
-import ProgressBar from "./ProgressBar";
 import { useNavigate } from "react-router-dom";
 import { getProgressBarInfo } from "./handleAnalyzeFile";
 
@@ -25,11 +24,6 @@ function FileUploadView({
           multiple
         />
       </DragAndDrop>
-
-      {/* 파일 업로드 중일 때 프로그레스 바 표시 */}
-      {typeof uploadProgress === "number" && (
-        <ProgressBar progress={uploadProgress} />
-      )}
     </div>
   );
 }
