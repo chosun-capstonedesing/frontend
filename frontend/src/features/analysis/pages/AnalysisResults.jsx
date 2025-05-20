@@ -155,7 +155,7 @@ function AnalysisResults({
             <p className="text-base break-all"><strong>파일 이름:</strong> {fileName}</p>
             <p className="text-base"><strong>파일 크기:</strong> {fileSize !== 'N/A' ? (typeof fileSize === 'number' ? fileSize.toLocaleString() : fileSize) : 'N/A'}</p>
             <p className="text-base"><strong>확장자:</strong> {fileExtension}</p>
-            <p className="text-base"><strong>탐지 결과:</strong> {resultLabel}</p>
+            <p className="text-base"><strong>탐지 결과:</strong> {resultLabel}</p><p className="text-base"><strong>악성 확률:</strong> {probability}{probability !== 'N/A' ? '%' : ''}</p>
             <p className="text-base"><strong>신뢰도:</strong> {confidenceValue}{confidenceValue !== 'N/A' ? '%' : ''}</p>
           </div>
           {actualIsLoggedIn && (
@@ -165,7 +165,6 @@ function AnalysisResults({
               <p className="text-base"><strong>모델 로딩 시간:</strong> {modelLoad}</p>
               <p className="text-base"><strong>전처리 시간:</strong> {preprocess}</p>
               <p className="text-base"><strong>추론 시간:</strong> {inference}</p>
-              <p className="text-base"><strong>악성 확률:</strong> {probability}{probability !== 'N/A' ? '%' : ''}</p>
               <p className="text-base"><strong>모델 종류:</strong> {modelType}</p>
               <p className="text-base"><strong>입력 정보:</strong> {modelInput}</p>
             </div>

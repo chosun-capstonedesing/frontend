@@ -9,16 +9,35 @@ export default function MyPage() {
   const [sortOption, setSortOption] = useState('최신순');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
+  const [currentResult, setCurrentResult] = useState(null);
   const itemsPerPage = 10;
 
   useEffect(() => {
     const savedFiles = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
-    const merged = savedFiles.map((file, i) => ({
-      analysis_id: file.analysis_id || `${file.name}-${file.date || i}`,
-      result: file.result || '분석중',
-      ...file,
-    }));
+    const merged = savedFiles.map((file, i) => {
+      const analysis_id = file.analysis_id || `${file.name}-${file.date || i}`;
+      let result = file.result || '분석중';
+
+      // 동기화: 로그 기반 결과 반영
+      if (file.log && typeof file.malicious === 'number') {
+        result = file.malicious > 50 ? '악성' : '정상';
+      }
+
+      return {
+        analysis_id,
+        result,
+        ...file,
+      };
+    });
     setFileList(merged);
+    // 최근 분석 결과 세션에서 불러오기
+    const lastViewedId = sessionStorage.getItem("lastViewedAnalysisId");
+    if (lastViewedId) {
+      const found = merged.find(f => f.analysis_id === lastViewedId);
+      if (found) {
+        setCurrentResult(found);
+      }
+    }
   }, []);
 
   const visibleFiles = [...fileList]
@@ -75,8 +94,8 @@ export default function MyPage() {
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`pb-2 text-sm font-medium border-b-2 ${activeTab === tab
-                  ? 'text-blue-600 border-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-400'
+                ? 'text-blue-600 border-blue-600'
+                : 'border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-400'
                 }`}
             >
               {tab === '전체' ? '전체' : `${tab} 파일`}
@@ -153,15 +172,14 @@ export default function MyPage() {
                 </div>
               </div>
               <div className="flex flex-wrap items-center justify-start sm:justify-end gap-2 sm:gap-4 min-w-[180px]">
-                <span className={`text-sm font-semibold rounded-full px-2 py-1 whitespace-nowrap text-center ${
-                  file.result === '정상'
-                    ? 'bg-green-100 text-green-700'
-                    : file.result === '악성'
-                      ? 'bg-red-100 text-red-700'
-                      : file.result === '분석중'
-                        ? 'bg-orange-100 text-orange-700'
-                        : 'bg-gray-100 text-gray-700'
-                }`}>
+                <span className={`text-sm font-semibold rounded-full px-2 py-1 whitespace-nowrap text-center ${file.result === '정상'
+                  ? 'bg-green-100 text-green-700'
+                  : file.result === '악성'
+                    ? 'bg-red-100 text-red-700'
+                    : file.result === '분석중'
+                      ? 'bg-orange-100 text-orange-700'
+                      : 'bg-gray-100 text-gray-700'
+                  }`}>
                   {file.result === '정상'
                     ? '정상'
                     : file.result === '악성'
@@ -171,9 +189,13 @@ export default function MyPage() {
                         : '정보 없음'}
                 </span>
                 <button
-                  onClick={() => setFileList(prev =>
-                    prev.map(f => f.analysis_id === file.analysis_id ? { ...f, expanded: !f.expanded } : f)
-                  )}
+                  onClick={() => {
+                    sessionStorage.setItem("lastViewedAnalysisId", file.analysis_id);
+                    setCurrentResult(file);
+                    setFileList(prev =>
+                      prev.map(f => f.analysis_id === file.analysis_id ? { ...f, expanded: !f.expanded } : f)
+                    );
+                  }}
                   className="text-sm text-blue-500 hover:underline"
                 >
                   결과 보기
