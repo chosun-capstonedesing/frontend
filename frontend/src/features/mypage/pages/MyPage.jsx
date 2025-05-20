@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import FileAccordionDetail from './MyPageDetail';
 import ReactPaginate from 'react-paginate';
+import { getUploadedFilesFromSession } from '../../analysis/components/useUploadSessions';
 
 export default function MyPage() {
   const [fileList, setFileList] = useState([]);
@@ -14,30 +15,48 @@ export default function MyPage() {
 
   useEffect(() => {
     const savedFiles = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
-    const merged = savedFiles.map((file, i) => {
-      const analysis_id = file.analysis_id || `${file.name}-${file.date || i}`;
-      let result = file.result || '분석중';
+    const sessionFiles = getUploadedFilesFromSession();
+    const combinedMap = new Map();
 
-      // 동기화: 로그 기반 결과 반영
-      if (file.log && typeof file.malicious === 'number') {
-        result = file.malicious > 50 ? '악성' : '정상';
+    [...savedFiles, ...sessionFiles].forEach((file, i) => {
+      const analysis_id = file.analysis_id || file.sha256 || `${file.name}-${file.date || i}`;
+      // --- BEGIN PATCHED RESULT LOGIC ---
+      let result = '분석 안됨';
+      const hasLog = file.log && Object.keys(file.log).length > 0;
+      const hasId = !!(file.analysis_id || file.sha256 || file.name);
+      const hasResult = typeof file.result === 'string';
+
+      if (hasLog || hasId) {
+        const mal = Number(
+          file.malicious ??
+          file.performance?.['Malware Accuracy'] ??
+          file.log?.malicious ??
+          (file.result === '악성' ? 1 : file.result === '정상' ? 0 : undefined)
+        );
+        if (!isNaN(mal)) {
+          result = mal >= 0.6 ? '악성' : '정상';
+        } else if (hasResult) {
+          result = typeof file.result === 'string' ? file.result : '분석 완료';
+        } else if (hasLog) {
+          result = '분석중';
+        } else {
+          result = '분석 완료';
+        }
       }
-
-      return {
+      // --- END PATCHED RESULT LOGIC ---
+      combinedMap.set(analysis_id, {
+        ...file,
         analysis_id,
         result,
-        ...file,
-      };
+        sha256: file.sha256 ?? file.hash,
+        summary: file.summary ?? file.description ?? file.result_summary ?? null,
+        report_url: file.report_url ?? file.pdfUrl ?? file.reportURL ?? null,
+        pdfUrl: file.report_url ?? file.pdfUrl,
+        name: file.name ?? file.filename ?? '',
+      });
     });
-    setFileList(merged);
-    // 최근 분석 결과 세션에서 불러오기
-    const lastViewedId = sessionStorage.getItem("lastViewedAnalysisId");
-    if (lastViewedId) {
-      const found = merged.find(f => f.analysis_id === lastViewedId);
-      if (found) {
-        setCurrentResult(found);
-      }
-    }
+
+    setFileList(Array.from(combinedMap.values()));
   }, []);
 
   const visibleFiles = [...fileList]
@@ -47,13 +66,13 @@ export default function MyPage() {
     })
     .filter(file => file.name.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => {
-      const dateA = new Date(a.uploadedAt || a.date || 0);
-      const dateB = new Date(b.uploadedAt || b.date || 0);
+      const dateA = new Date(a.log?.start_time || a.date || a.uploadedAt || 0);
+      const dateB = new Date(b.log?.start_time || b.date || b.uploadedAt || 0);
       if (isNaN(dateA) || isNaN(dateB)) return 0;
       return sortOption === '최신순' ? dateB - dateA : dateA - dateB;
     });
 
-  const pageCount = Math.ceil(visibleFiles.length / itemsPerPage);
+  const pageCount = Math.max(1, Math.ceil(visibleFiles.length / itemsPerPage));
   const handlePageClick = ({ selected }) => {
     setCurrentPage(selected);
   };
@@ -65,8 +84,8 @@ export default function MyPage() {
     })
     .filter(file => file.name.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => {
-      const dateA = new Date(a.uploadedAt || a.date || 0);
-      const dateB = new Date(b.uploadedAt || b.date || 0);
+      const dateA = new Date(a.log?.start_time || a.date || a.uploadedAt || 0);
+      const dateB = new Date(b.log?.start_time || b.date || b.uploadedAt || 0);
       if (isNaN(dateA) || isNaN(dateB)) return 0;
       return sortOption === '최신순' ? dateB - dateA : dateA - dateB;
     })
@@ -149,10 +168,24 @@ export default function MyPage() {
                   </svg>
                 </button>
                 <div className="flex-shrink-0">
-                  <span className={`h-8 w-8 rounded-full flex items-center justify-center ${file.result === '정상' ? 'bg-green-100' : file.result === '악성' ? 'bg-red-100' : 'bg-orange-100'
-                    }`}>
-                    <svg className={`h-5 w-5 ${file.result === '정상' ? 'text-green-600' : file.result === '악성' ? 'text-red-600' : 'text-orange-600'
-                      }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <span className={`h-8 w-8 rounded-full flex items-center justify-center ${
+                    file.result === '정상'
+                      ? 'bg-green-200'
+                      : file.result === '악성'
+                        ? 'bg-red-200'
+                        : file.result === '분석중'
+                          ? 'bg-yellow-200'
+                          : 'bg-gray-200'
+                  }`}>
+                    <svg className={`h-5 w-5 ${
+                      file.result === '정상'
+                        ? 'text-green-700'
+                        : file.result === '악성'
+                          ? 'text-red-700'
+                          : file.result === '분석중'
+                            ? 'text-yellow-800'
+                            : 'text-gray-600'
+                    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={
                         file.result === '정상'
                           ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
@@ -166,20 +199,21 @@ export default function MyPage() {
                   <p className="text-sm text-gray-500">
                     {(() => {
                       const date = new Date(file.date || file.uploadedAt);
-                      return file.uploadedAt || new Date().toLocaleDateString();
+                      return date instanceof Date && !isNaN(date) ? date.toLocaleString('ko-KR') : '날짜 정보 없음';
                     })()}
                   </p>
                 </div>
               </div>
               <div className="flex flex-wrap items-center justify-start sm:justify-end gap-2 sm:gap-4 min-w-[180px]">
-                <span className={`text-sm font-semibold rounded-full px-2 py-1 whitespace-nowrap text-center ${file.result === '정상'
-                  ? 'bg-green-100 text-green-700'
-                  : file.result === '악성'
-                    ? 'bg-red-100 text-red-700'
-                    : file.result === '분석중'
-                      ? 'bg-orange-100 text-orange-700'
-                      : 'bg-gray-100 text-gray-700'
-                  }`}>
+                <span className={`text-sm font-semibold rounded-full px-2 py-1 whitespace-nowrap text-center ${
+                  file.result === '정상'
+                    ? 'bg-green-100 text-green-700 border border-green-300'
+                    : file.result === '악성'
+                      ? 'bg-red-100 text-red-700 border border-red-300'
+                      : file.result === '분석중'
+                        ? 'bg-yellow-100 text-yellow-800 border border-yellow-300'
+                        : 'bg-gray-100 text-gray-600 border border-gray-300'
+                }`}>
                   {file.result === '정상'
                     ? '정상'
                     : file.result === '악성'
@@ -200,12 +234,26 @@ export default function MyPage() {
                 >
                   결과 보기
                 </button>
-                <a href={file.pdfUrl} download className="text-sm text-purple-600 hover:underline">PDF로 보기</a>
+                {file.report_url && (
+                  <button
+                    className="text-sm text-purple-600 hover:underline"
+                    onClick={() => {
+                      const url = file.report_url.startsWith("http")
+                        ? file.report_url
+                        : `${import.meta.env.VITE_API_BASE}${file.report_url}`;
+                      window.open(url, "_blank");
+                    }}
+                  >
+                    PDF 다운로드
+                  </button>
+                )}
               </div>
             </div>
 
             {file.expanded && (
-              <FileAccordionDetail file={file} />
+              <>
+                <FileAccordionDetail file={file} />
+              </>
             )}
           </li>
         ))}

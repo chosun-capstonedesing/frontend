@@ -53,7 +53,11 @@ function PerformanceSection() {
                 f1Score: parsed.performance?.["F1-Score"] ?? 'N/A',
                 benignAccuracy: parsed.performance?.["Benign Accuracy"] ?? 'N/A',
                 malwareAccuracy: parsed.performance?.["Malware Accuracy"] ?? 'N/A',
-                processingTime: parsed.log?.model_load + parsed.log?.preprocess + parsed.log?.inference ?? 'N/A',
+                processingTime: typeof parsed.log?.model_load === 'number' &&
+                                typeof parsed.log?.preprocess === 'number' &&
+                                typeof parsed.log?.inference === 'number'
+                  ? parsed.log.model_load + parsed.log.preprocess + parsed.log.inference
+                  : 'N/A',
                 reportGenerationTime: null,
                 accuracyMetrics: [
                   parsed.model_info?.test_accuracy ?? 0,
@@ -110,7 +114,11 @@ function PerformanceSection() {
                 f1Score: parsed.performance?.["F1-Score"] ?? 'N/A',
                 benignAccuracy: parsed.performance?.["Benign Accuracy"] ?? 'N/A',
                 malwareAccuracy: parsed.performance?.["Malware Accuracy"] ?? 'N/A',
-                processingTime: parsed.log?.model_load + parsed.log?.preprocess + parsed.log?.inference ?? 'N/A',
+                processingTime: typeof parsed.log?.model_load === 'number' &&
+                                typeof parsed.log?.preprocess === 'number' &&
+                                typeof parsed.log?.inference === 'number'
+                  ? parsed.log.model_load + parsed.log.preprocess + parsed.log.inference
+                  : 'N/A',
                 reportGenerationTime: null,
                 accuracyMetrics: [
                   parsed.model_info?.test_accuracy ?? 0,
@@ -159,10 +167,10 @@ function PerformanceSection() {
     labels: ['정상', '악성'],
     datasets: [
       {
-        label: '예측 수',
+        label: '예측 확률',
         data: [
           performance?.normalCount ?? 0,
-          performance?.maliciousCount ?? 0
+          performance?.malwareAccuracy ?? 0
         ],
         backgroundColor: ['#60A5FA', '#F87171'],
       },

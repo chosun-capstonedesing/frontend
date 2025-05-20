@@ -16,9 +16,36 @@ export function useUploadSession(isActuallyLoggedIn, maxCount) {
     const now = Date.now();
 
     const updatedFiles = savedFiles.map((file) => {
-      const result = localStorage.getItem(file.analysis_id || "");
-      if (result) {
-        return { ...file, status: "done" };
+      const raw = localStorage.getItem(file.analysis_id || "");
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          return {
+            ...file,
+            status: "done",
+            result:
+              typeof parsed.result === 'string' && parsed.result !== '[object Object]'
+                ? parsed.result
+                : typeof parsed.malicious === 'number'
+                  ? parsed.malicious >= 0.6 ? '악성' : '정상'
+                  : parsed.log ? '분석 완료'
+                  : '분석 안됨',
+            log: parsed.log,
+            confidence: parsed.confidence,
+            malicious: parsed.malicious,
+            summary: typeof parsed.summary === 'string' ? parsed.summary : '',
+            normal: parsed.normal,
+            sha256: parsed.sha256,
+            model_info: parsed.model_info,
+            performance: parsed.performance,
+            report_url: parsed.report_url,
+            display_name: parsed.display_name,
+            file_size: parsed.file_size,
+            extension: parsed.extension,
+          };
+        } catch {
+          return { ...file, status: "done" };
+        }
       }
       return file;
     });
@@ -70,14 +97,18 @@ export function useUploadSession(isActuallyLoggedIn, maxCount) {
       name: file.name || "이름 없는 파일",
       size: file.size || 0,
       type: file.type || "",
+      extension: file.name?.split('.').pop() || '',
       status: "pending",
       uploadedAt: new Date().toISOString(),
       file, // preserve original File object
     }));
 
+    const filtered = fileList.filter(f =>
+      !enhancedFiles.some(e => e.name === f.name && e.size === f.size)
+    );
     const updatedFiles = isActuallyLoggedIn()
-      ? [...fileList, ...enhancedFiles]
-      : [...fileList, ...enhancedFiles].slice(0, maxCount);
+      ? [...filtered, ...enhancedFiles]
+      : [...filtered, ...enhancedFiles].slice(0, maxCount);
 
     sessionStorage.setItem("uploadedFiles", JSON.stringify(updatedFiles));
     sessionStorage.setItem("uploadedCount", String(updatedFiles.length));
@@ -86,10 +117,24 @@ export function useUploadSession(isActuallyLoggedIn, maxCount) {
 
     // 로컬스토리지에도 동일하게 반영 (마이페이지 등 다른 탭 반영용)
     const combinedLocal = isActuallyLoggedIn()
-      ? [...JSON.parse(localStorage.getItem("uploadedFiles") || "[]"), ...enhancedFiles]
-      : [...JSON.parse(localStorage.getItem("uploadedFiles") || "[]"), ...enhancedFiles].slice(0, maxCount);
+      ? [...JSON.parse(localStorage.getItem("uploadedFiles") || "[]").filter(f =>
+          !enhancedFiles.some(e => e.name === f.name && e.size === f.size)
+        ), ...enhancedFiles]
+      : [...JSON.parse(localStorage.getItem("uploadedFiles") || "[]").filter(f =>
+          !enhancedFiles.some(e => e.name === f.name && e.size === f.size)
+        ), ...enhancedFiles].slice(0, maxCount);
     localStorage.setItem("uploadedFiles", JSON.stringify(combinedLocal));
   };
 
   return [fileList, setFileList, updateSession];
+}
+
+// 마이페이지에서 세션 기반 업로드 결과를 불러오기 위한 유틸
+export function getUploadedFilesFromSession() {
+  try {
+    const raw = sessionStorage.getItem("uploadedFiles");
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
 }

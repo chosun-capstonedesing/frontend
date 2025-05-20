@@ -101,8 +101,12 @@ function AnalysisResults({
   const modelType = fileData?.model_info?.type ?? modelInfo?.type ?? 'N/A';
   const modelInput = fileData?.model_info?.input ?? modelInfo?.input ?? 'N/A';
 
-  const finalProbability = probability !== 'N/A' ? probability :
-                           fileData?.maliciousProbability ?? 'N/A';
+  const normalProbability = fileData?.normal ?? 0;
+  // Robust malware probability logic
+  const malwareAccuracy = Number(fileData?.performance?.["Malware Accuracy"]);
+  const malwareProbability = !isNaN(malwareAccuracy)
+    ? malwareAccuracy
+    : Number(fileData?.malicious ?? probability ?? 0);
   const reportUrl = fileData?.report_url ?? null;
 
   const barData = {
@@ -110,10 +114,7 @@ function AnalysisResults({
     datasets: [
       {
         label: "탐지 확률 (%)",
-        data:
-          finalProbability !== 'N/A'
-            ? [100 - finalProbability, finalProbability]
-            : [0, 0],
+        data: [normalProbability, malwareProbability],
         backgroundColor: ["#4ade80", "#f87171"], // green and red
         borderRadius: 5,
       },
@@ -155,7 +156,9 @@ function AnalysisResults({
             <p className="text-base break-all"><strong>파일 이름:</strong> {fileName}</p>
             <p className="text-base"><strong>파일 크기:</strong> {fileSize !== 'N/A' ? (typeof fileSize === 'number' ? fileSize.toLocaleString() : fileSize) : 'N/A'}</p>
             <p className="text-base"><strong>확장자:</strong> {fileExtension}</p>
-            <p className="text-base"><strong>탐지 결과:</strong> {resultLabel}</p><p className="text-base"><strong>악성 확률:</strong> {probability}{probability !== 'N/A' ? '%' : ''}</p>
+            <p className="text-base"><strong>탐지 결과:</strong> {resultLabel}</p>
+            <p className="text-base"><strong>악성 확률:</strong> {malwareProbability ?? 'N/A'}%</p>
+            <p className="text-base"><strong>정상 확률:</strong> {fileData?.normal ?? 0}%</p>
             <p className="text-base"><strong>신뢰도:</strong> {confidenceValue}{confidenceValue !== 'N/A' ? '%' : ''}</p>
           </div>
           {actualIsLoggedIn && (
@@ -173,20 +176,7 @@ function AnalysisResults({
         <div>
           <div className="mb-6 w-full flex items-end justify-start">
             <Bar
-              data={{
-                labels: ["정상 확률", "악성 확률"],
-                datasets: [
-                  {
-                    label: "탐지 확률 (%)",
-                    data:
-                      probability !== 'N/A'
-                        ? [100 - probability, probability]
-                        : [0, 0],
-                    backgroundColor: ["#4ade80", "#f87171"],
-                    borderRadius: 5,
-                  },
-                ],
-              }}
+              data={barData}
               options={barOptions}
               height={400}
               width={580}
@@ -198,12 +188,8 @@ function AnalysisResults({
                 className="inline-flex items-center px-5 py-2 text-base bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
                 onClick={() => {
                   if (reportUrl) {
-                    const link = document.createElement("a");
-                    link.href = reportUrl.startsWith("http") ? reportUrl : `${import.meta.env.VITE_API_BASE}${reportUrl}`;
-                    link.download = fileName || "report.pdf";
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
+                    const url = reportUrl.startsWith("http") ? reportUrl : `${import.meta.env.VITE_API_BASE}${reportUrl}`;
+                    window.open(url, "_blank");
                   } else {
                     alert("PDF 파일 경로를 찾을 수 없습니다.");
                   }

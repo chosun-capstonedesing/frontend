@@ -5,14 +5,60 @@ export default function FileAccordionDetail({ file }) {
     return <div className="p-4 text-red-500">파일 정보가 없습니다.</div>;
   }
 
-  const matchedData = Object.keys(localStorage).map((key) => {
+  const matchedData = Object.values(localStorage).map((item) => {
     try {
-      const parsed = JSON.parse(localStorage.getItem(key));
-      return parsed?.hash === file.hash ? parsed : null;
+      const parsed = JSON.parse(item);
+
+      const overallAccuracy = parsed.model_info?.test_accuracy ?? 'N/A';
+      const precision = parsed.performance?.Precision ?? 'N/A';
+      const recall = parsed.performance?.Recall ?? 'N/A';
+      const f1Score = parsed.performance?.["F1-Score"] ?? 'N/A';
+      const benignAccuracy = parsed.performance?.["Benign Accuracy"] ?? 'N/A';
+      const malwareAccuracy = parsed.performance?.["Malware Accuracy"] ?? 'N/A';
+
+      const processingTime = (
+        typeof parsed.log?.model_load === 'number' &&
+        typeof parsed.log?.preprocess === 'number' &&
+        typeof parsed.log?.inference === 'number'
+      )
+        ? parsed.log.model_load + parsed.log.preprocess + parsed.log.inference
+        : 'N/A';
+
+      const matchHash = parsed?.sha256?.toLowerCase() === (file.sha256 ?? file.hash)?.toLowerCase();
+      const matchSummary = parsed?.summary === file.summary;
+      const matchFilename = parsed?.filename === file.name || parsed?.filename === file.filename;
+      const matchConfidence = parsed?.confidence === file.confidence;
+
+      return matchHash || matchSummary || (matchFilename && matchConfidence) ? { ...parsed, overallAccuracy, precision, recall, f1Score, benignAccuracy, malwareAccuracy, processingTime } : null;
     } catch {
       return null;
     }
-  }).filter(Boolean)[0];
+  }).find(Boolean);
+  const finalData = {
+    filename: matchedData?.filename ?? file.filename ?? file.name,
+    name: matchedData?.name ?? file.name,
+    file_size: matchedData?.file_size ?? file.file_size,
+    size: matchedData?.size ?? file.size,
+    extension: matchedData?.extension,
+    sha256: matchedData?.sha256 ?? file.sha256 ?? file.hash,
+    hash: matchedData?.hash ?? file.hash,
+    summary: matchedData?.summary ?? file.summary,
+    result: matchedData?.result ?? file.result ?? (matchedData ? '분석 완료' : '분석 안됨'),
+    malwareAccuracy: matchedData?.malwareAccuracy ?? file.malwareAccuracy,
+    report_url: matchedData?.report_url ?? file.report_url ?? null,
+    uploadedAt: matchedData?.uploadedAt ?? file.uploadedAt ?? file.upload_time ?? 'N/A',
+    confidence: matchedData?.confidence ?? file.confidence ?? 'N/A',
+    malicious: matchedData?.malicious ?? file.malicious ?? 'N/A',
+  };
+
+  const extension = finalData.extension ?? finalData.filename?.split('.').pop() ?? finalData.name?.split('.').pop() ?? 'N/A';
+
+  const formattedSize =
+    typeof finalData.file_size === 'string'
+      ? finalData.file_size
+      : typeof finalData.size === 'number'
+        ? `${(finalData.size / 1024 / 1024).toFixed(2)} MB`
+        : 'N/A';
 
   return (
     <div className="mt-4 bg-gray-50 border border-gray-200 rounded p-4">
@@ -20,28 +66,44 @@ export default function FileAccordionDetail({ file }) {
       <ul className="space-y-1 text-sm">
         <li className='pb-2.5'><strong className='text-base'>파일 분석 정보 (File Analysis Information)</strong>
           <ul className="mt-1 space-y-1 pl-1">
-            <li><strong>- 파일 이름: </strong>{file.name}</li>
-            <li><strong>- 파일 크기: </strong>{file.size ? file.size.toLocaleString() : 'N/A'} MB</li>
-            <li><strong>- 확장자: </strong>{file.name?.split('.').pop() || 'N/A'}</li>
-            <li><strong>- SHA-256 Hash: </strong>{file.hash || 'N/A'}</li>
+            <li><strong>- 파일 이름: </strong>{finalData.filename ?? finalData.name ?? 'N/A'}</li>
+            <li><strong>- 파일 크기: </strong>{formattedSize}</li>
+            <li><strong>- 확장자: </strong>{extension}</li>
+            <li><strong>- SHA-256 Hash: </strong>{finalData.sha256 ?? finalData.hash ?? 'N/A'}</li>
           </ul>
         </li>
 
-        <li className='pb-2'><strong className='text-base'>업로드 날짜 (Upload Date):</strong> {(file.uploadedAt || new Date().toLocaleDateString())}</li>
+        <li className='pb-2'><strong className='text-base'>업로드 날짜 (Upload Date):</strong> {new Date(finalData.uploadedAt).toLocaleString('ko-KR', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        })}</li>
 
         <li className='pb-2.5'><strong className='text-base'>탐지 결과 (Detection result)</strong>
-          <p className='mt-1 pl-1'> 해당 "<strong>{file.name}</strong>" 파일은 <strong>{matchedData?.result || file.result}</strong>으로 탐지되었으며, <strong>{(matchedData?.probability ?? file.probability) || 'N/A'}%</strong>의 탐지 확률을 기반으로 판단됩니다.</p>
+          <p className='mt-1 pl-1'>
+            {
+              finalData.summary ??
+              (finalData.result === undefined && finalData.malicious !== 'N/A'
+                ? `해당 "${finalData.filename ?? finalData.name ?? '파일명없음'}" 파일은 분석 완료되었으며, ${
+                    typeof finalData.malicious === 'number'
+                      ? finalData.malicious.toFixed(2)
+                      : (typeof finalData.malwareAccuracy === 'number'
+                        ? finalData.malwareAccuracy.toFixed(2)
+                        : 'N/A')
+                  }%의 탐지 확률을 기반으로 판단됩니다.`
+                : `해당 "${finalData.filename ?? finalData.name ?? '파일명없음'}" 파일은 ${finalData.result ?? '분석 안됨'}으로 탐지되었으며, ${
+                    typeof finalData.malicious === 'number'
+                      ? finalData.malicious.toFixed(2)
+                      : (typeof finalData.malwareAccuracy === 'number'
+                        ? finalData.malwareAccuracy.toFixed(2)
+                        : 'N/A')
+                  }%의 탐지 확률을 기반으로 판단됩니다.`)
+            }
+          </p>
           <p className="text-xs text-gray-500 mt-1 pl-1">※ 악성 확률이 60% 이상일 경우 '악성'으로 판별합니다.</p>
-        </li>
-
-        <li className='pb-2.5'>
-          <strong className='text-base'>분석 로그 요약 (Analysis Log Summary)</strong>
-          <ul className="mt-1 space-y-1 pl-1">
-            <li><strong>- 분석 시작 시간: </strong>{matchedData?.analysisStartedAt || file.analysisStartedAt || 'N/A'}</li>
-            <li><strong>- 모델 로딩 시간: </strong>{matchedData?.log?.model_load ?? 'N/A'}초</li>
-            <li><strong>- 파일 전처리 시간: </strong>{matchedData?.log?.preprocess ?? 'N/A'}초</li>
-            <li><strong>- 추론 시간: </strong>{matchedData?.log?.inference ?? 'N/A'}초</li>
-          </ul>
         </li>
       </ul>
     </div>
