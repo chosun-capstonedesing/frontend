@@ -25,6 +25,10 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
   // 로그인 여부 확인(개발 환경에선 항상 true)
   const isLoggedIn = import.meta.env.DEV ? true : isActuallyLoggedIn();
 
+  const isExceedingLimit = (newFilesCount) => {
+    return !isLoggedIn && fileList.length + newFilesCount > maxCount;
+  };
+
   // ---------------------------
   // 파일 선택(input) 시 처리 함수
   // - 업로드 제한 초과 시 경고
@@ -32,7 +36,7 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
   // ---------------------------
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
-    if (!isLoggedIn && fileList.length + selectedFiles.length > maxCount) {
+    if (isExceedingLimit(selectedFiles.length)) {
       alert(`비로그인 사용자는 하루 최대 ${maxCount}개 파일까지만 업로드할 수 있습니다.`);
       return;
     }
@@ -48,7 +52,7 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
   const handleDrop = (e) => {
     e.preventDefault();
     const droppedFiles = Array.from(e.dataTransfer.files);
-    if (!isLoggedIn && fileList.length + droppedFiles.length > maxCount) {
+    if (isExceedingLimit(droppedFiles.length)) {
       alert(`비로그인 사용자는 하루 최대 ${maxCount}개 파일까지만 업로드할 수 있습니다.`);
       return;
     }
@@ -80,23 +84,31 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
   };
 
   // ---------------------------
-  // 분석 완료된 파일의 토스트 상태 갱신
-  // - fileList의 각 파일 상태를 확인하고, 완료 시 토스트 업데이트
+  // 분석 완료된 파일의 토스트 상태 갱신 (향상된 신뢰성)
+  // - fileList의 각 파일 상태를 확인하고, 결과/로그 등 실제 데이터가 존재할 때만 토스트 및 세션 업데이트
   // ---------------------------
   useEffect(() => {
+    let changed = false;
+
     const updatedList = fileList.map((file, index) => {
-      if (file.status === "done" && !file.toastUpdated) {
+      if (
+        file.status === "done" &&
+        !file.toastUpdated &&
+        (file.result || file.malicious !== undefined || file.log)
+      ) {
+        const updatedFile = { ...file, toastUpdated: true };
         updateToastStatus(index);
-        return { ...file, toastUpdated: true };
+        updateSession([updatedFile]);
+        changed = true;
+        return updatedFile;
       }
       return file;
     });
 
-    // 변경사항이 있을 때만 fileList 상태 갱신
-    if (JSON.stringify(updatedList) !== JSON.stringify(fileList)) {
+    if (changed) {
       setFileList(updatedList);
     }
-  }, [fileList, updateToastStatus]);
+  }, [fileList, updateToastStatus, updateSession]);
 
   // ===============================
   // UI 렌더링

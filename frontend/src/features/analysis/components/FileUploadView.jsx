@@ -1,4 +1,5 @@
 import React from "react";
+import { deleteFileFromSessionAndLocal } from "../../../features/analysis/components/useUploadSession";
 import DragAndDrop from "./DragAndDrop";
 import FileInput from "./FileInput";
 import { useNavigate } from "react-router-dom";
@@ -52,6 +53,37 @@ export function FileUploadPreviewList({
     }
   }, [fileList]);
 
+  const parseResultFromLocalStorage = (analysisId) => {
+    const parsed = JSON.parse(localStorage.getItem(analysisId));
+    if (!parsed) return null;
+
+    const result =
+      typeof parsed.result === 'string'
+        ? parsed.result
+        : typeof parsed.malicious === 'number'
+        ? parsed.malicious >= 0.9
+          ? '악성'
+          : parsed.malicious >= 0.6
+          ? '의심'
+          : '정상'
+        : parsed.log
+        ? '분석 완료'
+        : '분석 안됨';
+
+    return { parsed, result };
+  };
+
+  const updateSessionWithParsedResult = (file, parsed, result, status = undefined) => {
+    const sessionFiles = JSON.parse(sessionStorage.getItem("uploadedFiles") || "[]");
+    const updatedSession = sessionFiles.map((f) =>
+      f.analysis_id === file.analysis_id
+        ? { ...f, ...parsed, result, ...(status && { status }) }
+        : f
+    );
+    sessionStorage.setItem("uploadedFiles", JSON.stringify(updatedSession));
+    return updatedSession;
+  };
+
   return (
     <ul className="bg-white rounded-lg shadow divide-y divide-gray-200">
       {/* 파일 리스트의 각 항목에 대해 표시 */}
@@ -67,12 +99,10 @@ export function FileUploadPreviewList({
             {/* 삭제 버튼 */}
             <button
               onClick={() => {
+                deleteFileFromSessionAndLocal(file.analysis_id);
                 const updated = [...fileList];
                 updated.splice(originalIndex, 1);
                 setFileList(updated);
-                sessionStorage.setItem("uploadedFiles", JSON.stringify(updated));
-                sessionStorage.setItem("uploadedCount", String(updated.length));
-                localStorage.setItem("uploadedFiles", JSON.stringify(updated));
                 window.dispatchEvent(new Event("fileListUpdated"));
               }}
               className="absolute -top-2 -left-2 bg-gray-400 hover:bg-gray-600 text-white rounded-full w-5 h-5 flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200"
@@ -168,12 +198,28 @@ export function FileUploadPreviewList({
                   if (isValid) {
                     navigate(`/analysis_results/${file.analysis_id}`);
                   } else if (file.status === "done") {
+                    // force session update for MyPage sync if data exists in localStorage
+                    const parsedResult = parseResultFromLocalStorage(file.analysis_id);
+                    if (parsedResult) {
+                      const { parsed, result } = parsedResult;
+                      updateSessionWithParsedResult(file, parsed, result);
+                    }
+
                     if (isLoggedIn) {
                       alert("분석 결과가 만료되었습니다. 마이페이지에서 확인해주세요.");
                     } else {
                       alert("분석 결과가 만료되었습니다. 로그인 후 마이페이지에서 히스토리를 확인할 수 있습니다.");
                     }
                   } else {
+                    if ((progressMap[file.analysis_id] ?? 0) >= 100) {
+                      const parsedResult = parseResultFromLocalStorage(file.analysis_id);
+                      if (parsedResult) {
+                        const { parsed, result } = parsedResult;
+                        const updatedSession = updateSessionWithParsedResult(file, parsed, result, 'done');
+                        setFileList(updatedSession);
+                        return;
+                      }
+                    }
                     onAnalyzeFile(file.analysis_id);
                   }
                 }}

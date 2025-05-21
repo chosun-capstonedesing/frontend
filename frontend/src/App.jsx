@@ -19,14 +19,15 @@ function App() {
     Cookies.set('client_uuid', uuidv4(), { expires: 1, path: '/' }); // 1일 유지
   }
 
-  const isDev = import.meta.env.DEV;
-  const [isLoggedIn, setIsLoggedIn] = useState(checkLoginStatus());
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const isValidToken = (token) => {
+    return token && token !== "undefined" && token.trim() !== "";
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");
-    if (!token || token === "undefined" || token.trim() === "") {
-      setIsLoggedIn(false);
-    }
+    setIsLoggedIn(isValidToken(token));
   }, []);
 
   const handleLoginSuccess = (accessToken) => {

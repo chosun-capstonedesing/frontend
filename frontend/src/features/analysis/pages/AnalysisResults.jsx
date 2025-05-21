@@ -30,24 +30,26 @@ function AnalysisResults({
   modelInfo = {}
 }) {
   const { analysis_id: analysisId } = useParams();
-  const [recentAnalysisId, setRecentAnalysisId] = useState(null);
-  console.log("분석 결과 페이지 - 파일 ID:", analysisId ?? recentAnalysisId);
-
   const [fileData, setFileData] = useState(null);
+
+  // Helper function to load analysis data from localStorage
+  const loadAnalysisData = (id) => {
+    const saved = localStorage.getItem(id);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setFileData(parsed);
+        return parsed;
+      } catch (e) {
+        console.error("분석 결과 파싱 실패:", e);
+      }
+    }
+  };
 
   useEffect(() => {
     if (analysisId) {
-      const saved = localStorage.getItem(analysisId);
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          setFileData(parsed);
-        } catch (e) {
-          console.error("분석 결과 파싱 실패:", e);
-        }
-      }
+      loadAnalysisData(analysisId);
     } else {
-      // fallback: get latest analysisId from localStorage
       const allKeys = Object.keys(localStorage);
       const recent = allKeys
         .filter((key) => {
@@ -66,17 +68,25 @@ function AnalysisResults({
 
       if (recent.length > 0) {
         const latestId = recent[0].id;
-        setRecentAnalysisId(latestId);
-        const latestData = localStorage.getItem(latestId);
-        try {
-          const parsed = JSON.parse(latestData);
-          setFileData(parsed);
-        } catch (e) {
-          console.error("최근 분석 결과 파싱 실패:", e);
-        }
+        loadAnalysisData(latestId);
       }
     }
   }, [analysisId]);
+
+useEffect(() => {
+    if (fileData?.analysis_id) {
+      const sessionFiles = JSON.parse(sessionStorage.getItem("uploadedFiles") || "[]");
+      const updatedSession = sessionFiles.map((f) =>
+        f.analysis_id === fileData.analysis_id ? { ...f, ...fileData, status: "done" } : f
+      );
+      sessionStorage.setItem("uploadedFiles", JSON.stringify(updatedSession));
+      // Also update localStorage based on deletedAnalysisIds
+      const deletedIds = JSON.parse(sessionStorage.getItem("deletedAnalysisIds") || "[]");
+      if (deletedIds.includes(fileData.analysis_id)) {
+        localStorage.removeItem(fileData.analysis_id);
+      }
+    }
+  }, [fileData]);
 
   if (!fileData) {
     return (
@@ -87,19 +97,19 @@ function AnalysisResults({
     );
   }
 
-  const fileName = fileData?.filename ?? name ?? 'N/A';
-  const fileSize = fileData?.file_size ?? size ?? 'N/A';
-  const fileExtension = fileData?.extension ?? extension ?? 'N/A';
-  const resultLabel = fileData?.result ?? result ?? 'N/A';
-  const confidenceValue = fileData?.confidence ?? confidence ?? 'N/A';
-  const startTime = fileData?.log?.start_time ?? analysisStartTime ?? 'N/A';
-  const modelLoad = fileData?.log?.model_load ?? modelLoadingTime ?? 'N/A';
-  const preprocess = fileData?.log?.preprocess ?? preprocessingTime ?? 'N/A';
-  const inference = fileData?.log?.inference ?? inferenceTime ?? 'N/A';
-  const sha256 = fileData?.sha256 ?? hash ?? 'N/A';
-  const probability = fileData?.malicious ?? maliciousProbability ?? 'N/A';
-  const modelType = fileData?.model_info?.type ?? modelInfo?.type ?? 'N/A';
-  const modelInput = fileData?.model_info?.input ?? modelInfo?.input ?? 'N/A';
+  const fileName = fileData.filename;
+  const fileSize = fileData.file_size;
+  const fileExtension = fileData.extension;
+  const resultLabel = fileData.result;
+  const confidenceValue = fileData.confidence;
+  const startTime = fileData.log?.start_time;
+  const modelLoad = fileData.log?.model_load;
+  const preprocess = fileData.log?.preprocess;
+  const inference = fileData.log?.inference;
+  const sha256 = fileData.sha256;
+  const probability = fileData.malicious;
+  const modelType = fileData.model_info?.type;
+  const modelInput = fileData.model_info?.input;
 
   const normalProbability = fileData?.normal ?? 0;
   const malwareProbability = typeof fileData?.malicious === 'number'
@@ -143,11 +153,7 @@ function AnalysisResults({
     },
   };
 
-  if (import.meta.env.MODE === "development") {
-    isLoggedIn = true;
-  }
-
-  const actualIsLoggedIn = typeof isLoggedIn !== "undefined" ? isLoggedIn : !!localStorage.getItem("access_token");
+  const actualIsLoggedIn = import.meta.env.MODE === "development" || !!localStorage.getItem("access_token");
 
   return (
     <div className="bg-white shadow-md rounded p-6">

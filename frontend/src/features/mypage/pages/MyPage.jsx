@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import FileAccordionDetail from './MyPageDetail';
 import ReactPaginate from 'react-paginate';
-import { getUploadedFilesFromSession } from '../../analysis/components/useUploadSessions';
+import { getUploadedFilesFromSession, deleteFileFromSessionAndLocal } from '../../analysis/components/useUploadSession';
 
 export default function MyPage() {
   const [fileList, setFileList] = useState([]);
@@ -21,10 +21,10 @@ export default function MyPage() {
     [...savedFiles, ...sessionFiles].forEach((file, i) => {
       const analysis_id = file.analysis_id || file.sha256 || `${file.name}-${file.date || i}`;
       // --- BEGIN PATCHED RESULT LOGIC ---
-      let result = '분석 안됨';
+      let result = '정보 없음';
       const hasLog = file.log && Object.keys(file.log).length > 0;
       const hasId = !!(file.analysis_id || file.sha256 || file.name);
-      const hasResult = typeof file.result === 'string';
+      const hasResult = typeof file.result === 'string' && file.result !== '정보 없음';
 
       if (hasLog || hasId) {
         const mal = Number(
@@ -36,10 +36,12 @@ export default function MyPage() {
         if (!isNaN(mal)) {
           result = mal >= 0.6 ? '악성' : '정상';
         } else if (hasResult) {
-          result = typeof file.result === 'string' ? file.result : '분석 완료';
-        } else if (hasLog) {
-          result = '분석중';
-        } else {
+          if (['악성', '정상', '의심'].includes(file.result)) {
+            result = file.result;
+          } else {
+            result = '분석 완료';
+          }
+        } else if (hasLog || file.log !== undefined) {
           result = '분석 완료';
         }
       }
@@ -59,46 +61,32 @@ export default function MyPage() {
     setFileList(Array.from(combinedMap.values()));
   }, []);
 
-  const visibleFiles = [...fileList]
-    .filter(file => {
-      if (activeTab === '전체') return true;
-      return file.result === activeTab;
-    })
-    .filter(file => file.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    .sort((a, b) => {
-      const dateA = new Date(a.log?.start_time || a.date || a.uploadedAt || 0);
-      const dateB = new Date(b.log?.start_time || b.date || b.uploadedAt || 0);
-      if (isNaN(dateA) || isNaN(dateB)) return 0;
-      return sortOption === '최신순' ? dateB - dateA : dateA - dateB;
-    });
+  const getFilteredAndSortedFiles = () => {
+    return [...fileList]
+      .filter(file => activeTab === '전체' || file.result === activeTab)
+      .filter(file => file.name.toLowerCase().includes(searchQuery.toLowerCase()))
+      .sort((a, b) => {
+        const dateA = new Date(a.log?.start_time || a.date || a.uploadedAt || 0);
+        const dateB = new Date(b.log?.start_time || b.date || b.uploadedAt || 0);
+        if (isNaN(dateA) || isNaN(dateB)) return 0;
+        return sortOption === '최신순' ? dateB - dateA : dateA - dateB;
+      });
+  };
+
+  const visibleFiles = getFilteredAndSortedFiles();
+  const sortedAndPaginatedFiles = visibleFiles.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
 
   const pageCount = Math.max(1, Math.ceil(visibleFiles.length / itemsPerPage));
   const handlePageClick = ({ selected }) => {
     setCurrentPage(selected);
   };
 
-  const sortedAndPaginatedFiles = [...fileList]
-    .filter(file => {
-      if (activeTab === '전체') return true;
-      return file.result === activeTab;
-    })
-    .filter(file => file.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    .sort((a, b) => {
-      const dateA = new Date(a.log?.start_time || a.date || a.uploadedAt || 0);
-      const dateB = new Date(b.log?.start_time || b.date || b.uploadedAt || 0);
-      if (isNaN(dateA) || isNaN(dateB)) return 0;
-      return sortOption === '최신순' ? dateB - dateA : dateA - dateB;
-    })
-    .slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
-
   // 파일 삭제 핸들러
   const handleDelete = (id) => {
+    deleteFileFromSessionAndLocal(id);
     const updated = fileList.filter(file => file.analysis_id !== id);
     setFileList(updated);
-    localStorage.setItem('uploadedFiles', JSON.stringify(updated));
-    sessionStorage.setItem('uploadedFiles', JSON.stringify(updated));
-    sessionStorage.setItem('uploadedCount', String(updated.length));
-    window.dispatchEvent(new Event("fileListUpdated")); // Notify other components in same tab
+    window.dispatchEvent(new Event("fileListUpdated"));
   };
 
   return (

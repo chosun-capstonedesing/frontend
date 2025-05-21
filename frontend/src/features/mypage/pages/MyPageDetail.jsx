@@ -1,39 +1,45 @@
 import React from 'react';
 
 export default function FileAccordionDetail({ file }) {
+  // Helper function to get matched data from localStorage
+  const getMatchedDataFromLocalStorage = (file) => {
+    return Object.values(localStorage).map((item) => {
+      try {
+        const parsed = JSON.parse(item);
+        const matchHash = parsed?.sha256?.toLowerCase() === (file.sha256 ?? file.hash)?.toLowerCase();
+        const matchSummary = parsed?.summary === file.summary;
+        const matchFilename = parsed?.filename === file.name || parsed?.filename === file.filename;
+        const matchConfidence = parsed?.confidence === file.confidence;
+
+        if (matchHash || matchSummary || (matchFilename && matchConfidence)) {
+          const overallAccuracy = parsed.model_info?.test_accuracy ?? 'N/A';
+          const precision = parsed.performance?.Precision ?? 'N/A';
+          const recall = parsed.performance?.Recall ?? 'N/A';
+          const f1Score = parsed.performance?.["F1-Score"] ?? 'N/A';
+          const benignAccuracy = parsed.performance?.["Benign Accuracy"] ?? 'N/A';
+          const malwareAccuracy = parsed.performance?.["Malware Accuracy"] ?? 'N/A';
+          const processingTime = (
+            typeof parsed.log?.model_load === 'number' &&
+            typeof parsed.log?.preprocess === 'number' &&
+            typeof parsed.log?.inference === 'number'
+          )
+            ? parsed.log.model_load + parsed.log.preprocess + parsed.log.inference
+            : 'N/A';
+
+          return { ...parsed, overallAccuracy, precision, recall, f1Score, benignAccuracy, malwareAccuracy, processingTime };
+        }
+        return null;
+      } catch {
+        return null;
+      }
+    }).find(Boolean);
+  };
+
   if (!file) {
     return <div className="p-4 text-red-500">파일 정보가 없습니다.</div>;
   }
 
-  const matchedData = Object.values(localStorage).map((item) => {
-    try {
-      const parsed = JSON.parse(item);
-
-      const overallAccuracy = parsed.model_info?.test_accuracy ?? 'N/A';
-      const precision = parsed.performance?.Precision ?? 'N/A';
-      const recall = parsed.performance?.Recall ?? 'N/A';
-      const f1Score = parsed.performance?.["F1-Score"] ?? 'N/A';
-      const benignAccuracy = parsed.performance?.["Benign Accuracy"] ?? 'N/A';
-      const malwareAccuracy = parsed.performance?.["Malware Accuracy"] ?? 'N/A';
-
-      const processingTime = (
-        typeof parsed.log?.model_load === 'number' &&
-        typeof parsed.log?.preprocess === 'number' &&
-        typeof parsed.log?.inference === 'number'
-      )
-        ? parsed.log.model_load + parsed.log.preprocess + parsed.log.inference
-        : 'N/A';
-
-      const matchHash = parsed?.sha256?.toLowerCase() === (file.sha256 ?? file.hash)?.toLowerCase();
-      const matchSummary = parsed?.summary === file.summary;
-      const matchFilename = parsed?.filename === file.name || parsed?.filename === file.filename;
-      const matchConfidence = parsed?.confidence === file.confidence;
-
-      return matchHash || matchSummary || (matchFilename && matchConfidence) ? { ...parsed, overallAccuracy, precision, recall, f1Score, benignAccuracy, malwareAccuracy, processingTime } : null;
-    } catch {
-      return null;
-    }
-  }).find(Boolean);
+  const matchedData = getMatchedDataFromLocalStorage(file);
   const finalData = {
     filename: matchedData?.filename ?? file.filename ?? file.name,
     name: matchedData?.name ?? file.name,
@@ -43,12 +49,16 @@ export default function FileAccordionDetail({ file }) {
     sha256: matchedData?.sha256 ?? file.sha256 ?? file.hash,
     hash: matchedData?.hash ?? file.hash,
     summary: matchedData?.summary ?? file.summary,
-    result: matchedData?.result ?? file.result ?? (matchedData ? '분석 완료' : '분석 안됨'),
+    result: matchedData?.result ?? file.result ?? (matchedData ? (matchedData?.malicious !== undefined ? '분석 완료' : '분석 안됨') : '분석 안됨'),
     malwareAccuracy: matchedData?.malwareAccuracy ?? file.malwareAccuracy,
     report_url: matchedData?.report_url ?? file.report_url ?? null,
     uploadedAt: matchedData?.uploadedAt ?? file.uploadedAt ?? file.upload_time ?? 'N/A',
     confidence: matchedData?.confidence ?? file.confidence ?? 'N/A',
-    malicious: matchedData?.malicious ?? file.malicious ?? 'N/A',
+    malicious: typeof matchedData?.malicious === 'number'
+      ? matchedData.malicious
+      : typeof file.malicious === 'number'
+        ? file.malicious
+        : parseFloat(matchedData?.malicious ?? file.malicious) || 'N/A',
   };
 
   const extension = finalData.extension ?? finalData.filename?.split('.').pop() ?? finalData.name?.split('.').pop() ?? 'N/A';
@@ -86,7 +96,7 @@ export default function FileAccordionDetail({ file }) {
           <p className='mt-1 pl-1'>
             {
               finalData.summary ??
-              (finalData.result === undefined && finalData.malicious !== 'N/A'
+              ((finalData.result === undefined || finalData.result === '분석 완료' || finalData.result === '의심' || finalData.result === '정상' || finalData.result === '악성') && finalData.malicious !== 'N/A'
                 ? `해당 "${finalData.filename ?? finalData.name ?? '파일명없음'}" 파일은 분석 완료되었으며, ${
                     typeof finalData.malicious === 'number'
                       ? finalData.malicious.toFixed(2)

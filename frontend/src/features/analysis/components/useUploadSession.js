@@ -1,3 +1,23 @@
+/**
+ * Delete a file from sessionStorage and localStorage by analysisId,
+ * and remove its associated result from localStorage.
+ */
+export function deleteFileFromSessionAndLocal(analysisId) {
+  // Remove from sessionStorage
+  const sessionFiles = JSON.parse(sessionStorage.getItem("uploadedFiles") || "[]");
+  const updatedSession = sessionFiles.filter(f => f.analysis_id !== analysisId);
+  sessionStorage.setItem("uploadedFiles", JSON.stringify(updatedSession));
+  sessionStorage.setItem("uploadedCount", String(updatedSession.length));
+
+  // Remove from localStorage
+  const localFiles = JSON.parse(localStorage.getItem("uploadedFiles") || "[]");
+  const updatedLocal = localFiles.filter(f => f.analysis_id !== analysisId);
+  localStorage.setItem("uploadedFiles", JSON.stringify(updatedLocal));
+
+  // Remove associated result by key
+  localStorage.removeItem(analysisId);
+  sessionStorage.removeItem(analysisId);
+}
 import { v4 as uuidv4 } from "uuid";
 import { useState, useEffect } from "react";
 
@@ -17,9 +37,11 @@ export function useUploadSession(isActuallyLoggedIn, maxCount) {
 
     const updatedFiles = savedFiles.map((file) => {
       const raw = localStorage.getItem(file.analysis_id || "");
-      if (raw) {
+      const rawSession = sessionStorage.getItem(file.analysis_id || "");
+      const parsedRaw = raw || rawSession;
+      if (parsedRaw) {
         try {
-          const parsed = JSON.parse(raw);
+          const parsed = JSON.parse(parsedRaw);
           return {
             ...file,
             status: "done",
@@ -27,7 +49,11 @@ export function useUploadSession(isActuallyLoggedIn, maxCount) {
               typeof parsed.result === 'string' && parsed.result !== '[object Object]'
                 ? parsed.result
                 : typeof parsed.malicious === 'number'
-                  ? parsed.malicious >= 0.6 ? '악성' : '정상'
+                  ? parsed.malicious >= 0.9
+                    ? '악성'
+                    : parsed.malicious >= 0.6
+                      ? '의심'
+                      : '정상'
                   : parsed.log ? '분석 완료'
                   : '분석 안됨',
             log: parsed.log,
@@ -89,10 +115,8 @@ export function useUploadSession(isActuallyLoggedIn, maxCount) {
     };
   }, [isActuallyLoggedIn, maxCount]);
 
-  // 파일 목록을 세션/로컬스토리지에 반영
-  const updateSession = (newFiles) => {
-    const now = Date.now();
-    const enhancedFiles = newFiles.map((file) => ({
+  const createEnhancedFiles = (newFiles) => {
+    return newFiles.map((file) => ({
       analysis_id: uuidv4(),
       name: file.name || "이름 없는 파일",
       size: file.size || 0,
@@ -100,8 +124,14 @@ export function useUploadSession(isActuallyLoggedIn, maxCount) {
       extension: file.name?.split('.').pop() || '',
       status: "pending",
       uploadedAt: new Date().toISOString(),
-      file, // preserve original File object
+      file,
     }));
+  };
+
+  // 파일 목록을 세션/로컬스토리지에 반영
+  const updateSession = (newFiles) => {
+    const now = Date.now();
+    const enhancedFiles = createEnhancedFiles(newFiles);
 
     const filtered = fileList.filter(f =>
       !enhancedFiles.some(e => e.name === f.name && e.size === f.size)

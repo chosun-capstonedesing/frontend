@@ -3,6 +3,11 @@ import { createPortal } from "react-dom";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 import { useNavigate } from "react-router-dom";
 
+// Utility functions for status checks
+const isProcessing = (status) => status === 'processing';
+const isDone = (status) => status === 'done';
+const isCancelled = (status) => status === 'cancelled';
+
 // ✅ ToastContext 생성 - 전역에서 알림을 호출/관리하기 위해 사용
 const ToastContext = createContext();
 
@@ -24,7 +29,7 @@ export const ToastProvider = ({ children }) => {
   const updateProgress = (analysisId, progress) => {
     setToasts(prev =>
       prev.map(t =>
-        t.analysisId === analysisId && t.status === "processing"
+        t.analysisId === analysisId && isProcessing(t.status)
           ? { ...t, progress }
           : t
       )
@@ -51,7 +56,7 @@ export const ToastProvider = ({ children }) => {
   const cancelToastStatus = (analysisId) => {
     setToasts(prev =>
       prev.map(t =>
-        t.analysisId === analysisId && t.status === "processing"
+        t.analysisId === analysisId && isProcessing(t.status)
           ? { ...t, status: "cancelled" }
           : t
       )
@@ -105,9 +110,9 @@ export const ToastProvider = ({ children }) => {
             <div
               key={toast.id}
               className={`relative w-72 bg-white shadow-md rounded-md p-3 
-                ${toast.status === 'done' 
+                ${isDone(toast.status) 
                   ? 'border border-green-200' 
-                  : toast.status === 'cancelled' 
+                  : isCancelled(toast.status) 
                   ? 'border border-red-200' 
                   : 'border border-yellow-300'}`}
             >
@@ -124,10 +129,10 @@ export const ToastProvider = ({ children }) => {
 
               <div className="flex items-center space-x-2">
                 {/* ✅ 아이콘 표시: 완료, 중지, 진행 중 상태에 따른 아이콘 및 배경 색상 */}
-                <div className={`${toast.status === 'done' ? 'bg-green-100' : toast.status === 'cancelled' ? 'bg-red-100' : 'bg-yellow-100'} p-1.5 rounded-full`}>
-                  {toast.status === "done" ? (
+                <div className={`${isDone(toast.status) ? 'bg-green-100' : isCancelled(toast.status) ? 'bg-red-100' : 'bg-yellow-100'} p-1.5 rounded-full`}>
+                  {isDone(toast.status) ? (
                     <CheckCircleIcon className="h-5 w-5 text-green-500" />
-                  ) : toast.status === "cancelled" ? (
+                  ) : isCancelled(toast.status) ? (
                     <ClockIcon className="h-5 w-5 text-red-500 rotate-45" />
                   ) : (
                     <ClockIcon className="h-5 w-5 text-yellow-500" />
@@ -136,9 +141,9 @@ export const ToastProvider = ({ children }) => {
 
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-gray-800">
-                    {toast.status === "done"
+                    {isDone(toast.status)
                       ? "분석 완료"
-                      : toast.status === "cancelled"
+                      : isCancelled(toast.status)
                       ? "분석 중지됨"
                       : "분석 중"}
                   </p>
@@ -146,7 +151,7 @@ export const ToastProvider = ({ children }) => {
                   <div className="text-xs text-gray-600 break-all whitespace-pre-wrap max-w-full">{toast.message}</div>
 
                   {/* ✅ 분석 중일 때: 프로그래스 바 표시 */}
-                  {toast.status === "processing" && (
+                  {isProcessing(toast.status) && (
                     <div className="w-full mt-2">
                       <div className="flex items-center space-x-2">
                         <div className="flex-1 bg-gray-200 h-2 rounded-full">
@@ -174,7 +179,7 @@ export const ToastProvider = ({ children }) => {
                   )}
 
                   {/* ✅ 분석 완료일 때: 결과 보기 링크 표시 */}
-                  {toast.status === "done" && (
+                  {isDone(toast.status) && (
                     <p
                       onClick={() => {
                         if (toast.analysisId !== null) {

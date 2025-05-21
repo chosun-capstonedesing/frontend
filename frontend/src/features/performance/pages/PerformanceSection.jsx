@@ -13,6 +13,7 @@ import {
   Legend
 } from 'chart.js';
 
+
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
 /**
@@ -27,6 +28,57 @@ function PerformanceSection() {
   const { analysis_id: analysisId } = useParams();
   const [recentAnalysisId, setRecentAnalysisId] = useState(null);
   console.log("모델 성능 페이지 - 파일 ID:", analysisId ?? recentAnalysisId);
+
+  const parseAndSetPerformance = (parsed, analysisIdToSet) => {
+    setLogInfo(parsed.log ?? null);
+    setPerformance({
+      overallAccuracy: parsed.model_info?.test_accuracy ?? 'N/A',
+      precision: parsed.performance?.Precision ?? 'N/A',
+      recall: parsed.performance?.Recall ?? 'N/A',
+      f1Score: parsed.performance?.["F1-Score"] ?? 'N/A',
+      benignAccuracy: parsed.performance?.["Benign Accuracy"] ?? 'N/A',
+      malwareAccuracy: parsed.performance?.["Malware Accuracy"] ?? 'N/A',
+      processingTime: typeof parsed.log?.model_load === 'number' &&
+                      typeof parsed.log?.preprocess === 'number' &&
+                      typeof parsed.log?.inference === 'number'
+        ? parsed.log.model_load + parsed.log.preprocess + parsed.log.inference
+        : 'N/A',
+      accuracyMetrics: [
+        parsed.model_info?.test_accuracy ?? 0,
+        parsed.performance?.Precision ?? 0,
+        parsed.performance?.Recall ?? 0,
+        parsed.performance?.["F1-Score"] ?? 0,
+      ],
+      normalCount: parsed.normal ?? 0,
+      maliciousCount: parsed.malicious ?? 0,
+      environment: parsed.model_info ? {
+        modelName: parsed.model_info?.type ?? 'N/A',
+        dataset: '사용된 데이터셋 정보 없음',
+        epochs: 'N/A',
+        batchSize: 'N/A',
+        optimizer: 'N/A',
+        metrics: [],
+        modelPath: 'N/A',
+        libraries: [parsed.model_info?.input],
+      } : null
+    });
+    if (parsed?.analysis_id) {
+      const sessionFiles = JSON.parse(sessionStorage.getItem("uploadedFiles") || "[]");
+      const updatedSession = sessionFiles.map((f) =>
+        f.analysis_id === parsed.analysis_id
+          ? { ...f, ...parsed, status: "done" }
+          : f
+      );
+      sessionStorage.setItem("uploadedFiles", JSON.stringify(updatedSession));
+      const deletedKeys = JSON.parse(sessionStorage.getItem("deletedAnalysisIds") || "[]");
+      if (deletedKeys.includes(parsed.analysis_id)) {
+        localStorage.removeItem(parsed.analysis_id);
+        const updated = updatedSession.filter(f => f.analysis_id !== parsed.analysis_id);
+        sessionStorage.setItem("uploadedFiles", JSON.stringify(updated));
+      }
+    }
+    setActiveAnalysisId(analysisIdToSet);
+  };
 
   useEffect(() => {
     const fetchPerformanceData = async () => {
@@ -45,40 +97,7 @@ function PerformanceSection() {
           if (saved) {
             try {
               const parsed = JSON.parse(saved);
-              setLogInfo(parsed.log ?? null);
-              setPerformance({
-                overallAccuracy: parsed.model_info?.test_accuracy ?? 'N/A',
-                precision: parsed.performance?.Precision ?? 'N/A',
-                recall: parsed.performance?.Recall ?? 'N/A',
-                f1Score: parsed.performance?.["F1-Score"] ?? 'N/A',
-                benignAccuracy: parsed.performance?.["Benign Accuracy"] ?? 'N/A',
-                malwareAccuracy: parsed.performance?.["Malware Accuracy"] ?? 'N/A',
-                processingTime: typeof parsed.log?.model_load === 'number' &&
-                                typeof parsed.log?.preprocess === 'number' &&
-                                typeof parsed.log?.inference === 'number'
-                  ? parsed.log.model_load + parsed.log.preprocess + parsed.log.inference
-                  : 'N/A',
-                reportGenerationTime: null,
-                accuracyMetrics: [
-                  parsed.model_info?.test_accuracy ?? 0,
-                  parsed.performance?.Precision ?? 0,
-                  parsed.performance?.Recall ?? 0,
-                  parsed.performance?.["F1-Score"] ?? 0,
-                ],
-                normalCount: parsed.normal ?? 0,
-                maliciousCount: parsed.malicious ?? 0,
-                environment: parsed.model_info ? {
-                  modelName: parsed.model_info?.type ?? 'N/A',
-                  dataset: '사용된 데이터셋 정보 없음',
-                  epochs: 'N/A',
-                  batchSize: 'N/A',
-                  optimizer: 'N/A',
-                  metrics: [],
-                  modelPath: 'N/A',
-                  libraries: [parsed.model_info?.input],
-                } : null
-              });
-              setActiveAnalysisId(analysisId);
+              parseAndSetPerformance(parsed, analysisId);
             } catch (e) {
               console.error("분석 성능 파싱 실패:", e);
             }
@@ -106,39 +125,7 @@ function PerformanceSection() {
             setActiveAnalysisId(latestId);
             try {
               const parsed = JSON.parse(latestData);
-              setLogInfo(parsed.log ?? null);
-              setPerformance({
-                overallAccuracy: parsed.model_info?.test_accuracy ?? 'N/A',
-                precision: parsed.performance?.Precision ?? 'N/A',
-                recall: parsed.performance?.Recall ?? 'N/A',
-                f1Score: parsed.performance?.["F1-Score"] ?? 'N/A',
-                benignAccuracy: parsed.performance?.["Benign Accuracy"] ?? 'N/A',
-                malwareAccuracy: parsed.performance?.["Malware Accuracy"] ?? 'N/A',
-                processingTime: typeof parsed.log?.model_load === 'number' &&
-                                typeof parsed.log?.preprocess === 'number' &&
-                                typeof parsed.log?.inference === 'number'
-                  ? parsed.log.model_load + parsed.log.preprocess + parsed.log.inference
-                  : 'N/A',
-                reportGenerationTime: null,
-                accuracyMetrics: [
-                  parsed.model_info?.test_accuracy ?? 0,
-                  parsed.performance?.Precision ?? 0,
-                  parsed.performance?.Recall ?? 0,
-                  parsed.performance?.["F1-Score"] ?? 0,
-                ],
-                normalCount: parsed.normal ?? 0,
-                maliciousCount: parsed.malicious ?? 0,
-                environment: parsed.model_info ? {
-                  modelName: parsed.model_info?.type ?? 'N/A',
-                  dataset: '사용된 데이터셋 정보 없음',
-                  epochs: 'N/A',
-                  batchSize: 'N/A',
-                  optimizer: 'N/A',
-                  metrics: [],
-                  modelPath: 'N/A',
-                  libraries: [parsed.model_info?.input],
-                } : null
-              });
+              parseAndSetPerformance(parsed, latestId);
             } catch (e) {
               console.error("최근 성능 로그 파싱 실패:", e);
             }
@@ -156,9 +143,9 @@ function PerformanceSection() {
 
   if (!performance || !logInfo) {
     return (
-      <div className="bg-white shadow-sm rounded p-6 text-center text-gray-800 mt-10">
-        <h2 className="text-lg font-semibold mb-2">먼저 분석을 진행해주세요.</h2>
-        <p className="text-sm">분석 결과에 사용된 모델 정보가 나타납니다.</p>
+      <div className="bg-white shadow-md rounded p-6 text-center text-gray-800 mt-20">
+        <p className="text-lg font-semibold">분석에 사용된 모델 정보를 확인할 수 없습니다.</p>
+        <p className="text-sm mt-2">먼저 분석을 진행해주세요.</p>
       </div>
     );
   }
@@ -305,7 +292,6 @@ function PerformanceSection() {
             <li><span className="font-bold">정상 탐지 정확도:</span> {performance?.benignAccuracy ?? 'N/A'}%</li>
             <li><span className="font-bold">악성 탐지 정확도:</span> {performance?.malwareAccuracy ?? 'N/A'}%</li>
             <li><span className="font-bold">처리 속도:</span> {performance?.processingTime ?? 'N/A'}초</li>
-            <li><span className="font-bold">리포트 생성 시간:</span> {performance?.reportGenerationTime ?? 'N/A'}초</li>
           </ul>
         </div>
         <div>

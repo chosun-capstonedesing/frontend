@@ -4,6 +4,45 @@ import QRSearchBlock from '../../search/components/QRSearchBlock';
 import GlobalStats from '../../../components/layout/GlobalStats';
 import { useNavigate } from 'react-router-dom';
 
+const syncToSessionStorage = (analysisId) => {
+  const saved = localStorage.getItem(analysisId);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      let sessionFiles = JSON.parse(sessionStorage.getItem("uploadedFiles") || "[]");
+
+      const existingIndex = sessionFiles.findIndex((f) => f.analysis_id === analysisId);
+      if (existingIndex !== -1) {
+        sessionFiles[existingIndex] = { ...sessionFiles[existingIndex], ...parsed };
+      } else {
+        sessionFiles.push(parsed);
+      }
+
+      sessionStorage.setItem("uploadedFiles", JSON.stringify(sessionFiles));
+    } catch (e) {
+      console.error("세션 동기화 실패:", e);
+    }
+  }
+};
+
+const handleCancelAnalysis = (analysisId, setFileState) => {
+  console.log("분석 탭에서 분석 중지 요청 수신:", analysisId);
+  setFileState((prev) => {
+    if (!prev || !Array.isArray(prev)) return prev;
+    const updated = [...prev];
+    const targetIndex = updated.findIndex((file) => file.analysis_id === analysisId);
+    if (targetIndex !== -1) {
+      updated[targetIndex] = {
+        ...updated[targetIndex],
+        status: 'cancelled',
+        progress: 0,
+        isUploading: false
+      };
+    }
+    return updated;
+  });
+};
+
 export default function AnalysisPage({ uploadedFile, handleFileSelect }) {
   const [localUploadedFile, setLocalUploadedFile] = useState(uploadedFile);
   const [activeTab, setActiveTab] = useState('upload');
@@ -16,28 +55,14 @@ export default function AnalysisPage({ uploadedFile, handleFileSelect }) {
   useEffect(() => {
     const handleCancel = (e) => {
       const { analysisId } = e.detail;
-      console.log("분석 탭에서 분석 중지 요청 수신:", analysisId);
-      // 상태 업데이트로 재분석 버튼이 보이도록 구성 (예: 파일 상태를 'cancelled'로 변경)
-      setLocalUploadedFile((prev) => {
-        if (!prev || !Array.isArray(prev)) return prev;
-        const updated = [...prev];
-        const targetIndex = updated.findIndex((file) => file.analysis_id === analysisId);
-        if (targetIndex !== -1) {
-          updated[targetIndex] = {
-            ...updated[targetIndex],
-            status: 'cancelled',
-            progress: 0,
-            isUploading: false
-          };
-        }
-        return updated;
-      });
+      handleCancelAnalysis(analysisId, setLocalUploadedFile);
     };
 
     const handleResult = (e) => {
       const { analysisId } = e.detail;
       console.log("분석 탭에서 결과 보기 요청 수신:", analysisId);
       navigate(`/analysis_results?id=${analysisId}`);
+      syncToSessionStorage(analysisId);
     };
 
     window.addEventListener("cancelAnalysis", handleCancel);
