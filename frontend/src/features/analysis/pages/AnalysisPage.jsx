@@ -76,7 +76,6 @@ export default function AnalysisPage({ uploadedFile, handleFileSelect }) {
 
   return (
     <div className="bg-white shadow-md rounded p-6">
-      <GlobalStats />
       <h1 className="text-2xl font-semibold mb-4">🗂️ 파일 분석</h1>
 
       <div className="mb-6 border-b border-gray-200">

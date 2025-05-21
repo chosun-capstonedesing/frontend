@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import LoginPage from './features/auth/pages/LoginPage';
-import MainLayout from './routes/MainLayout';
+import MainLayout from './components/layout/MainLayout';
 import LogoutButton from './features/auth/components/LogoutButton';
 import MyPage from './features/mypage/pages/MyPage';
 import MyPageDetail from './features/mypage/pages/MyPageDetail';
@@ -44,23 +44,10 @@ function App() {
 
   return (
     <ToastProvider>
-      <div className="min-h-screen bg-gray-100 p-5 overflow-hidden">
-        <div className="flex justify-end space-x-4 mb-2 mr-5">
-          {isLoggedIn ? (
-            <>
-              <Link to="/mypage" className="text-base hover:underline">My Page</Link>
-              <LogoutButton onLogout={handleLogout} />
-            </>
-          ) : (
-            <>
-              <Link to="/login" className="text-base hover:underline">Login/SignUp</Link>
-            </>
-          )}
-        </div>
-
+      <div className="min-h-screen bg-gray-100">
         <Routes>
           <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
-          <Route path="/" element={<MainLayout />}>
+          <Route path="/" element={<MainLayout isLoggedIn={isLoggedIn} onLogout={handleLogout} />}>
             <Route index element={<AnalysisPage />} />
             <Route path="mypage" element={<MyPage />} />
             <Route path="analysis_results/:analysis_id" element={<AnalysisResults />} />
@@ -69,6 +56,7 @@ function App() {
             <Route path="performance" element={<PerformanceSection />} />
             <Route path="guide" element={<GuideSection />} />
             <Route path="mypage/detail/:analysis_id" element={<MyPageDetail />} />
+            {/* <Route path="qr_url_search" element={<QRandURLPage />} /> */}
           </Route>
         </Routes>
       </div>
