@@ -102,11 +102,11 @@ function AnalysisResults({
   const modelInput = fileData?.model_info?.input ?? modelInfo?.input ?? 'N/A';
 
   const normalProbability = fileData?.normal ?? 0;
-  // Robust malware probability logic
-  const malwareAccuracy = Number(fileData?.performance?.["Malware Accuracy"]);
-  const malwareProbability = !isNaN(malwareAccuracy)
-    ? malwareAccuracy
-    : Number(fileData?.malicious ?? probability ?? 0);
+  const malwareProbability = typeof fileData?.malicious === 'number'
+    ? fileData.malicious * 100
+    : typeof probability === 'number'
+      ? probability * 100
+      : 0;
   const reportUrl = fileData?.report_url ?? null;
 
   const barData = {
@@ -114,7 +114,10 @@ function AnalysisResults({
     datasets: [
       {
         label: "탐지 확률 (%)",
-        data: [normalProbability, malwareProbability],
+        data: [
+          typeof normalProbability === 'number' ? normalProbability * 100 : 0,
+          malwareProbability
+        ],
         backgroundColor: ["#4ade80", "#f87171"], // green and red
         borderRadius: 5,
       },

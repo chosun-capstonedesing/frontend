@@ -169,8 +169,8 @@ function PerformanceSection() {
       {
         label: '예측 확률',
         data: [
-          performance?.normalCount ?? 0,
-          performance?.malwareAccuracy ?? 0
+          typeof performance?.normalCount === 'number' ? performance.normalCount * 100 : 0,
+          typeof performance?.maliciousCount === 'number' ? performance.maliciousCount * 100 : 0
         ],
         backgroundColor: ['#60A5FA', '#F87171'],
       },
