@@ -9,13 +9,22 @@ const syncToSessionStorage = (analysisId) => {
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
+      if (!parsed.name && !parsed.filename) return;  // 이름 없는 데이터는 무시
+
       let sessionFiles = JSON.parse(sessionStorage.getItem("uploadedFiles") || "[]");
 
       const existingIndex = sessionFiles.findIndex((f) => f.analysis_id === analysisId);
+      const enriched = {
+        ...parsed,
+        name: parsed.filename || parsed.name || "이름 없는 파일",
+        status: parsed.status || "done",
+        uploadedAt: parsed.uploadedAt || new Date().toISOString(),
+      };
+
       if (existingIndex !== -1) {
-        sessionFiles[existingIndex] = { ...sessionFiles[existingIndex], ...parsed };
+        sessionFiles[existingIndex] = { ...sessionFiles[existingIndex], ...enriched };
       } else {
-        sessionFiles.push(parsed);
+        sessionFiles.push(enriched);
       }
 
       sessionStorage.setItem("uploadedFiles", JSON.stringify(sessionFiles));
@@ -61,7 +70,7 @@ export default function AnalysisPage({ uploadedFile, handleFileSelect }) {
       const { analysisId } = e.detail;
       console.log("분석 탭에서 결과 보기 요청 수신:", analysisId);
       navigate(`/analysis_results?id=${analysisId}`);
-      syncToSessionStorage(analysisId);
+      // syncToSessionStorage(analysisId); 제거됨
     };
 
     window.addEventListener("cancelAnalysis", handleCancel);

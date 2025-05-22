@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { isLoggedIn } from "../../../utils/isLoggedIn";
 
 /**
@@ -15,17 +15,45 @@ function DragAndDrop({ onDrop, onDragOver, children }) {
     const [isDragging, setIsDragging] = useState(false);
 
     const handleFiles = (files) => {
-        const maxCount = isLoggedIn() ? Infinity : 3;
-        const totalCount = uploadedFiles.length + files.length;
+      const maxCount = isLoggedIn() ? Infinity : 3;
 
-        if (totalCount > maxCount) {
-            alert(`비로그인 사용자는 하루 최대 ${maxCount}개 파일까지만 업로드할 수 있습니다.`);
-            return false;
-        }
+      // Remove unnamed files
+      const validFiles = files.filter(file => file.name && file.name.trim() !== '');
 
-        setUploadedFiles(prev => [...prev, ...files]);
-        return true;
+      // Prevent duplicates using name + size + lastModified
+      const newFiles = validFiles.filter(file =>
+        !uploadedFiles.some(f =>
+          f.name === file.name &&
+          f.size === file.size &&
+          f.lastModified === file.lastModified
+        )
+      );
+
+      const totalCount = uploadedFiles.length + newFiles.length;
+
+      if (newFiles.length === 0) {
+        alert("이미 업로드된 파일입니다. 또는 이름이 없는 파일입니다.");
+        return false;
+      }
+
+      if (totalCount > maxCount) {
+        alert(`비로그인 사용자는 하루 최대 ${maxCount}개 파일까지만 업로드할 수 있습니다.`);
+        return false;
+      }
+
+      const updated = [...uploadedFiles, ...newFiles];
+      setUploadedFiles(updated);
+      sessionStorage.setItem("uploadedFiles", JSON.stringify(updated)); // 세션에도 저장
+
+      return true;
     };
+
+    useEffect(() => {
+      const saved = JSON.parse(sessionStorage.getItem("uploadedFiles") || "[]");
+      if (saved.length > 0) {
+        setUploadedFiles(saved);
+      }
+    }, []);
 
     const handleDrop = (e) => {
         e.preventDefault();

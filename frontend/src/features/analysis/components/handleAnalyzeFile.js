@@ -12,6 +12,10 @@ if (!handleAnalyzeFile.abortControllers) {
 
 // 로컬 스토리지 내 파일 결과 업데이트 함수 (모듈 최상위로 이동)
 export function updateLocalStorageResult(analysisId, result) {
+  if (!result || result.display_name === null || typeof result !== "object") {
+    console.warn("⚠️ 저장 생략: display_name이 없거나 결과가 유효하지 않음", result);
+    return;
+  }
   const localFiles = JSON.parse(localStorage.getItem("uploadedFiles") || "[]");
   const updatedLocal = localFiles.map((file) => {
     if (file.analysis_id === analysisId) {
@@ -27,6 +31,7 @@ export function updateLocalStorageResult(analysisId, result) {
         log: result?.log,
         model_info: result?.model_info,
         performance: result?.performance,
+        uploaded_at: file.uploaded_at ?? new Date().toISOString()
       };
     }
     return file;
@@ -50,6 +55,7 @@ export function updateLocalStorageResult(analysisId, result) {
         log: result?.log,
         model_info: result?.model_info,
         performance: result?.performance,
+        uploaded_at: file.uploaded_at ?? new Date().toISOString()
       };
     }
     return file;
@@ -111,6 +117,12 @@ export async function handleAnalyzeFile(
   const storedFiles = JSON.parse(localStorage.getItem("uploadedFiles") || "[]");
   const storedFile = storedFiles.find((f) => f.analysis_id === targetId);
   if (storedFile && storedFile.result) {
+    const parsed = typeof storedFile.result === 'string' ? null : storedFile.result;
+    if (parsed?.display_name === null) {
+      localStorage.removeItem(targetId);
+      sessionStorage.removeItem(targetId);
+      return; // 분석 결과가 유효하지 않으면 스킵
+    }
     updatedFiles[targetIndex].status = "done";
     setFileList(updatedFiles);
     return; // 이미 완료된 분석은 다시 요청하지 않음

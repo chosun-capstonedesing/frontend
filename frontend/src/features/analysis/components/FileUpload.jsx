@@ -11,7 +11,7 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
   const fileInputRef = useRef();
 
   // 토스트 알림 관련 함수 및 상태 제공 (알림 표시, 진행률 갱신 등)
-  const { showToast, updateProgress, updateToastStatus } = useToast();
+  const { showToast, updateToastStatus } = useToast();
 
   // 업로드 제한(최대 개수), 남은 업로드 정보, 로그인 여부 제공
   const { maxCount, remainingInfo, isActuallyLoggedIn } = useUploadLimit();
@@ -94,6 +94,8 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
       if (
         file.status === "done" &&
         !file.toastUpdated &&
+        file.name &&
+        file.size > 0 &&
         (file.result || file.malicious !== undefined || file.log)
       ) {
         const updatedFile = { ...file, toastUpdated: true };

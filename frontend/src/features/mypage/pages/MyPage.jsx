@@ -33,9 +33,19 @@ export default function MyPage() {
     const savedFiles = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
     const sessionFiles = getUploadedFilesFromSession();
     const combinedMap = new Map();
+    // 추가: 삭제된 분석 ID 목록 불러오기
+    const deletedIds = JSON.parse(sessionStorage.getItem("deletedAnalysisIds") || "[]");
 
     [...savedFiles, ...sessionFiles].forEach((file, i) => {
       const analysis_id = file.analysis_id || file.sha256 || `${file.name}-${file.date || i}`;
+      if (
+        typeof file.name !== 'string' ||
+        file.name.trim() === '' ||
+        file.name === '이름 없는 파일' ||
+        combinedMap.has(analysis_id) ||
+        deletedIds.includes(analysis_id)
+      ) return;
+
       // --- BEGIN PATCHED RESULT LOGIC ---
       let result = '정보 없음';
       const hasLog = file.log && Object.keys(file.log).length > 0;
@@ -57,11 +67,31 @@ export default function MyPage() {
           } else {
             result = '분석 완료';
           }
-        } else if (hasLog || file.log !== undefined) {
+        } else if (hasLog || file.log !== undefined || file.performance) {
           result = '분석 완료';
         }
       }
       // --- END PATCHED RESULT LOGIC ---
+
+      // 기존 분석 완료 파일이 있는 경우 "정보 없음" 상태의 파일로 덮지 않도록 방지
+      const existing = combinedMap.get(analysis_id);
+      // 새 조건: 기존이 있고, 새 result가 "정보 없음"이고, 기존 result가 완료된 상태면 덮지 않음
+      if (
+        existing &&
+        result === '정보 없음' &&
+        (existing.result === '정상' || existing.result === '악성' || existing.result === '분석 완료')
+      ) {
+        return;
+      }
+      if (existing) {
+        const isExistingValid = existing.result && existing.result !== '정보 없음';
+        const isNewInvalid = !result || result === '정보 없음';
+        const isSameFile = existing.name === file.name && existing.size === file.size;
+
+        if (isExistingValid && isNewInvalid) return;
+        if (isSameFile && isNewInvalid) return;
+      }
+      
       combinedMap.set(analysis_id, {
         ...file,
         analysis_id,
@@ -84,7 +114,7 @@ export default function MyPage() {
       .sort((a, b) => {
         const dateA = new Date(a.log?.start_time || a.date || a.uploadedAt || 0);
         const dateB = new Date(b.log?.start_time || b.date || b.uploadedAt || 0);
-        if (isNaN(dateA) || isNaN(dateB)) return 0;
+        if (Number.isNaN(dateA.getTime()) || Number.isNaN(dateB.getTime())) return 0;
         return sortOption === '최신순' ? dateB - dateA : dateA - dateB;
       });
   };
