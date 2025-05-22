@@ -1,3 +1,4 @@
+import { FaUser } from "react-icons/fa";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { setCookie, deleteCookie } from "../../../utils/cookie";
@@ -21,7 +22,8 @@ function LogoutButton({ onLogout, userId }) {
     };
 
     return (
-        <button onClick={handleLogout} className="text-base hover:underline text-gray-700">
+        <button onClick={handleLogout} className="text-base hover:underline text-gray-700 inline-flex items-center gap-2">
+            <FaUser className="text-gray-600" />
             {userId ? `Welcome, ${userId}` : "Welcome"}
         </button>
     );
