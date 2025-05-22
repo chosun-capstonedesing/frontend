@@ -76,7 +76,7 @@ export default function AnalysisPage({ uploadedFile, handleFileSelect }) {
   return (
     <div className="flex flex-col gap-6">
       {/* 파일 업로드 박스 */}
-      <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-200">
+      <div className="bg-white rounded-2xl shadow-xl p-6">
         <div className="flex items-center space-x-3 mb-4">
           <span className="text-2xl">📁</span>
           <h2 className="text-lg font-semibold text-blue-600">파일 업로드</h2>
@@ -85,7 +85,7 @@ export default function AnalysisPage({ uploadedFile, handleFileSelect }) {
       </div>
 
       {/* QR / URL 검색 박스 */}
-      <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-200">
+      <div className="bg-white rounded-2xl shadow-xl p-6">
         <div className="flex items-center space-x-3 mb-4">
           <span className="text-2xl">🔎</span>
           <h2 className="text-lg font-semibold text-green-600">QR / URL 검색</h2>

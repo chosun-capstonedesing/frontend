@@ -193,12 +193,11 @@ function PerformanceSection() {
   const totalTime = (logInfo?.model_load ?? 0) + (logInfo?.preprocess ?? 0) + (logInfo?.inference ?? 0);
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-6">
-      <h2 className="text-2xl font-bold mb-6">모델 성능</h2>
-
-      <div className="grid md:grid-cols-2 gap-6 mt-6">
-        <div>
-          <h3 className="text-xl font-semibold mb-2">분석 파일 정보</h3>
+    <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        {/* 카드 1: 분석 파일 정보 */}
+        <div className="bg-white rounded-2xl shadow-xl p-6">
+          <h3 className="text-2xl font-semibold mb-2">분석 파일 정보</h3>
           <ul className="list-disc list-inside text-base leading-relaxed">
             <li><span className="font-bold">분석 ID:</span> {activeAnalysisId ?? 'N/A'}</li>
             <li><span className="font-bold">분석 시작 시간:</span> {logInfo?.start_time ?? 'N/A'}</li>
@@ -207,15 +206,18 @@ function PerformanceSection() {
             <li><span className="font-bold">추론 시간:</span> {logInfo?.inference ?? 'N/A'}초</li>
           </ul>
         </div>
-        <div>
-          <h3 className="text-xl font-semibold mb-2">예측 결과 분포</h3>
+
+        {/* 카드 2: 예측 결과 분포 */}
+        <div className="bg-white rounded-2xl shadow-xl p-6">
+          <h3 className="text-2xl font-semibold mb-2">예측 결과 분포</h3>
           <div className="max-w-[200px] mx-auto">
             <Doughnut data={predictionData} options={chartOptions} />
           </div>
         </div>
 
-        <div>
-          <h3 className="text-xl font-semibold mb-2 mt-2">분석 환경</h3>
+        {/* 카드 3: 분석 환경 */}
+        <div className="bg-white rounded-2xl shadow-xl p-6">
+          <h3 className="text-2xl font-semibold mb-2">분석 환경</h3>
           <ul className="list-disc list-inside text-base leading-relaxed">
             <li><span className="font-bold">모델명:</span> {performance?.environment?.modelName ?? 'N/A'}</li>
             <li><span className="font-bold">학습 데이터셋:</span> {performance?.environment?.dataset ?? 'N/A'}</li>
@@ -223,67 +225,60 @@ function PerformanceSection() {
             <li><span className="font-bold">사용한 라이브러리:</span> {(performance?.environment?.libraries || []).join(', ')}</li>
           </ul>
         </div>
-        <div>
-          <h3 className="text-xl font-semibold mb-2 mt-2">분석 시간 시각화</h3>
-          {
-            logInfo && (
-              <div className="max-w-[400px] mx-auto">
-                <div className="relative h-6 bg-gray-200 rounded overflow-hidden w-full max-w-xl">
-                  <div
-                    className="absolute top-0 left-0 h-full bg-blue-500"
-                    style={{ width: `${((logInfo?.model_load ?? 0) / totalTime) * 100}%` }}
-                    title={`모델 로딩: ${logInfo?.model_load ?? 0}s`}
-                  />
-                  <div
-                    className="absolute top-0 h-full bg-yellow-300"
-                    style={{
-                      left: `${((logInfo?.model_load ?? 0) / totalTime) * 100}%`,
-                      width: `${((logInfo?.preprocess ?? 0) / totalTime) * 100}%`
-                    }}
-                    title={`전처리: ${logInfo?.preprocess ?? 0}s`}
-                  />
-                  <div
-                    className="absolute top-0 h-full bg-rose-400"
-                    style={{
-                      left: `${(((logInfo?.model_load ?? 0) + (logInfo?.preprocess ?? 0)) / totalTime) * 100}%`,
-                      width: `${((logInfo?.inference ?? 0) / totalTime) * 100}%`
-                    }}
-                    title={`추론: ${logInfo?.inference ?? 0}s`}
-                  />
-                </div>
 
-                <div className="flex justify-between text-sm text-gray-600 mt-1 max-w-xl">
-                  <span>시작 (0s)</span>
-                  <span>
-                    종료 {(
-                      (logInfo?.model_load ?? 0) +
-                      (logInfo?.preprocess ?? 0) +
-                      (logInfo?.inference ?? 0)
-                    ).toFixed(2)}s
-                  </span>
-                </div>
-
-                <div className="mt-2 text-xs text-gray-500 space-x-4">
-                  <span className="inline-flex items-center">
-                    <span className="inline-block w-3 h-3 bg-blue-500 mr-1 rounded-sm" />
-                    모델 로딩
-                  </span>
-                  <span className="inline-flex items-center">
-                    <span className="inline-block w-3 h-3 bg-yellow-300 mr-1 rounded-sm" />
-                    전처리
-                  </span>
-                  <span className="inline-flex items-center">
-                    <span className="inline-block w-3 h-3 bg-rose-400 mr-1 rounded-sm" />
-                    추론
-                  </span>
-                </div>
+        {/* 카드 4: 분석 시간 시각화 */}
+        <div className="bg-white rounded-2xl shadow-xl p-6">
+          <h3 className="text-2xl font-semibold mb-2">분석 시간 시각화</h3>
+          {logInfo && (
+            <div className="max-w-[400px] mx-auto">
+              <div className="relative h-6 bg-gray-200 rounded overflow-hidden w-full max-w-xl">
+                <div
+                  className="absolute top-0 left-0 h-full bg-blue-500"
+                  style={{ width: `${((logInfo?.model_load ?? 0) / totalTime) * 100}%` }}
+                  title={`모델 로딩: ${logInfo?.model_load ?? 0}s`}
+                />
+                <div
+                  className="absolute top-0 h-full bg-yellow-300"
+                  style={{
+                    left: `${((logInfo?.model_load ?? 0) / totalTime) * 100}%`,
+                    width: `${((logInfo?.preprocess ?? 0) / totalTime) * 100}%`
+                  }}
+                  title={`전처리: ${logInfo?.preprocess ?? 0}s`}
+                />
+                <div
+                  className="absolute top-0 h-full bg-rose-400"
+                  style={{
+                    left: `${(((logInfo?.model_load ?? 0) + (logInfo?.preprocess ?? 0)) / totalTime) * 100}%`,
+                    width: `${((logInfo?.inference ?? 0) / totalTime) * 100}%`
+                  }}
+                  title={`추론: ${logInfo?.inference ?? 0}s`}
+                />
               </div>
-            )
-          }
+              <div className="flex justify-between text-sm text-gray-600 mt-1 max-w-xl">
+                <span>시작 (0s)</span>
+                <span>종료 {totalTime.toFixed(2)}s</span>
+              </div>
+              <div className="mt-2 text-xs text-gray-500 space-x-4">
+                <span className="inline-flex items-center">
+                  <span className="inline-block w-3 h-3 bg-blue-500 mr-1 rounded-sm" />
+                  모델 로딩
+                </span>
+                <span className="inline-flex items-center">
+                  <span className="inline-block w-3 h-3 bg-yellow-300 mr-1 rounded-sm" />
+                  전처리
+                </span>
+                <span className="inline-flex items-center">
+                  <span className="inline-block w-3 h-3 bg-rose-400 mr-1 rounded-sm" />
+                  추론
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
-        <div>
-          <h3 className="text-xl font-semibold mb-2 mt-12">성능 지표</h3>
+        {/* 카드 5: 성능 지표 */}
+        <div className="bg-white rounded-2xl shadow-xl p-6">
+          <h3 className="text-2xl font-semibold mb-2">성능 지표</h3>
           <ul className="list-disc list-inside text-base leading-relaxed">
             <li><span className="font-bold">정확도:</span> {performance?.overallAccuracy ?? 'N/A'}%</li>
             <li><span className="font-bold">정밀도 (Precision):</span> {performance?.precision ?? 'N/A'}%</li>
@@ -294,8 +289,10 @@ function PerformanceSection() {
             <li><span className="font-bold">처리 속도:</span> {performance?.processingTime ?? 'N/A'}초</li>
           </ul>
         </div>
-        <div>
-          <h3 className="text-xl font-semibold mb-2 mt-12">모델 성능 요약</h3>
+
+        {/* 카드 6: 모델 성능 요약 */}
+        <div className="bg-white rounded-2xl shadow-xl p-6">
+          <h3 className="text-2xl font-semibold mb-2">모델 성능 요약</h3>
           <div className="max-w-xl mx-auto w-full">
             <Bar data={accuracyData} options={chartOptions} />
           </div>

@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import Cookies from 'js-cookie';
 import LoginPage from './features/auth/pages/LoginPage';
 import MainLayout from './components/layout/MainLayout';
-import LogoutButton from './features/auth/components/LogoutButton';
 import MyPage from './features/mypage/pages/MyPage';
 import MyPageDetail from './features/mypage/pages/MyPageDetail';
 import GuideSection from './features/guide/pages/GuideSection';
 import PerformanceSection from './features/performance/pages/PerformanceSection';
 import AnalysisPage from './features/analysis/pages/AnalysisPage';
-import { isLoggedIn as checkLoginStatus } from './utils/isLoggedIn';
 import { ToastProvider } from './context/ToastContext';
 import AnalysisResults from './features/analysis/pages/AnalysisResults';
 import { v4 as uuidv4 } from 'uuid';
 
 function App() {
+  const location = useLocation();
+  const showLoginModal = location.pathname === '/login';
+
   if (!Cookies.get('client_uuid')) {
     Cookies.set('client_uuid', uuidv4(), { expires: 1, path: '/' }); // 1일 유지
   }
@@ -44,9 +46,17 @@ function App() {
 
   return (
     <ToastProvider>
-      <div className="min-h-screen bg-gray-100">
+      <div className="max-h-screen">
+        {showLoginModal && createPortal(
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/10 backdrop-blur-md backdrop-brightness-50">
+            <div className="p-6 w-[90%] max-w-md">
+              <LoginPage onLoginSuccess={handleLoginSuccess} />
+            </div>
+          </div>,
+          document.body
+        )}
         <Routes>
-          <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
+          {/* <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} /> */}
           <Route path="/" element={<MainLayout isLoggedIn={isLoggedIn} onLogout={handleLogout} />}>
             <Route index element={<AnalysisPage />} />
             <Route path="mypage" element={<MyPage />} />

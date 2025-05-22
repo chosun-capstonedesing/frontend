@@ -1,10 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import Cookies from 'js-cookie';
+import { isLoggedIn } from '../../../utils/isLoggedIn';
+import LoginPage from '../../../features/auth/pages/LoginPage';
 import FileAccordionDetail from './MyPageDetail';
 import ReactPaginate from 'react-paginate';
 import { getUploadedFilesFromSession, deleteFileFromSessionAndLocal } from '../../analysis/components/useUploadSession';
 
 export default function MyPage() {
+  if (!isLoggedIn()) {
+    return (
+      <div className="bg-white py-10 px-8 rounded-2xl shadow-xl text-center mt-10">
+        <h2 className="text-xl font-semibold text-gray-700">로그인 후 이용 가능합니다.</h2>
+        <Link
+          to="/login"
+          className="mt-4 inline-block text-blue-600 hover:underline text-sm font-medium"
+        >
+          로그인 하러 가기
+        </Link>
+      </div>
+    );
+  }
   const [fileList, setFileList] = useState([]);
   const [activeTab, setActiveTab] = useState('전체');
   const [sortOption, setSortOption] = useState('최신순');
@@ -156,24 +172,22 @@ export default function MyPage() {
                   </svg>
                 </button>
                 <div className="flex-shrink-0">
-                  <span className={`h-8 w-8 rounded-full flex items-center justify-center ${
-                    file.result === '정상'
+                  <span className={`h-8 w-8 rounded-full flex items-center justify-center ${file.result === '정상'
                       ? 'bg-green-200'
                       : file.result === '악성'
                         ? 'bg-red-200'
                         : file.result === '분석중'
                           ? 'bg-yellow-200'
                           : 'bg-gray-200'
-                  }`}>
-                    <svg className={`h-5 w-5 ${
-                      file.result === '정상'
+                    }`}>
+                    <svg className={`h-5 w-5 ${file.result === '정상'
                         ? 'text-green-700'
                         : file.result === '악성'
                           ? 'text-red-700'
                           : file.result === '분석중'
                             ? 'text-yellow-800'
                             : 'text-gray-600'
-                    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={
                         file.result === '정상'
                           ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
@@ -193,15 +207,14 @@ export default function MyPage() {
                 </div>
               </div>
               <div className="flex flex-wrap items-center justify-start sm:justify-end gap-2 sm:gap-4 min-w-[180px]">
-                <span className={`text-sm font-semibold rounded-full px-2 py-1 whitespace-nowrap text-center ${
-                  file.result === '정상'
+                <span className={`text-sm font-semibold rounded-full px-2 py-1 whitespace-nowrap text-center ${file.result === '정상'
                     ? 'bg-green-100 text-green-700 border border-green-300'
                     : file.result === '악성'
                       ? 'bg-red-100 text-red-700 border border-red-300'
                       : file.result === '분석중'
                         ? 'bg-yellow-100 text-yellow-800 border border-yellow-300'
                         : 'bg-gray-100 text-gray-600 border border-gray-300'
-                }`}>
+                  }`}>
                   {file.result === '정상'
                     ? '정상'
                     : file.result === '악성'

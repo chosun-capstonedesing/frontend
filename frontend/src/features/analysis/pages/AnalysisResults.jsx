@@ -157,9 +157,9 @@ function AnalysisResults({
 
   return (
     <div>
-      <div className="space-y-6">
+      <div className="space-y-6 md:space-y-0 md:flex md:space-x-6">
         {/* 카드 1: 기본 정보 */}
-        <div className="bg-white rounded-2xl shadow-xl p-6">
+        <div className="bg-white rounded-2xl shadow-xl p-6 md:w-1/2">
           <h3 className="text-2xl font-semibold mb-4">분석 결과</h3>
           <div className="space-y-2">
             <p><strong>분석 ID:</strong> {analysisId ?? 'N/A'}</p>
@@ -176,67 +176,52 @@ function AnalysisResults({
         </div>
 
         {/* 카드 2: 그래프 */}
-        <div className="bg-white rounded-2xl shadow-xl p-6">
+        <div className="bg-white rounded-2xl shadow-xl p-6 md:w-1/2">
           <h3 className="text-lg font-semibold mb-4">탐지 확률 비교</h3>
           <Bar
             data={barData}
             options={barOptions}
-            height={400}
-            width={580}
+            height={300}
+            width={400}
           />
         </div>
+      </div>
 
-        {/* 카드 3: 로그 정보
-        {actualIsLoggedIn && (
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <h3 className="text-lg font-semibold mb-4">로그 및 모델 정보</h3>
-            <div className="space-y-2">
-              <p><strong>분석 시작 시간:</strong> {startTime}</p>
-              <p><strong>모델 로딩 시간:</strong> {modelLoad}</p>
-              <p><strong>전처리 시간:</strong> {preprocess}</p>
-              <p><strong>추론 시간:</strong> {inference}</p>
-              <p><strong>모델 종류:</strong> {modelType}</p>
-              <p><strong>입력 정보:</strong> {modelInput}</p>
-            </div>
-          </div>
-        )} */}
-
-        {/* PDF 버튼 */}
-        <div className="flex justify-end">
-          {actualIsLoggedIn ? (
-            <button
-              className="inline-flex items-center px-5 py-2 text-base bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
-              onClick={() => {
-                if (reportUrl) {
-                  const url = reportUrl.startsWith("http") ? reportUrl : `${import.meta.env.VITE_API_BASE}${reportUrl}`;
-                  window.open(url, "_blank");
-                } else {
-                  alert("PDF 파일 경로를 찾을 수 없습니다.");
-                }
-              }}
+      {/* PDF 버튼 */}
+      <div className="flex justify-end mt-4">
+        {actualIsLoggedIn ? (
+          <button
+            className="inline-flex items-center px-5 py-2 text-base bg-blue-100 text-blue-600 rounded-2xl shadow-xl hover:bg-blue-200 transition-colors"
+            onClick={() => {
+              if (reportUrl) {
+                const url = reportUrl.startsWith("http") ? reportUrl : `${import.meta.env.VITE_API_BASE}${reportUrl}`;
+                window.open(url, "_blank");
+              } else {
+                alert("PDF 파일 경로를 찾을 수 없습니다.");
+              }
+            }}
+          >
+            <svg
+              className="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
             >
-              <svg
-                className="w-5 h-5 mr-2"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                />
-              </svg>
-              분석 결과 PDF 다운로드
-            </button>
-          ) : (
-            <div className="inline-flex items-center px-5 py-2 text-base bg-blue-100 text-blue-400 rounded-lg cursor-not-allowed border border-blue-200 backdrop-blur-sm bg-opacity-70">
-              <FaLock className="w-5 h-5 mr-2 text-blue-300" />
-              로그인 시 PDF 다운로드 가능
-            </div>
-          )}
-        </div>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              />
+            </svg>
+            분석 결과 PDF 다운로드
+          </button>
+        ) : (
+          <div className="inline-flex items-center px-5 py-2 text-base bg-blue-100 text-blue-400 rounded-lg cursor-not-allowed border border-blue-200 backdrop-blur-sm bg-opacity-70">
+            <FaLock className="w-5 h-5 mr-2 text-blue-300" />
+            로그인 시 PDF 다운로드 가능
+          </div>
+        )}
       </div>
     </div>
   );
