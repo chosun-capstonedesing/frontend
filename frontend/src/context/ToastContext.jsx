@@ -50,6 +50,13 @@ export const ToastProvider = ({ children }) => {
     // 추가: 분석 완료 상태를 다른 컴포넌트에 알림
     const event = new CustomEvent("toastStatusUpdated", { detail: { analysisId, status } });
     window.dispatchEvent(event);
+
+    // ✅ 3분 후 자동으로 toast 제거 (done 상태일 때만)
+    if (status === "done") {
+      setTimeout(() => {
+        setToasts(prev => prev.filter(t => t.analysisId !== analysisId));
+      }, 3 * 60 * 1000); // 3분
+    }
   };
 
   // ✅ cancelToastStatus: 분석 중 상태를 즉시 "cancelled"로 바꿔줌
@@ -104,12 +111,14 @@ export const ToastProvider = ({ children }) => {
       {children}
       {/* ✅ createPortal: 알림을 최상위 DOM(body)에 렌더링 */}
       {createPortal(
-        <div className="fixed top-20 right-5 space-y-3 z-50">
+        <div className="fixed top-20 right-7 space-y-3 z-50">
           {toasts.map((toast) => (
             // ✅ 알림 카드: 상태에 따라 테두리와 색상 변경
             <div
               key={toast.id}
-              className={`relative w-72 bg-white shadow-md rounded-md p-3 
+              className={`relative w-72 bg-white rounded-xl shadow-lg p-3 transition-all duration-700 ease-in-out
+                ${isDone(toast.status) ? 'translate-x-0 hover:translate-x-1' : ''}
+                ${isDone(toast.status) && 'animate-slide-out'}
                 ${isDone(toast.status) 
                   ? 'border border-green-200' 
                   : isCancelled(toast.status) 
@@ -204,3 +213,18 @@ export const ToastProvider = ({ children }) => {
     </ToastContext.Provider>
   );
 };
+{/* --- Tailwind CSS Custom Animation for Slide-Out --- */}
+<style>
+{`
+@keyframes slide-out {
+  to {
+    transform: translateX(150%);
+    opacity: 0;
+  }
+}
+.animate-slide-out {
+  animation: slide-out 1s ease-in forwards;
+  animation-delay: 177s; /* start near 3min */
+}
+`}
+</style>

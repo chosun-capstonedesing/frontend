@@ -90,7 +90,7 @@ function AnalysisResults({
 
   if (!fileData) {
     return (
-      <div className="bg-white shadow-md rounded p-6 text-center text-gray-800 mt-20">
+      <div className="bg-white rounded-2xl shadow-xl p-6 text-center text-gray-800 mt-20">
         <p className="text-lg font-semibold">분석 결과를 확인할 수 없습니다.</p>
         <p className="text-sm mt-2">먼저 분석을 진행해주세요.</p>
       </div>
