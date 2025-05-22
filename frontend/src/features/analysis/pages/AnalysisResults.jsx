@@ -73,7 +73,7 @@ function AnalysisResults({
     }
   }, [analysisId]);
 
-useEffect(() => {
+  useEffect(() => {
     if (fileData?.analysis_id) {
       const sessionFiles = JSON.parse(sessionStorage.getItem("uploadedFiles") || "[]");
       const updatedSession = sessionFiles.map((f) =>
@@ -156,76 +156,86 @@ useEffect(() => {
   const actualIsLoggedIn = import.meta.env.MODE === "development" || !!localStorage.getItem("access_token");
 
   return (
-    <div className="bg-white shadow-md rounded p-6">
-      <h2 className="text-2xl font-bold mb-4">파일 분석 결과</h2>
-      <div className="flex flex-col md:grid md:grid-cols-[1fr_1.2fr] gap-4 mt-4 break-words overflow-hidden">
-        <div>
-          <div className="space-y-2 mt-4 mb-4">
-            <p className="text-base"><strong>분석 ID:</strong> {analysisId ?? 'N/A'}</p>
-            <p className="text-base break-all"><strong>파일 이름:</strong> {fileName}</p>
-            <p className="text-base"><strong>파일 크기:</strong> {fileSize !== 'N/A' ? (typeof fileSize === 'number' ? fileSize.toLocaleString() : fileSize) : 'N/A'}</p>
-            <p className="text-base"><strong>확장자:</strong> {fileExtension}</p>
-            <p className="text-base"><strong>탐지 결과:</strong> {resultLabel}</p>
-            <p className="text-base"><strong>악성 확률:</strong> {malwareProbability ?? 'N/A'}%</p>
-            <p className="text-base"><strong>정상 확률:</strong> {fileData?.normal ?? 0}%</p>
-            <p className="text-base"><strong>신뢰도:</strong> {confidenceValue}{confidenceValue !== 'N/A' ? '%' : ''}</p>
+    <div>
+      <div className="space-y-6">
+        {/* 카드 1: 기본 정보 */}
+        <div className="bg-white rounded-2xl shadow-xl p-6">
+          <h3 className="text-2xl font-semibold mb-4">분석 결과</h3>
+          <div className="space-y-2">
+            <p><strong>분석 ID:</strong> {analysisId ?? 'N/A'}</p>
+            <p className="break-all"><strong>SHA-256 해시:</strong> {sha256}</p>
+            <p className="break-all"><strong>파일 이름:</strong> {fileName}</p>
+            <p><strong>파일 크기:</strong> {fileSize !== 'N/A' ? (typeof fileSize === 'number' ? fileSize.toLocaleString() : fileSize) : 'N/A'}</p>
+            <p><strong>확장자:</strong> {fileExtension}</p>
+            <p><strong>분석 시작 시간:</strong> {startTime}</p>
+            <p><strong>탐지 결과:</strong> {resultLabel}</p>
+            <p><strong>악성 확률:</strong> {malwareProbability ?? 'N/A'}%</p>
+            <p><strong>정상 확률:</strong> {fileData?.normal ?? 0}%</p>
+            <p><strong>신뢰도:</strong> {confidenceValue}{confidenceValue !== 'N/A' ? '%' : ''}</p>
           </div>
-          {actualIsLoggedIn && (
-            <div className="space-y-2 border-t pt-4 pb-4">
-              <p className="text-base break-all"><strong>SHA-256 해시:</strong> {sha256}</p>
-              <p className="text-base"><strong>분석 시작 시간:</strong> {startTime}</p>
-              <p className="text-base"><strong>모델 로딩 시간:</strong> {modelLoad}</p>
-              <p className="text-base"><strong>전처리 시간:</strong> {preprocess}</p>
-              <p className="text-base"><strong>추론 시간:</strong> {inference}</p>
-              <p className="text-base"><strong>모델 종류:</strong> {modelType}</p>
-              <p className="text-base"><strong>입력 정보:</strong> {modelInput}</p>
+        </div>
+
+        {/* 카드 2: 그래프 */}
+        <div className="bg-white rounded-2xl shadow-xl p-6">
+          <h3 className="text-lg font-semibold mb-4">탐지 확률 비교</h3>
+          <Bar
+            data={barData}
+            options={barOptions}
+            height={400}
+            width={580}
+          />
+        </div>
+
+        {/* 카드 3: 로그 정보
+        {actualIsLoggedIn && (
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <h3 className="text-lg font-semibold mb-4">로그 및 모델 정보</h3>
+            <div className="space-y-2">
+              <p><strong>분석 시작 시간:</strong> {startTime}</p>
+              <p><strong>모델 로딩 시간:</strong> {modelLoad}</p>
+              <p><strong>전처리 시간:</strong> {preprocess}</p>
+              <p><strong>추론 시간:</strong> {inference}</p>
+              <p><strong>모델 종류:</strong> {modelType}</p>
+              <p><strong>입력 정보:</strong> {modelInput}</p>
+            </div>
+          </div>
+        )} */}
+
+        {/* PDF 버튼 */}
+        <div className="flex justify-end">
+          {actualIsLoggedIn ? (
+            <button
+              className="inline-flex items-center px-5 py-2 text-base bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
+              onClick={() => {
+                if (reportUrl) {
+                  const url = reportUrl.startsWith("http") ? reportUrl : `${import.meta.env.VITE_API_BASE}${reportUrl}`;
+                  window.open(url, "_blank");
+                } else {
+                  alert("PDF 파일 경로를 찾을 수 없습니다.");
+                }
+              }}
+            >
+              <svg
+                className="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                />
+              </svg>
+              분석 결과 PDF 다운로드
+            </button>
+          ) : (
+            <div className="inline-flex items-center px-5 py-2 text-base bg-blue-100 text-blue-400 rounded-lg cursor-not-allowed border border-blue-200 backdrop-blur-sm bg-opacity-70">
+              <FaLock className="w-5 h-5 mr-2 text-blue-300" />
+              로그인 시 PDF 다운로드 가능
             </div>
           )}
-        </div>
-        <div>
-          <div className="mb-6 w-full flex items-end justify-start">
-            <Bar
-              data={barData}
-              options={barOptions}
-              height={400}
-              width={580}
-            />
-          </div>
-          <div className="mt-8 flex justify-end">
-            {actualIsLoggedIn ? (
-              <button
-                className="inline-flex items-center px-5 py-2 text-base bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
-                onClick={() => {
-                  if (reportUrl) {
-                    const url = reportUrl.startsWith("http") ? reportUrl : `${import.meta.env.VITE_API_BASE}${reportUrl}`;
-                    window.open(url, "_blank");
-                  } else {
-                    alert("PDF 파일 경로를 찾을 수 없습니다.");
-                  }
-                }}
-              >
-                <svg
-                  className="w-5 h-5 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                  />
-                </svg>
-                분석 결과 PDF 다운로드
-              </button>
-            ) : (
-              <div className="inline-flex items-center px-5 py-2 text-base bg-blue-100 text-blue-400 rounded-lg cursor-not-allowed border border-blue-200 backdrop-blur-sm bg-opacity-70">
-                <FaLock className="w-5 h-5 mr-2 text-blue-300" />
-                로그인 시 PDF 다운로드 가능
-              </div>
-            )}
-          </div>
         </div>
       </div>
     </div>

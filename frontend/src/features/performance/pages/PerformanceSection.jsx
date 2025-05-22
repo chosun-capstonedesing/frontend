@@ -193,7 +193,7 @@ function PerformanceSection() {
   const totalTime = (logInfo?.model_load ?? 0) + (logInfo?.preprocess ?? 0) + (logInfo?.inference ?? 0);
 
   return (
-    <div className="bg-white shadow-sm rounded p-6">
+    <div className="bg-white rounded-2xl shadow-xl p-6">
       <h2 className="text-2xl font-bold mb-6">모델 성능</h2>
 
       <div className="grid md:grid-cols-2 gap-6 mt-6">

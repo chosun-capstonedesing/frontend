@@ -7,7 +7,7 @@ import React from "react";
 
 function GuideSection() {
     return (
-        <div className="bg-white shadow-md rounded p-6">
+        <div className="bg-white rounded-2xl shadow-xl p-6">
             <h2 className="text-xl font-bold mb-4">사용자 가이드 & 설명</h2>
             <p>
                 머신러닝 기반 악성코드 분석을 제공하며, CNN 모델을 사용하여 실행 파일의 정상/악성 여부를 판단합니다.

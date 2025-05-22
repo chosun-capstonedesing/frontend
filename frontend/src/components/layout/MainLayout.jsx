@@ -18,7 +18,7 @@ export default function MainLayout() {
           <Sidebar />
         </div>
 
-        <main className="w-[calc(100%-20rem-16rem)] bg-gray-100 px-4 py-4 mt-20">
+        <main className="w-[calc(100%-20rem-18rem)] min-h-screen bg-gray-100 px-4 py-4 ml-5 mt-20 mb-20">
           <Outlet />
         </main>
 

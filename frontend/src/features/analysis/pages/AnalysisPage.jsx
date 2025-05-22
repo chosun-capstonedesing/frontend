@@ -45,7 +45,6 @@ const handleCancelAnalysis = (analysisId, setFileState) => {
 
 export default function AnalysisPage({ uploadedFile, handleFileSelect }) {
   const [localUploadedFile, setLocalUploadedFile] = useState(uploadedFile);
-  const [activeTab, setActiveTab] = useState('upload');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -75,43 +74,24 @@ export default function AnalysisPage({ uploadedFile, handleFileSelect }) {
   }, []);
 
   return (
-    <div className="bg-white shadow-md rounded p-6">
-      <h1 className="text-2xl font-semibold mb-4">🗂️ 파일 분석</h1>
-
-      <div className="mb-6 border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-          <button
-            className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'upload'
-              ? 'border-blue-500 text-blue-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            onClick={() => setActiveTab('upload')}
-          >
-            파일 업로드
-          </button>
-          <button
-            className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'search'
-              ? 'border-blue-500 text-blue-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            onClick={() => setActiveTab('search')}
-          >
-            QR / URL 검색
-          </button>
-        </nav>
+    <div className="flex flex-col gap-6">
+      {/* 파일 업로드 박스 */}
+      <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-200">
+        <div className="flex items-center space-x-3 mb-4">
+          <span className="text-2xl">📁</span>
+          <h2 className="text-lg font-semibold text-blue-600">파일 업로드</h2>
+        </div>
+        <FileUpload onFileSelect={handleFileSelect} />
       </div>
 
-      {activeTab === 'upload' && (
-        <>
-          <FileUpload onFileSelect={handleFileSelect} />
-        </>
-      )}
-
-      {activeTab === 'search' && (
-        <div>
-          <QRSearchBlock />
+      {/* QR / URL 검색 박스 */}
+      <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-200">
+        <div className="flex items-center space-x-3 mb-4">
+          <span className="text-2xl">🔎</span>
+          <h2 className="text-lg font-semibold text-green-600">QR / URL 검색</h2>
         </div>
-      )}
+        <QRSearchBlock />
+      </div>
     </div>
   );
 }

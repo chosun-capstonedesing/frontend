@@ -90,7 +90,7 @@ export default function MyPage() {
   };
 
   return (
-    <div className="bg-white min-h-screen py-8 px-8 rounded-x">
+    <div className="bg-white py-8 px-8 rounded-2xl shadow-xl">
       <h2 className="text-3xl font-bold mb-4">내 업로드 내역</h2>
 
       {/* 탭 메뉴 및 검색바 */}
