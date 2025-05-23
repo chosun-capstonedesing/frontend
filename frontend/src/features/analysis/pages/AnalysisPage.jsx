@@ -59,11 +59,47 @@ const handleCancelAnalysis = (analysisId, setFileState) => {
 
 export default function AnalysisPage({ uploadedFile, handleFileSelect }) {
   const [localUploadedFile, setLocalUploadedFile] = useState(uploadedFile);
+  const [recentResults, setRecentResults] = useState(() => {
+    const saved = sessionStorage.getItem("urlresult");
+    return saved ? JSON.parse(saved).slice(0, 4) : [];
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
     setLocalUploadedFile(uploadedFile);
   }, [uploadedFile]);
+
+  useEffect(() => {
+    const examples = [
+      {
+        id: 'ex1',
+        url: 'https://malicious.example.com',
+        resultSummary: '악성 URL로 판단됨 (피싱 사이트)',
+        timestamp: '2025-05-21T10:24:00.000Z'
+      },
+      {
+        id: 'ex2',
+        url: 'https://safe-site.com',
+        resultSummary: '정상 사이트로 확인됨',
+        timestamp: '2025-05-20T15:42:00.000Z'
+      },
+      {
+        id: 'ex3',
+        url: 'http://suspicious.net',
+        resultSummary: '의심스러운 연결 기록 있음',
+        timestamp: '2025-05-19T08:10:00.000Z'
+      },
+      {
+        id: 'ex4',
+        url: 'http://unknown-site.org',
+        resultSummary: '정보 부족으로 판단 불가',
+        timestamp: '2025-05-18T13:55:00.000Z'
+      },
+    ];
+    setRecentResults(examples);
+    sessionStorage.setItem("urlresult", JSON.stringify(examples));
+    localStorage.setItem("urlresult", JSON.stringify(examples));
+  }, []);
 
   useEffect(() => {
     const handleCancel = (e) => {
@@ -98,13 +134,57 @@ export default function AnalysisPage({ uploadedFile, handleFileSelect }) {
         <FileUpload onFileSelect={handleFileSelect} />
       </div>
 
-      {/* QR / URL 검색 박스 */}
-      <div className="bg-white rounded-2xl shadow-xl p-6">
-        <div className="flex items-center space-x-3 mb-4">
-          <span className="text-2xl">🔎</span>
-          <h2 className="text-lg font-semibold text-green-600">QR / URL 검색</h2>
+      {/* QR / URL 검색 박스 + 분석 결과 박스 */}
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* QR / URL 검색 박스 */}
+        <div className="bg-white rounded-2xl shadow-xl p-6 w-full lg:w-2/3">
+          <div className="flex items-center space-x-3 mb-4">
+            <span className="text-2xl">🔎</span>
+            <h2 className="text-lg font-semibold text-green-600">QR / URL 검색</h2>
+          </div>
+          <QRSearchBlock onResult={(result) => {
+            const updatedResults = [result, ...recentResults.filter(r => r.id !== result.id)].slice(0, 4);
+            setRecentResults(updatedResults);
+            sessionStorage.setItem("urlresult", JSON.stringify(updatedResults));
+            localStorage.setItem("urlresult", JSON.stringify(updatedResults));
+          }} />
         </div>
-        <QRSearchBlock />
+
+        {/* QR 분석 결과 박스 */}
+        <div className="bg-white rounded-2xl shadow-xl p-6 w-full lg:w-1/3">
+          <div className="flex items-center space-x-3 mb-4">
+            <span className="text-2xl">📊</span>
+            <h2 className="text-lg font-semibold text-purple-600"> QR / URL 분석 결과</h2>
+          </div>
+          <div className="bg-white rounded-2xl shadow-md p-4 text-gray-600 text-sm space-y-3">
+            {recentResults.length === 0 ? (
+              <div>분석 결과가 여기에 표시됩니다.</div>
+            ) : (
+              recentResults.map((res, idx) => (
+                <div
+                  key={idx}
+                  className={`border-b ${idx === recentResults.length - 1 ? 'border-b-0 pb-0' : 'pb-4'}`}
+                >
+                  <div className="flex justify-between items-center">
+                    <div className="font-semibold text-gray-800 break-words">{res.url || res.title || "분석 대상"}</div>
+                    <span className={`text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap ${
+                      res.resultSummary?.includes('악성') ? 'bg-red-100 text-red-600' :
+                      res.resultSummary?.includes('정상') ? 'bg-green-100 text-green-600' :
+                      'bg-yellow-100 text-yellow-700'
+                    }`}>
+                      {res.resultSummary?.includes('악성') ? '악성' :
+                       res.resultSummary?.includes('정상') ? '정상' : '의심'}
+                    </span>
+                  </div>
+                  <div className="text-sm text-gray-600 mt-1 break-words">{res.resultSummary || "결과 없음"}</div>
+                  {res.timestamp && (
+                    <div className="text-xs text-gray-400 mt-1">{new Date(res.timestamp).toLocaleString()}</div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

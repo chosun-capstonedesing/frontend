@@ -167,7 +167,7 @@ export function FileUploadPreviewList({
   }
 
   return (
-    <ul className="bg-white rounded-lg shadow divide-y divide-gray-200">
+    <ul className="bg-white rounded-2xl shadow-md divide-y divide-gray-200">
       {/* 파일 리스트의 각 항목에 대해 표시 */}
       {filteredFileList
         .map((file, i) => ({ file, originalIndex: i })) // 인덱스를 유지하기 위한 래핑
@@ -311,7 +311,7 @@ export function FileUploadPreviewList({
 
                 {/* 분석 상태에 따라 버튼 스타일 및 텍스트 변경 */}
                 <button
-                  className={`ml-4 text-sm font-medium px-3 py-1 rounded 
+                  className={`ml-4 text-sm font-medium px-3 py-1 rounded-lg shadow-md 
                   ${file.status === "done"
                       ? "bg-green-100 text-green-700 hover:-green-200"
                       : file.status === "processing"

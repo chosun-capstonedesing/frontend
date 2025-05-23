@@ -20,6 +20,9 @@ export const ToastProvider = ({ children }) => {
   const showToast = (message, status = "done", analysisId = null, progress = 0) => {
     const id = Date.now(); // 고유 ID 생성 (타임스탬프 사용)
     setToasts(prev => [...prev, { id, message, status, analysisId, progress }]);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 30000); // 30초 후 자동 제거
   };
 
   // updateToastStatus: 특정 분석 ID에 해당하는 토스트의 상태(status)를 업데이트

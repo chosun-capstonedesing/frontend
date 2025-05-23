@@ -27,7 +27,7 @@ export default function MyPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
   const [currentResult, setCurrentResult] = useState(null);
-  const itemsPerPage = 10;
+  const itemsPerPage = 5;
 
   useEffect(() => {
     const savedFiles = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
@@ -184,7 +184,7 @@ export default function MyPage() {
         </select>
       </div>
 
-      <ul className="bg-white rounded-lg shadow-[0_4px_16px_0_rgba(0,0,0,0.08)] divide-y divide-gray-200">
+      <ul className="bg-white rounded-2xl shadow-md divide-y divide-gray-200">
         {sortedAndPaginatedFiles.map(file => (
           <li
             key={file.analysis_id}
@@ -201,7 +201,7 @@ export default function MyPage() {
                     <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 011.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                   </svg>
                 </button>
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 pr-3">
                   <span className={`h-8 w-8 rounded-full flex items-center justify-center ${file.result === '정상'
                       ? 'bg-green-200'
                       : file.result === '악성'
@@ -226,8 +226,8 @@ export default function MyPage() {
                     </svg>
                   </span>
                 </div>
-                <div className="max-w-[180px] md:max-w-[240px] lg:max-w-[320px]">
-                  <p className="text-sm font-medium text-gray-900 break-all whitespace-normal">{file.name}</p>
+                <div className="ml-6 max-w-[200px] md:max-w-[360px] lg:max-w-[480px]">
+                  <p className="text-sm font-medium text-gray-900 break-words whitespace-normal">{file.name}</p>
                   <p className="text-sm text-gray-500">
                     {(() => {
                       const date = new Date(file.date || file.uploadedAt);
