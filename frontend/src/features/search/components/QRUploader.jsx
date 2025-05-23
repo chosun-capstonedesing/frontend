@@ -38,7 +38,15 @@ function QRUploader({ onDecode }) {
 
   return (
     <div>
-      <input type="file" accept="image/*" onChange={handleFileChange} />
+      <label className="inline-block bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold py-2 px-4 rounded-2xl shadow-xl cursor-pointer">
+        파일 선택
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="hidden"
+        />
+      </label>
     </div>
   );
 }

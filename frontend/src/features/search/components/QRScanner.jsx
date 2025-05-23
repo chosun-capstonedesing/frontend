@@ -42,8 +42,8 @@ function QRScanner({ onScanSuccess }) {
   }, [onScanSuccess]);
 
   return (
-    <div className="w-full max-w-sm mx-auto border rounded">
-      <video ref={videoRef} className="w-full aspect-video" />
+    <div className="w-[320px] h-[240px] rounded-xl shadow-xl overflow-hidden mr-auto">
+      <video ref={videoRef} className="w-full h-full object-cover" />
     </div>
   );
 }

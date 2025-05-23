@@ -25,34 +25,34 @@ function QRSearchBlock() {
       {!showScanner ? (
         <button
           onClick={() => setShowScanner(true)}
-          className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded">
+          className="px-4 py-2 rounded-2xl shadow-xl bg-green-500 hover:bg-green-600 text-white">
           QR 스캔 시작
         </button>
       ) : (
-        <>
+        <div className="relative">
           <QRScanner onScanSuccess={(result) => {
             setDecodedText(result);
             setShowScanner(false);
           }} scanning={showScanner} />
           <button
             onClick={() => setShowScanner(false)}
-            className="mt-2 px-4 py-2 bg-red-500 text-white rounded">
+            className="absolute bottom-2 right-2 px-4 py-2 rounded-2xl shadow-xl bg-red-500 hover:bg-red-600 text-white">
             QR 스캔 취소
           </button>
-        </>
+        </div>
       )}
 
       <QRUploader onDecode={handleQRResult} />
       <URLSearchForm onSearch={handleQRResult} />
 
-      <div className="mt-4 space-y-2">
+      <div className="mt-4 space-y-5">
         <div className="font-medium">📦 인식된 정보:</div>
-        <div className="p-2 bg-gray-200 rounded break-words">
+        <div className="p-3 pl-5 bg-gray-200 rounded-2xl shadow-xl break-words">
           {decodedText || "없음"}
         </div>
         <button
           onClick={handleQRSearch}
-          className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+          className="mt-5 px-5 py-2 rounded-2xl shadow-xl bg-blue-500 text-white hover:bg-blue-600">
           분석 시작
         </button>
       </div>
