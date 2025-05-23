@@ -16,9 +16,9 @@ const StatCard = ({ icon, label, count, color }) => (
 
 export default function GlobalStats() {
   const data = [
-    { icon: <FaLink />, label: "세계 실시간 URL 분석 수", count: 873, color: "text-blue-500", barColor: "bg-blue-300", width: "60%" },
-    { icon: <FaFileAlt />, label: "세계 실시간 파일 분석 수", count: 1274, color: "text-green-500", barColor: "bg-green-300", width: "83.33%" },
-    { icon: <FaChartBar />, label: "세계 실시간 총 분석 수", count: 2147, color: "text-purple-500", barColor: "bg-purple-300", width: "100%" },
+    { icon: <FaLink />, label: "세계 실시간 URL 분석 수", count: 873, color: "text-blue-500", barColor: "bg-blue-400", width: "60%" },
+    { icon: <FaFileAlt />, label: "세계 실시간 파일 분석 수", count: 1274, color: "text-green-500", barColor: "bg-green-400", width: "83.33%" },
+    { icon: <FaChartBar />, label: "세계 실시간 총 분석 수", count: 2147, color: "text-purple-500", barColor: "bg-purple-400", width: "100%" },
   ];
 
   const [animatedWidths, setAnimatedWidths] = useState(

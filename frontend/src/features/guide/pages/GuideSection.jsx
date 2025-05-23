@@ -7,16 +7,124 @@ import React from "react";
 
 function GuideSection() {
     return (
-        <div className="bg-white rounded-2xl shadow-xl p-6">
-            <h2 className="text-xl font-bold mb-4">사용자 가이드 & 설명</h2>
-            <p>
-                머신러닝 기반 악성코드 분석을 제공하며, CNN 모델을 사용하여 실행 파일의 정상/악성 여부를 판단합니다.
-            </p>
+        <>
+            <div className="lg:flex">
+                <div className="w-full lg:w-2/3 pr-4">
+                    <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
+                        <h2 className="text-2xl font-bold mb-4">사용자 가이드 & 설명</h2>
+                        <p className="text-lg leading-relaxed text-gray-800">
+                          본 웹 서비스는 AI 기반의 머신러닝(ML) 기술을 활용하여<br/>
+                          파일 분석 및 URL/QR 분석을 제공합니다.
+                        </p>
+                        <p className="mt-4 text-lg leading-relaxed text-gray-800">
+                          • <strong>분석 결과</strong>에서는 사용자가 분석한 파일에 대한 탐지 결과를 확인할 수 있습니다.<br/>
+                          • <strong>모델 정보</strong>에서는 분석 시 활용된 머신러닝 모델의 세부 정보를 볼 수 있습니다.<br/>
+                          • <strong>마이페이지</strong>에서는 분석 기록을 기반으로 과거 분석 파일의 결과를 조회할 수 있습니다.<br/>
+                          • 분석 결과 및 마이페이지에서는 <strong>결과 데이터를 PDF로 다운로드 받을 수 있습니다.</strong>
+                        </p>
+                        <p className="mt-4 text-base leading-relaxed text-gray-500">
+                          기술 스택, 팀 정보 외의 상세한 프로젝트 진행 정보는 팀 정보의 <strong>팀 GitHub</strong> 링크를 참고해주세요.
+                        </p>
+                    </div>
+                    <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
+                        <div className="mt-6">
+                            <h1 className="text-2xl font-bold -mt-4 mb-4">사용 기술 스택</h1>
 
-            <p className="mt-2">
-                데이터 처리, 모델 학습 및 분석 방법에 대한 자세한 내용은 추가 문서를 참고하세요.
-            </p>
-        </div>
+                            <h4 className="text-lg font-semibold mt-8 mb-2">Backend</h4>
+                            <div className="flex flex-wrap gap-4">
+                                {[
+                                    { name: "FastAPI", icon: <img src="https://cdn.simpleicons.org/fastapi/009688" alt="FastAPI" className="w-10 h-10 rounded-sm" />, color: "bg-green-700" },
+                                    { name: "Uvicorn", icon: <div className="text-4xl">🦄</div>, color: "bg-pink-700" },
+                                    { name: "SQLAlchemy", icon: <img src="https://www.sqlalchemy.org/img/sqla_logo.png" alt="SQLAlchemy" className="w-32 h-20 object-contain" />, color: "bg-yellow-700" },
+                                    { name: "PostgreSQL", icon: <img src="https://cdn.simpleicons.org/postgresql/336791" alt="PostgreSQL" className="w-10 h-10 rounded-sm" />, color: "bg-blue-700" },
+                                ].map((item, idx) => (
+                                    <div key={idx} className="flex items-center gap-2 px-2 py-1 text-sm">
+                                        {item.icon}
+                                        <span>{item.name}</span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <h4 className="text-lg font-semibold mt-5 mb-2">Frontend</h4>
+                            <div className="flex flex-wrap gap-4">
+                                {[
+                                    { name: "React", icon: <img src="https://cdn.simpleicons.org/react/61DAFB" alt="React" className="w-10 h-10 rounded-sm" />, color: "bg-cyan-700" },
+                                    { name: "Tailwind", icon: <img src="https://cdn.simpleicons.org/tailwindcss/06B6D4" alt="Tailwind" className="w-10 h-10 rounded-sm" />, color: "bg-teal-700" },
+                                    { name: "Vite", icon: <img src="https://cdn.simpleicons.org/vite/646CFF" alt="Vite" className="w-10 h-10 rounded-sm" />, color: "bg-indigo-700" },
+                                    { name: "Axios", icon: <img src="https://cdn.simpleicons.org/github/181717" alt="Axios" className="w-10 h-10 rounded-sm" />, color: "bg-purple-700" },
+                                ].map((item, idx) => (
+                                    <div key={idx} className="flex items-center gap-2 px-2 py-1 text-sm">
+                                        {item.icon}
+                                        <span>{item.name}</span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <h4 className="text-lg font-semibold mt-11 mb-2">ML 모델</h4>
+                            <div className="flex flex-wrap gap-4">
+                                {[
+                                    { name: "CNN", icon: <div className="text-4xl">🧠</div>, color: "bg-red-700" },
+                                    { name: "Random Forest", icon: <div className="text-4xl">🌲</div>, color: "bg-green-700" },
+                                ].map((item, idx) => (
+                                    <div key={idx} className="flex items-center gap-2 px-2 py-1 text-sm">
+                                        {item.icon}
+                                        <span>{item.name}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="w-full lg:w-1/3">
+                    <div className="bg-white rounded-2xl shadow-xl p-6 mt-0 mb-6">
+                        <div className="mt-2 mb-6">
+                            <h3 className="text-2xl font-semibold mb-3 -mt-3">팀 정보</h3>
+                            <a
+                                href="https://github.com/chosun-capstonedesing"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex justify-center items-center bg-black hover:bg-gray-800 text-white font-semibold text-base py-3 px-4 rounded-full shadow-md w-full"
+                            >
+                                <img
+                                    src="https://cdn.simpleicons.org/github/ffffff"
+                                    alt="GitHub"
+                                    className="w-6 h-6 mr-3"
+                                />
+                                CSEC Team GitHub
+                            </a>
+                        </div>
+                        <div className="flex flex-col gap-4">
+                            {[
+                                { name: "박준언", email: "pppp662667@gmail.com", role: "ML", position: "팀장", affiliation: "조선대학교 정보보안전공" },
+                                { name: "김민서", email: "iminseo031224@gmail.com", role: "Frontend", position: "팀원", affiliation: "조선대학교 정보보안전공" },
+                                { name: "김원준", email: "kimwonjun1429@gmail.com", role: "ML", position: "팀원", affiliation: "조선대학교 정보보안전공" },
+                                { name: "윤혜준", email: "hj021313@gmail.com", role: "Backend", position: "팀원", affiliation: "조선대학교 정보보안전공" },
+                                { name: "임창훈", email: "limch2320@chosun.ac.kr", role: "ML", position: "팀원", affiliation: "조선대학교 정보보안전공" },
+                            ].map((member, index) => (
+                                <div key={index} className="flex items-center bg-gray-50 p-4 rounded-2xl shadow-xl">
+                                    <div className="flex-shrink-0 mr-4">
+                                        <svg className="w-10 h-10 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p className="font-medium">{member.name}</p>
+                                        <p className="text-sm text-gray-600">{member.email}</p>
+                                        <p className="text-sm text-gray-600">{member.affiliation}</p>
+                                        <span className="inline-block mt-1 px-2 py-0.5 text-xs font-semibold text-white bg-blue-500 rounded-full mr-1">
+                                          {member.role}
+                                        </span>
+                                        <span className="inline-block mt-1 px-2 py-0.5 text-xs font-semibold text-white bg-gray-600 rounded-full">
+                                          {member.position}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
     );
 }
 
