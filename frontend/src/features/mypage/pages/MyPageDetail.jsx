@@ -116,15 +116,15 @@ export default function FileAccordionDetail({ file }) {
         : 'N/A';
 
   return (
-    <div className="mt-4 bg-gray-50 border border-gray-200 rounded p-4">
+    <div className="mt-4 bg-gray-50 border border-gray-200 rounded p-4 break-words">
       <h2 className="text-lg font-semibold mb-2">파일 분석 결과</h2>
       <ul className="space-y-1 text-sm">
         <li className='pb-2.5'><strong className='text-base'>파일 분석 정보 (File Analysis Information)</strong>
           <ul className="mt-1 space-y-1 pl-1">
-            <li><strong>- 파일 이름: </strong>{finalData.filename ?? finalData.name ?? 'N/A'}</li>
+            <li><strong>- 파일 이름: </strong><span className="break-all">{finalData.filename ?? finalData.name ?? 'N/A'}</span></li>
             <li><strong>- 파일 크기: </strong>{formattedSize}</li>
             <li><strong>- 확장자: </strong>{extension}</li>
-            <li><strong>- SHA-256 Hash: </strong>{finalData.sha256 ?? finalData.hash ?? 'N/A'}</li>
+            <li><strong>- SHA-256 Hash: </strong><span className="break-all">{finalData.sha256 ?? finalData.hash ?? 'N/A'}</span></li>
           </ul>
         </li>
 

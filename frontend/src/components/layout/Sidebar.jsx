@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { FaHome, FaChartPie, FaClipboardList, FaQrcode, FaUser, FaInfoCircle } from "react-icons/fa";
 
-const Sidebar = () => {
+const Sidebar = ({ onNavigate }) => {
   const menuItems = [
     { icon: <FaHome />, label: "파일 분석", path: "/" },
     { icon: <FaClipboardList />, label: "분석 결과", path: "/analysis_results" },
@@ -22,6 +22,7 @@ const Sidebar = () => {
           <NavLink
             to={item.path}
             key={idx}
+            onClick={onNavigate}
             className={({ isActive }) =>
               `flex items-center gap-3 w-full px-4 py-2 rounded-2xl transition-colors ${
                 isActive

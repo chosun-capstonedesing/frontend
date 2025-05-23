@@ -26,13 +26,13 @@ function URLSearchForm({ onSearch }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="flex space-x-2">
+      <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
         <input
           type="text"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="https://example.com"
-          className="border px-5 py-2 flex-grow rounded-2xl shadow-xl"
+          className="border px-5 py-2 rounded-2xl shadow-xl flex-grow"
         />
         <button
           type="submit"
