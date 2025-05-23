@@ -22,10 +22,14 @@ const syncToSessionStorage = (analysisId) => {
       };
 
       if (existingIndex !== -1) {
-        sessionFiles[existingIndex] = { ...sessionFiles[existingIndex], ...enriched };
+        sessionFiles[existingIndex] = { ...sessionFiles[existingIndex], ...parsed };
       } else {
         sessionFiles.push(enriched);
       }
+
+      sessionFiles = sessionFiles.filter((f, idx, self) => 
+        idx === self.findIndex((o) => o.analysis_id === f.analysis_id)
+      );
 
       sessionStorage.setItem("uploadedFiles", JSON.stringify(sessionFiles));
     } catch (e) {
@@ -48,6 +52,7 @@ const handleCancelAnalysis = (analysisId, setFileState) => {
         isUploading: false
       };
     }
+    sessionStorage.setItem("uploadedFiles", JSON.stringify(updated));
     return updated;
   });
 };
@@ -70,7 +75,7 @@ export default function AnalysisPage({ uploadedFile, handleFileSelect }) {
       const { analysisId } = e.detail;
       console.log("분석 탭에서 결과 보기 요청 수신:", analysisId);
       navigate(`/analysis_results?id=${analysisId}`);
-      // syncToSessionStorage(analysisId); 제거됨
+      syncToSessionStorage(analysisId);
     };
 
     window.addEventListener("cancelAnalysis", handleCancel);

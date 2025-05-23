@@ -9,8 +9,6 @@ export const AuthProvider = ({ children }) => {
 
   const login = () => {
     localStorage.setItem('access_token', 'mock_token_value');
-    sessionStorage.removeItem('uploadedFiles');
-    sessionStorage.removeItem('uploadedCount');
     setIsLoggedIn(true);
   };
 

@@ -188,6 +188,14 @@ export async function handleAnalyzeFile(
         ]);
       }
 
+      const dedupedSession = Array.from(
+        new Map(
+          JSON.parse(sessionStorage.getItem("uploadedFiles") || "[]")
+            .map((f) => [f.analysis_id, f])
+        ).values()
+      );
+      sessionStorage.setItem("uploadedFiles", JSON.stringify(dedupedSession));
+
       delete handleAnalyzeFile.canceledFlags[targetId];
     }
   }, numberStepTime);

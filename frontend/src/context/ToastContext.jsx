@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
+import { useNavigate } from "react-router-dom";
 
 // ToastContext: 전역 상태 관리를 위한 Context 생성
 const ToastContext = createContext();
@@ -12,12 +13,24 @@ export const useToast = () => useContext(ToastContext);
 export const ToastProvider = ({ children }) => {
   // toasts 상태: 현재 화면에 표시 중인 토스트 알림 목록 (배열)
   const [toasts, setToasts] = useState([]);
+  const navigate = useNavigate();
 
   // showToast: 새 토스트 알림을 추가하는 함수
   // message: 알림 메시지, status: 상태값, analysisId: 분석 식별자, progress: 진행률(0~100)
   const showToast = (message, status = "done", analysisId = null, progress = 0) => {
     const id = Date.now(); // 고유 ID 생성 (타임스탬프 사용)
     setToasts(prev => [...prev, { id, message, status, analysisId, progress }]);
+  };
+
+  // updateToastStatus: 특정 분석 ID에 해당하는 토스트의 상태(status)를 업데이트
+  const updateToastStatus = (analysisId, status) => {
+    setToasts(prev =>
+      prev.map(t =>
+        t.analysisId === analysisId
+          ? { ...t, status }
+          : t
+      )
+    );
   };
 
   // updateProgress: 특정 분석 ID에 해당하는 토스트의 진행률(progress)를 업데이트
@@ -51,7 +64,7 @@ export const ToastProvider = ({ children }) => {
   }, [toasts]);
 
   return (
-    <ToastContext.Provider value={{ showToast, updateProgress }}>
+    <ToastContext.Provider value={{ showToast, updateProgress, updateToastStatus }}>
       {children}
       {/* createPortal: 알림을 최상위 DOM(body)에 렌더링하여 UI가 다른 컴포넌트에 가려지지 않도록 함 */}
       {createPortal(
@@ -95,27 +108,31 @@ export const ToastProvider = ({ children }) => {
                   {/* 알림 메시지: 여러 줄 지원 및 줄바꿈 유지 */}
                   <div className="text-xs text-gray-600 break-all whitespace-pre-wrap max-w-full">{toast.message}</div>
 
-                  {/* 프로그래스 바 표시 */}
-                  <div className="w-full mt-2">
-                    <div className="flex items-center space-x-2">
-                      {/* 프로그래스 바 배경 */}
-                      <div className="flex-1 bg-gray-200 h-2 rounded-full">
-                        {/* 프로그래스 바 진행률 표시 */}
-                        <div
-                          className="h-2 bg-yellow-400 rounded-full transition-all duration-500"
-                          style={{ width: `${toast.progress || 0}%` }}
-                        />
+                  {/* 프로그래스 바 표시: 진행 중일 때만 */}
+                  {toast.status !== 'done' && (
+                    <div className="w-full mt-2">
+                      <div className="flex items-center space-x-2">
+                        {/* 프로그래스 바 배경 */}
+                        <div className="flex-1 bg-gray-200 h-2 rounded-full">
+                          {/* 프로그래스 바 진행률 표시 */}
+                          <div
+                            className="h-2 bg-yellow-400 rounded-full transition-all duration-500"
+                            style={{ width: `${toast.progress || 0}%` }}
+                          />
+                        </div>
+                        {/* 진행률 텍스트 */}
+                        <div className="text-xs text-gray-500">{toast.progress || 0}%</div>
                       </div>
-                      {/* 진행률 텍스트 */}
-                      <div className="text-xs text-gray-500">{toast.progress || 0}%</div>
                     </div>
-                  </div>
+                  )}
 
                   {/* 분석 완료: 결과 보기 버튼 표시 */}
                   {toast.status === 'done' && (
                     <p
                       onClick={() => {
-                        alert("결과 보기");
+                        if (toast.analysisId) {
+                          navigate(`/analysis_results/${toast.analysisId}`);
+                        }
                       }}
                       className="text-xs text-green-600 mt-1 font-medium cursor-pointer hover:underline"
                     >

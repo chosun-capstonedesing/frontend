@@ -48,7 +48,7 @@ function AnalysisResults({
 
   useEffect(() => {
     if (analysisId) {
-      loadAnalysisData(analysisId);
+        loadAnalysisData(analysisId);
     } else {
       const allKeys = Object.keys(localStorage);
       const recent = allKeys
@@ -76,9 +76,8 @@ function AnalysisResults({
   useEffect(() => {
     if (fileData?.analysis_id) {
       const sessionFiles = JSON.parse(sessionStorage.getItem("uploadedFiles") || "[]");
-      const updatedSession = sessionFiles.map((f) =>
-        f.analysis_id === fileData.analysis_id ? { ...f, ...fileData, status: "done" } : f
-      );
+      let updatedSession = sessionFiles.filter(f => f.analysis_id !== fileData.analysis_id);
+      updatedSession.push({ ...fileData, status: "done" });
       sessionStorage.setItem("uploadedFiles", JSON.stringify(updatedSession));
       // Also update localStorage based on deletedAnalysisIds
       const deletedIds = JSON.parse(sessionStorage.getItem("deletedAnalysisIds") || "[]");
@@ -94,7 +93,7 @@ function AnalysisResults({
         <p className="text-lg font-semibold">분석 결과를 확인할 수 없습니다.</p>
         <p className="text-sm mt-2">먼저 분석을 진행해주세요.</p>
       </div>
-    );
+    );ㅋㅇ
   }
 
   const fileName = fileData.filename;

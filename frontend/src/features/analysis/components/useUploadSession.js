@@ -268,9 +268,10 @@ export function useUploadSession(isActuallyLoggedIn, maxCount) {
     const now = Date.now();
     const enhancedFiles = createEnhancedFiles(newFiles);
 
-    // 기존 파일 목록에서 새로 추가할 파일과 이름과 크기가 동일한 파일 제거 (중복 방지)
+    // 기존 파일 목록에서 새로 추가할 파일과 analysis_id가 동일한 파일만 제거
+    // (이름/크기만 같은 파일이 삭제되는 부작용 방지)
     const filtered = fileList.filter(f =>
-      !enhancedFiles.some(e => e.name === f.name && e.size === f.size)
+      !enhancedFiles.some(e => e.analysis_id === f.analysis_id)
     );
 
     // 로그인 상태에 따라 저장할 파일 목록 결정 (비로그인은 maxCount 제한 적용)
@@ -278,11 +279,16 @@ export function useUploadSession(isActuallyLoggedIn, maxCount) {
       ? [...filtered, ...enhancedFiles]
       : [...filtered, ...enhancedFiles].slice(0, maxCount);
 
+    // analysis_id 기준으로 중복 제거 (deduplication)
+    const dedupedFiles = Array.from(
+      new Map(updatedFiles.map(f => [f.analysis_id, f])).values()
+    );
+
     // sessionStorage에 업데이트된 파일 목록과 관련 정보 저장
-    sessionStorage.setItem("uploadedFiles", JSON.stringify(updatedFiles));
-    sessionStorage.setItem("uploadedCount", String(updatedFiles.length));
+    sessionStorage.setItem("uploadedFiles", JSON.stringify(dedupedFiles));
+    sessionStorage.setItem("uploadedCount", String(dedupedFiles.length));
     sessionStorage.setItem("uploadedTime", String(now));
-    setFileList(updatedFiles);
+    setFileList(dedupedFiles);
 
     // 수정 2: localStorage 저장 시 analysis_id를 기준으로 중복 제거
     const localList = JSON.parse(localStorage.getItem("uploadedFiles") || "[]").filter(
@@ -291,7 +297,11 @@ export function useUploadSession(isActuallyLoggedIn, maxCount) {
     const combinedLocal = isActuallyLoggedIn()
       ? [...localList, ...enhancedFiles]
       : [...localList, ...enhancedFiles].slice(0, maxCount);
-    localStorage.setItem("uploadedFiles", JSON.stringify(combinedLocal));
+    // deduplicate localStorage as well
+    const dedupedLocal = Array.from(
+      new Map(combinedLocal.map(f => [f.analysis_id, f])).values()
+    );
+    localStorage.setItem("uploadedFiles", JSON.stringify(dedupedLocal));
   };
 
   return [fileList, setFileList, updateSession];
