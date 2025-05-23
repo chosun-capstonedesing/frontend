@@ -12,7 +12,7 @@ const Sidebar = ({ onNavigate }) => {
   ];
 
   return (
-    <aside className="w-64 min-h-full bg-white border-r border-gray-200 rounded-2xl shadow-xl px-5 py-6">
+    <div className="w-64 items-start min-h-full border-r rounded-r-3xl shadow-xl px-5 py-6">
       <div className="flex items-center gap-3 mb-8">
         <img src="/CSEC.PNG" alt="로고" className="w-9 h-9 object-contain" />
         <h1 className="text-xl font-extrabold text-gray-900">CSEC</h1>
@@ -36,7 +36,7 @@ const Sidebar = ({ onNavigate }) => {
           </NavLink>
         ))}
       </nav>
-    </aside>
+    </div>
   );
 };
 

@@ -20,7 +20,7 @@ export default function MainLayoutPC() {
   return (
     <div className="relative">
       {/* top right login */}
-      <div className="absolute top-8 right-10 z-50 mb-10">
+      <div className="fixed top-8 right-10 z-50 mb-10">
         {isLoggedIn() ? (
           <LogoutButton userId={userId} onLogout={handleLogout} />
         ) : (
@@ -28,13 +28,16 @@ export default function MainLayoutPC() {
         )}
       </div>
 
+      {/* white background blur layer */}
+      <div className="fixed inset-0 -z-10 backdrop-blur-2xl bg-white/100"></div>
+
       {/* layout content */}
-      <div className="flex w-full bg-gray-100 min-h-screen">
-        <div className="w-64">
+      <div className="flex w-full relative z-10 bg-gradient-to-br from-[#2a4dc1]/40 via-[#5698e2]/30 to-[#935bca]/30 min-h-screen">
+        <div className="w-64 h-screen z-50 overflow-y-auto bg-white shadow-lg rounded-r-3xl flex-shrink-0 fixed top-0 left-0">
           <Sidebar />
         </div>
 
-        <main className="w-[calc(100%-20rem-18rem)] min-h-screen bg-gray-100 px-4 py-4 ml-5 mt-20 mb-20">
+        <main className="w-[calc(100%-20rem-18rem)] min-h-screen px-4 py-4 ml-[17.3rem] mt-20 mb-20">
           <Outlet />
         </main>
 
