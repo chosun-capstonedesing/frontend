@@ -29,8 +29,14 @@ function AnalysisResults({
   maliciousProbability,
   modelInfo = {}
 }) {
-  const { analysis_id: analysisId } = useParams();
+  const { analysisId: paramId } = useParams();
+  const [analysisId, setAnalysisId] = useState(paramId || null);
+  console.log("useParams:", useParams());
+  const lastViewedId = localStorage.getItem("lastViewedAnalysisId");
   const [fileData, setFileData] = useState(null);
+  console.log("[분석결과탭] 초기 렌더링됨");
+  console.log("분석 결과 페이지 - useParams analysisId:", analysisId);
+  console.log("분석 결과 페이지 - localStorage 마지막 ID:", lastViewedId);
 
   // Helper function to load analysis data from localStorage
   const loadAnalysisData = (id) => {
@@ -38,7 +44,16 @@ function AnalysisResults({
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
+        console.log("[분석결과탭] 로딩된 로컬 데이터:", parsed);
         setFileData(parsed);
+        // analysis_id가 있으면 상태 및 세션스토리지 동기화
+        if (parsed.analysis_id) {
+          setAnalysisId(parsed.analysis_id);
+          const sessionFiles = JSON.parse(sessionStorage.getItem("uploadedFiles") || "[]");
+          let updatedSession = sessionFiles.filter(f => f.analysis_id !== parsed.analysis_id);
+          updatedSession.push({ ...parsed, status: "done" });
+          sessionStorage.setItem("uploadedFiles", JSON.stringify(updatedSession));
+        }
         return parsed;
       } catch (e) {
         console.error("분석 결과 파싱 실패:", e);
@@ -47,9 +62,33 @@ function AnalysisResults({
   };
 
   useEffect(() => {
-    if (analysisId) {
-        loadAnalysisData(analysisId);
+    if (paramId) {
+      console.log("[분석결과탭] paramId 기반 analysisId:", paramId);
+      localStorage.setItem("lastViewedAnalysisId", paramId);
+      loadAnalysisData(paramId);
+      setAnalysisId(paramId);
     } else {
+      // Fallback: try sessionStorage uploadedFiles first
+      const sessionFiles = JSON.parse(sessionStorage.getItem("uploadedFiles") || "[]");
+      console.log("[분석결과탭] paramId 없음, sessionFiles:", sessionFiles);
+      if (sessionFiles && sessionFiles.length > 0) {
+        // Sort by start_time
+        const sortedSession = sessionFiles
+          .map(f => ({ ...f, time: new Date(f.log?.start_time) }))
+          .sort((a, b) => b.time - a.time);
+        const latest = sortedSession[0];
+        if (latest?.analysis_id) {
+          console.log("[분석결과탭] sessionFiles에서 최신 analysisId 선택:", latest.analysis_id);
+          setAnalysisId(latest.analysis_id);
+          loadAnalysisData(latest.analysis_id);
+          return;
+        } else {
+          console.log("[분석결과탭] sessionFiles에 analysis_id 없음, fallback 진행");
+        }
+      } else {
+        console.log("[분석결과탭] sessionFiles 비어있음, localStorage fallback 진행");
+      }
+      // Fallback: localStorage에서 최근 분석 찾기
       const allKeys = Object.keys(localStorage);
       const recent = allKeys
         .filter((key) => {
@@ -65,13 +104,17 @@ function AnalysisResults({
           time: new Date(JSON.parse(localStorage.getItem(key)).log.start_time),
         }))
         .sort((a, b) => b.time - a.time);
-
+      console.log("[분석결과탭] localStorage에서 최근 분석 목록:", recent);
       if (recent.length > 0) {
         const latestId = recent[0].id;
+        console.log("[분석결과탭] localStorage에서 최신 analysisId 선택:", latestId);
+        setAnalysisId(latestId);
         loadAnalysisData(latestId);
+      } else {
+        console.log("[분석결과탭] localStorage에도 최근 분석 없음");
       }
     }
-  }, [analysisId]);
+  }, [paramId]);
 
   useEffect(() => {
     if (fileData?.analysis_id) {
@@ -88,12 +131,13 @@ function AnalysisResults({
   }, [fileData]);
 
   if (!fileData) {
+    console.log("[분석결과탭] fileData 없음, analysisId:", analysisId);
     return (
       <div className="bg-white rounded-2xl shadow-xl p-6 text-center text-gray-800 mt-20">
         <p className="text-lg font-semibold">분석 결과를 확인할 수 없습니다.</p>
         <p className="text-sm mt-2">먼저 분석을 진행해주세요.</p>
       </div>
-    );ㅋㅇ
+    );
   }
 
   const fileName = fileData.filename;

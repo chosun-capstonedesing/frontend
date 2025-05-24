@@ -47,11 +47,23 @@ export function FileUploadPreviewList({
   const [latestCompleteIndex, setLatestCompleteIndex] = React.useState(null);
   const [validUntil, setValidUntil] = React.useState(null);
 
+  // Restore latestCompleteIndex and validUntil from sessionStorage if available
+  React.useEffect(() => {
+    const savedIndex = sessionStorage.getItem("latestCompleteIndex");
+    const savedValidUntil = sessionStorage.getItem("validUntil");
+    if (savedIndex !== null) setLatestCompleteIndex(Number(savedIndex));
+    if (savedValidUntil !== null) setValidUntil(Number(savedValidUntil));
+  }, []);
+
   React.useEffect(() => {
     const latestIndex = fileList.findLastIndex(file => file.status === "done");
     if (latestIndex !== -1) {
       setLatestCompleteIndex(latestIndex);
-      setValidUntil(Date.now() + 30 * 60 * 1000); // 30분 타이머 설정
+      const newValidUntil = Date.now() + 30 * 60 * 1000;
+      setValidUntil(newValidUntil);
+      sessionStorage.setItem("latestCompleteIndex", latestIndex);
+      sessionStorage.setItem("validUntil", newValidUntil);
+      // Already set above, remove this line
     }
   }, [fileList]);
 
@@ -60,27 +72,27 @@ export function FileUploadPreviewList({
       JSON.parse(sessionStorage.getItem(analysisId)) ||
       JSON.parse(localStorage.getItem(analysisId));
     if (!parsed) return null;
-    // for (const key in localStorage) {
-    //   try {
-    //     const item = JSON.parse(localStorage.getItem(key));
-    //     if (item?.analysis_id === analysisId) {
-    //       const result =
-    //         typeof item.result === "string"
-    //           ? item.result
-    //           : typeof item.malicious === "number"
-    //             ? item.malicious >= 0.9
-    //               ? "악성"
-    //               : item.malicious >= 0.6
-    //                 ? "의심"
-    //                 : "정상"
-    //             : item.log
-    //               ? "분석 완료"
-    //               : "분석 안됨";
+    for (const key in localStorage) {
+      try {
+        const item = JSON.parse(localStorage.getItem(key));
+        if (item?.analysis_id === analysisId) {
+          const result =
+            typeof item.result === "string"
+              ? item.result
+              : typeof item.malicious === "number"
+                ? item.malicious >= 0.9
+                  ? "악성"
+                  : item.malicious >= 0.6
+                    ? "의심"
+                    : "정상"
+                : item.log
+                  ? "분석 완료"
+                  : "분석 안됨";
 
-    //       return { parsed: item, result };
-    //     }
-    //   } catch (_) { }
-    // }
+          return { parsed: item, result };
+        }
+      } catch (_) { }
+    }
     return null;
   };
 
@@ -322,18 +334,35 @@ export function FileUploadPreviewList({
                     if (file.status === "processing") return;
                     if (file.status === "done") {
                       const parsedResult = parseResultFromLocalStorage(file.analysis_id);
+                      let parsed = null;
+                      let result = null;
                       if (parsedResult) {
-                        const { parsed, result } = parsedResult;
-                        updateSessionWithParsedResult(file, parsed, result);
-                      } else {
-                        // fallback to just using session if parsedResult is unavailable
-                        const sessionFiles = JSON.parse(sessionStorage.getItem("uploadedFiles") || "[]");
-                        const match = sessionFiles.find(f => f.analysis_id === file.analysis_id);
-                        if (match) {
-                          sessionStorage.setItem("uploadedFiles", JSON.stringify(sessionFiles));
-                        }
+                        parsed = parsedResult.parsed;
+                        result = parsedResult.result;
+                      } else if (file?.result || file?.log) {
+                        parsed = file;
+                        result =
+                          typeof file.result === "string"
+                            ? file.result
+                            : typeof file.malicious === "number"
+                              ? file.malicious >= 0.9
+                                ? "악성"
+                                : file.malicious >= 0.6
+                                  ? "의심"
+                                  : "정상"
+                              : file.log
+                                ? "분석 완료"
+                                : "분석 안됨";
                       }
-                      navigate(`/analysis_results/${file.analysis_id}`);
+
+                      if (parsed) {
+                        const updated = updateSessionWithParsedResult(file, parsed, result, "done");
+                        setFileList(updated);
+                        sessionStorage.setItem("lastViewedAnalysisId", file.analysis_id);
+                        navigate(`/analysis_results/${file.analysis_id}`);
+                      } else {
+                        alert("분석 결과를 찾을 수 없습니다. 마이페이지에서 확인해주세요.");
+                      }
                     } else {
                       if ((progressMap[file.analysis_id] ?? 0) >= 100) {
                         const parsedResult = parseResultFromLocalStorage(file.analysis_id);
