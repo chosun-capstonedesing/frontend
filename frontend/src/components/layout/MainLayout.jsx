@@ -4,6 +4,6 @@ import MainLayoutPC from './MainLayoutPC';
 import MainLayoutMobile from './MainLayoutMobile';
 
 export default function MainLayout() {
-  const isMobile = useMediaQuery({ maxWidth: 768 });
+  const isMobile = useMediaQuery({ maxWidth: 1000 });
   return isMobile ? <MainLayoutMobile /> : <MainLayoutPC />;
 }

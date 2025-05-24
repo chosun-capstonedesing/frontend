@@ -4,8 +4,13 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+
   theme: {
-    extend: {},
+    extend: {
+      screens: {
+        'custom': '1000px',
+      }
+    }
   },
   plugins: [],
 }

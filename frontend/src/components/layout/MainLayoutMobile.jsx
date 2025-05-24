@@ -23,19 +23,17 @@ export default function MainLayoutMobile() {
   return (
     <div className="relative">
       {/* top right login */}
-      {!sidebarOpen && (
-        <div className="absolute top-8 right-10 z-50 mb-10">
-          {isLoggedIn() ? (
-            <LogoutButton userId={userId} onLogout={handleLogout} />
-          ) : (
-            <Link to="/login" className="text-base font-medium text-gray-700 hover:underline">Login/SignUp</Link>
-          )}
-        </div>
-      )}
+      <div className="absolute top-8 right-10 z-50 mb-10">
+        {isLoggedIn() ? (
+          <LogoutButton userId={userId} onLogout={handleLogout} />
+        ) : (
+          <Link to="/login" className="text-base font-medium text-gray-700 hover:underline">Login/SignUp</Link>
+        )}
+      </div>
 
       {/* hamburger toggle button */}
       {!sidebarOpen && (
-        <div className="sm:hidden absolute top-5 left-5 z-50">
+        <div className="custom:hidden absolute top-5 left-5 z-50">
           <button onClick={() => setSidebarOpen(true)}>
             <Bars3Icon className="w-6 h-6 text-gray-700" />
           </button>
@@ -51,7 +49,12 @@ export default function MainLayoutMobile() {
       )}
 
       {/* layout content */}
-      <div className="flex w-full bg-gray-200 min-h-screen">
+      <div
+        className="flex w-full bg-gray-200 min-h-screen"
+        onClick={() => {
+          if (sidebarOpen) setSidebarOpen(false);
+        }}
+      >
         <div
           className={`
             fixed z-50 top-0 left-0 h-screen w-64 bg-white shadow-md transform transition-transform duration-300 ease-in-out
