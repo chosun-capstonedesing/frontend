@@ -31,7 +31,7 @@ function GuideSection() {
                             <h1 className="text-2xl font-bold -mt-4 mb-4">사용 기술 스택</h1>
 
                             <h4 className="text-xl font-semibold mt-8">Backend</h4>
-                            <div className="flex gap-4 mb-2">
+                            <div className="flex flex-wrap gap-4 mb-2 justify-start">
                                 {[
                                     { name: "FastAPI", icon: <img src="https://cdn.simpleicons.org/fastapi/009688" alt="FastAPI" className="w-10 h-10 rounded-sm" /> },
                                     { name: "Uvicorn", icon: <div className="text-4xl">🦄</div> },
@@ -43,7 +43,7 @@ function GuideSection() {
                                     </div>
                                 ))}
                             </div>
-                            <div className="flex gap-4">
+                            <div className="flex flex-wrap gap-4 justify-start">
                                 {[
                                     { name: "PostgreSQL", icon: <img src="https://cdn.simpleicons.org/postgresql/336791" alt="PostgreSQL" className="w-10 h-10 rounded-sm" /> },
                                     { name: "Docker", icon: <img src="https://cdn.simpleicons.org/docker/2496ED" alt="Docker" className="w-10 h-10 rounded-sm" /> },
@@ -57,7 +57,7 @@ function GuideSection() {
                             </div>
 
                             <h4 className="text-xl font-semibold mt-5 mb-4">Frontend</h4>
-                            <div className="flex flex-wrap gap-4">
+                            <div className="flex flex-wrap gap-4 justify-start">
                                 {[
                                     { name: "React", icon: <img src="https://cdn.simpleicons.org/react/61DAFB" alt="React" className="w-10 h-10 rounded-sm" /> },
                                     { name: "Tailwind", icon: <img src="https://cdn.simpleicons.org/tailwindcss/06B6D4" alt="Tailwind" className="w-10 h-10 rounded-sm" /> },
@@ -69,7 +69,7 @@ function GuideSection() {
                                     </div>
                                 ))}
                             </div>
-                            <div className="flex flex-wrap gap-4 mt-2">
+                            <div className="flex flex-wrap gap-4 mt-2 justify-start">
                                 {[
                                     { name: "Axios", icon: <img src="/axios-logo.png" alt="Axios" className="w-10 h-10 rounded-sm" /> },
                                     { name: "JavaScript", icon: <img src="https://cdn.simpleicons.org/javascript/F7DF1E" alt="JavaScript" className="w-10 h-10 rounded-sm" /> },
