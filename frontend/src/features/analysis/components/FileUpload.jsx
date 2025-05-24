@@ -156,6 +156,8 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
     }
   }, []);
 
+  const uploadedCount = Number(sessionStorage.getItem("uploadedCount") || 0);
+
   // ===============================
   // UI 렌더링
   // - 파일 선택/드래그앤드롭 영역
@@ -190,8 +192,8 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
       <div className="mt-3 text-sm text-center text-gray-500">
         업로드 파일 수:{" "}
         {isLoggedIn
-          ? `${fileList.length} / 제한 없음`
-          : `${fileList.length} / ${remainingInfo?.limit ?? 3}`}
+          ? `${uploadedCount} / 제한 없음`
+          : `${uploadedCount} / ${remainingInfo?.limit ?? 3}`}
       </div>
     </div>
   );
