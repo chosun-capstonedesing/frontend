@@ -30,13 +30,24 @@ function GuideSection() {
                         <div className="mt-6">
                             <h1 className="text-2xl font-bold -mt-4 mb-4">사용 기술 스택</h1>
 
-                            <h4 className="text-lg font-semibold mt-8 mb-2">Backend</h4>
-                            <div className="flex flex-wrap gap-4">
+                            <h4 className="text-xl font-semibold mt-8">Backend</h4>
+                            <div className="flex gap-4 mb-2">
                                 {[
-                                    { name: "FastAPI", icon: <img src="https://cdn.simpleicons.org/fastapi/009688" alt="FastAPI" className="w-10 h-10 rounded-sm" />, color: "bg-green-700" },
-                                    { name: "Uvicorn", icon: <div className="text-4xl">🦄</div>, color: "bg-pink-700" },
-                                    { name: "SQLAlchemy", icon: <img src="https://www.sqlalchemy.org/img/sqla_logo.png" alt="SQLAlchemy" className="w-32 h-20 object-contain" />, color: "bg-yellow-700" },
-                                    { name: "PostgreSQL", icon: <img src="https://cdn.simpleicons.org/postgresql/336791" alt="PostgreSQL" className="w-10 h-10 rounded-sm" />, color: "bg-blue-700" },
+                                    { name: "FastAPI", icon: <img src="https://cdn.simpleicons.org/fastapi/009688" alt="FastAPI" className="w-10 h-10 rounded-sm" /> },
+                                    { name: "Uvicorn", icon: <div className="text-4xl">🦄</div> },
+                                    { name: "SQLAlchemy", icon: <img src="https://www.sqlalchemy.org/img/sqla_logo.png" alt="SQLAlchemy" className="w-32 h-20 object-contain" /> }
+                                ].map((item, idx) => (
+                                    <div key={idx} className="flex items-center gap-2 px-2 py-1 text-sm">
+                                        {item.icon}
+                                        <span>{item.name}</span>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="flex gap-4">
+                                {[
+                                    { name: "PostgreSQL", icon: <img src="https://cdn.simpleicons.org/postgresql/336791" alt="PostgreSQL" className="w-10 h-10 rounded-sm" /> },
+                                    { name: "Docker", icon: <img src="https://cdn.simpleicons.org/docker/2496ED" alt="Docker" className="w-10 h-10 rounded-sm" /> },
+                                    { name: "Python", icon: <img src="https://cdn.simpleicons.org/python/3776AB" alt="Python" className="w-10 h-10 rounded-sm" /> }
                                 ].map((item, idx) => (
                                     <div key={idx} className="flex items-center gap-2 px-2 py-1 text-sm">
                                         {item.icon}
@@ -45,13 +56,24 @@ function GuideSection() {
                                 ))}
                             </div>
 
-                            <h4 className="text-lg font-semibold mt-5 mb-2">Frontend</h4>
+                            <h4 className="text-xl font-semibold mt-5 mb-4">Frontend</h4>
                             <div className="flex flex-wrap gap-4">
                                 {[
-                                    { name: "React", icon: <img src="https://cdn.simpleicons.org/react/61DAFB" alt="React" className="w-10 h-10 rounded-sm" />, color: "bg-cyan-700" },
-                                    { name: "Tailwind", icon: <img src="https://cdn.simpleicons.org/tailwindcss/06B6D4" alt="Tailwind" className="w-10 h-10 rounded-sm" />, color: "bg-teal-700" },
-                                    { name: "Vite", icon: <img src="https://cdn.simpleicons.org/vite/646CFF" alt="Vite" className="w-10 h-10 rounded-sm" />, color: "bg-indigo-700" },
-                                    { name: "Axios", icon: <img src="https://cdn.simpleicons.org/github/181717" alt="Axios" className="w-10 h-10 rounded-sm" />, color: "bg-purple-700" },
+                                    { name: "React", icon: <img src="https://cdn.simpleicons.org/react/61DAFB" alt="React" className="w-10 h-10 rounded-sm" /> },
+                                    { name: "Tailwind", icon: <img src="https://cdn.simpleicons.org/tailwindcss/06B6D4" alt="Tailwind" className="w-10 h-10 rounded-sm" /> },
+                                    { name: "Vite", icon: <img src="https://cdn.simpleicons.org/vite/646CFF" alt="Vite" className="w-10 h-10 rounded-sm" /> }
+                                ].map((item, idx) => (
+                                    <div key={idx} className="flex items-center gap-2 px-2 py-1 text-sm">
+                                        {item.icon}
+                                        <span>{item.name}</span>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="flex flex-wrap gap-4 mt-2">
+                                {[
+                                    { name: "Axios", icon: <img src="https://cdn.simpleicons.org/github/181717" alt="Axios" className="w-10 h-10 rounded-sm" /> },
+                                    { name: "JavaScript", icon: <img src="https://cdn.simpleicons.org/javascript/F7DF1E" alt="JavaScript" className="w-10 h-10 rounded-sm" /> },
+                                    { name: "Netlify", icon: <img src="https://cdn.simpleicons.org/netlify/00C7B7" alt="Netlify" className="w-10 h-10 rounded-sm" /> }
                                 ].map((item, idx) => (
                                     <div key={idx} className="flex items-center gap-2 px-2 py-1 text-sm">
                                         {item.icon}
@@ -60,11 +82,12 @@ function GuideSection() {
                                 ))}
                             </div>
 
-                            <h4 className="text-lg font-semibold mt-11 mb-2">ML 모델</h4>
+                            <h4 className="text-xl font-semibold mt-7 mb-4">ML(Machine Learning)</h4>
                             <div className="flex flex-wrap gap-4">
                                 {[
                                     { name: "CNN", icon: <div className="text-4xl">🧠</div>, color: "bg-red-700" },
                                     { name: "Random Forest", icon: <div className="text-4xl">🌲</div>, color: "bg-green-700" },
+                                    { name: "Python", icon: <img src="https://cdn.simpleicons.org/python/3776AB" alt="Python" className="w-10 h-10 rounded-sm" />, color: "bg-yellow-600" }
                                 ].map((item, idx) => (
                                     <div key={idx} className="flex items-center gap-2 px-2 py-1 text-sm">
                                         {item.icon}
@@ -78,7 +101,7 @@ function GuideSection() {
                 <div className="w-full lg:w-1/3">
                     <div className="bg-white rounded-2xl shadow-xl p-6 mt-0 mb-6">
                         <div className="mt-2 mb-6">
-                            <h3 className="text-2xl font-semibold mb-3 -mt-3">팀 정보</h3>
+                            <h3 className="text-2xl font-semibold mb-5 -mt-3">팀 정보</h3>
                             <a
                                 href="https://github.com/chosun-capstonedesing"
                                 target="_blank"
@@ -111,10 +134,28 @@ function GuideSection() {
                                         <p className="font-medium">{member.name}</p>
                                         <p className="text-sm text-gray-600">{member.email}</p>
                                         <p className="text-sm text-gray-600">{member.affiliation}</p>
-                                        <span className="inline-block mt-1 px-2 py-0.5 text-xs font-semibold text-white bg-blue-500 rounded-full mr-1">
+                                        <span
+                                          className={`inline-block mt-1 px-2 py-0.5 text-xs font-semibold text-white rounded-full mr-1 ${
+                                            member.role === "ML"
+                                              ? "bg-blue-500"
+                                              : member.role === "Frontend"
+                                              ? "bg-purple-500"
+                                              : member.role === "Backend"
+                                              ? "bg-green-500"
+                                              : "bg-gray-500"
+                                          }`}
+                                        >
                                           {member.role}
                                         </span>
-                                        <span className="inline-block mt-1 px-2 py-0.5 text-xs font-semibold text-white bg-gray-600 rounded-full">
+                                        <span
+                                          className={`inline-block mt-1 px-2 py-0.5 text-xs font-semibold text-white rounded-full ${
+                                            member.position === "팀장"
+                                              ? "bg-gray-800"
+                                              : member.position === "팀원"
+                                              ? "bg-gray-600"
+                                              : "bg-gray-400"
+                                          }`}
+                                        >
                                           {member.position}
                                         </span>
                                     </div>
