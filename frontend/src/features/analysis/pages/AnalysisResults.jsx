@@ -130,7 +130,20 @@ function AnalysisResults({
     }
   }, [fileData]);
 
-  if (!fileData) {
+  if (!fileData && analysisId) {
+    const fallback = localStorage.getItem(analysisId);
+    if (fallback) {
+      try {
+        const parsed = JSON.parse(fallback);
+        setFileData(parsed);
+        return null; // allow re-render
+      } catch (e) {
+        console.error("Fallback 로컬 데이터 파싱 실패:", e);
+      }
+    }
+  }
+
+  if (!fileData || (!fileData.filename && !fileData.display_name)) {
     console.log("[분석결과탭] fileData 없음, analysisId:", analysisId);
     return (
       <div className="bg-white rounded-2xl shadow-xl p-6 text-center text-gray-800 mt-20">
@@ -140,7 +153,7 @@ function AnalysisResults({
     );
   }
 
-  const fileName = fileData.filename;
+  const fileName = fileData.filename || fileData.display_name || "이름 없음";
   const fileSize = fileData.file_size;
   const fileExtension = fileData.extension;
   const resultLabel = fileData.result;
@@ -154,7 +167,7 @@ function AnalysisResults({
   const modelType = fileData.model_info?.type;
   const modelInput = fileData.model_info?.input;
 
-  const normalProbability = fileData?.normal ?? 0;
+  const normalProbability = typeof fileData?.normal === 'number' ? fileData.normal * 100 : 0;
   const malwareProbability = typeof fileData?.malicious === 'number'
     ? fileData.malicious * 100
     : typeof probability === 'number'
@@ -168,7 +181,7 @@ function AnalysisResults({
       {
         label: "탐지 확률 (%)",
         data: [
-          typeof normalProbability === 'number' ? normalProbability * 100 : 0,
+          typeof normalProbability === 'number' ? normalProbability : 0,
           malwareProbability
         ],
         backgroundColor: ["#4ade80", "#f87171"], // green and red
@@ -213,7 +226,7 @@ function AnalysisResults({
             <p><strong>분석 시작 시간:</strong> {startTime}</p>
             <p><strong>탐지 결과:</strong> {resultLabel}</p>
             <p><strong>악성 확률:</strong> {malwareProbability ?? 'N/A'}%</p>
-            <p><strong>정상 확률:</strong> {fileData?.normal ?? 0}%</p>
+            <p><strong>정상 확률:</strong> {typeof normalProbability === 'number' ? normalProbability.toFixed(2) : 0}%</p>
             <p><strong>신뢰도:</strong> {confidenceValue}{confidenceValue !== 'N/A' ? '%' : ''}</p>
           </div>
         </div>

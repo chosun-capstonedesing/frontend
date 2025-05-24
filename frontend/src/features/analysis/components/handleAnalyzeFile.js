@@ -12,10 +12,13 @@ if (!handleAnalyzeFile.abortControllers) {
 
 // 로컬 스토리지 내 파일 결과 업데이트 함수 (모듈 최상위로 이동)
 export function updateLocalStorageResult(analysisId, result) {
-  if (!result || result.display_name === null || typeof result !== "object") {
-    console.warn("⚠️ 저장 생략: display_name이 없거나 결과가 유효하지 않음", result);
-    return;
+  if (!result?.display_name && result?.filename) {
+    result.display_name = result.filename.replace(/\.[^/.]+$/, '') + "_report.pdf";
   }
+  // if (!result || result.display_name === null || typeof result !== "object") {
+  //   console.warn("⚠️ 저장 생략: display_name이 없거나 결과가 유효하지 않음", result);
+  //   return;
+  // }
   const localFiles = JSON.parse(localStorage.getItem("uploadedFiles") || "[]");
   const updatedLocal = localFiles.map((file) => {
     if (file.analysis_id === analysisId) {
@@ -23,7 +26,8 @@ export function updateLocalStorageResult(analysisId, result) {
         ...file,
         result,
         report_url: result?.report_url,
-        display_name: result?.display_name,
+        display_name: result?.display_name ?? result?.filename ?? file.name,
+        filename: result?.filename ?? file.name,
         malicious: result?.malicious,
         normal: result?.normal,
         confidence: result?.confidence,
@@ -47,7 +51,8 @@ export function updateLocalStorageResult(analysisId, result) {
         ...file,
         result,
         report_url: result?.report_url,
-        display_name: result?.display_name,
+        display_name: result?.display_name ?? result?.filename ?? file.name,
+        filename: result?.filename ?? file.name,
         malicious: result?.malicious,
         normal: result?.normal,
         confidence: result?.confidence,
@@ -117,7 +122,9 @@ export async function handleAnalyzeFile(
   const storedFiles = JSON.parse(localStorage.getItem("uploadedFiles") || "[]");
   const storedFile = storedFiles.find((f) => f.analysis_id === targetId);
   if (storedFile && storedFile.result) {
-    const parsed = typeof storedFile.result === 'string' ? null : storedFile.result;
+    if (!storedFile.result.display_name && storedFile.result.filename) {
+      storedFile.result.display_name = storedFile.result.filename.replace(/\.[^/.]+$/, '') + "_report.pdf";
+    }
     if (parsed?.display_name === null) {
       localStorage.removeItem(targetId);
       sessionStorage.removeItem(targetId);

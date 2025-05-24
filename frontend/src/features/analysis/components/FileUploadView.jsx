@@ -124,7 +124,8 @@ export function FileUploadPreviewList({
   const allKeys = Object.keys(localStorage);
   let filteredFileList = fileList
     .filter(file => {
-      if (!file || !file.analysis_id || !file.name || file.name === "이름 없는 파일") return false;
+      // Accept files with either name or display_name (or both), and must have analysis_id
+      if (!file || !file.analysis_id || (!file.name && !file.display_name)) return false;
       // Check localStorage keys
       const inLocalStorageKey = allKeys.includes(file.analysis_id);
       // Check localStorage values for analysis_id
@@ -214,7 +215,8 @@ export function FileUploadPreviewList({
             } catch (_) { }
           }
           // --- localStorage 상태 반영 로직 추가 끝 ---
-          if (!file || !file.name || file.name === "이름 없는 파일") return null;
+          // Render only if file exists and has a name or display_name
+          if (!file || (!file.name && !file.display_name)) return null;
           return (
             <li
               key={file.analysis_id}
@@ -241,7 +243,11 @@ export function FileUploadPreviewList({
                       }
                     } catch (_) { }
                   }
-                  const updated = fileList.filter((f, idx) => idx !== originalIndex && f.analysis_id !== file.analysis_id);
+                  // 삭제 기준: display_name만 있는 파일도 정상적으로 삭제
+                  const updated = fileList.filter(
+                    (f, idx) =>
+                      idx !== originalIndex && f.analysis_id !== file.analysis_id
+                  );
                   setFileList(updated);
                   const deduped = Array.from(new Map(updated.map(f => [f.analysis_id, f])).values());
                   sessionStorage.setItem("uploadedFiles", JSON.stringify(deduped));
@@ -313,7 +319,7 @@ export function FileUploadPreviewList({
                 {/* 파일 이름과 업로드 날짜, 크기 표시 */}
                 <div className="flex-1">
                   <p className="text-lg font-semibold text-black break-all whitespace-pre-wrap max-w-full">
-                    {file.name}
+                    {file.display_name || file.name || "이름 없는 파일"}
                   </p>
                   <p className="text-xs text-gray-500">
                     {file.uploadedAt || new Date().toLocaleDateString()} ·{" "}
