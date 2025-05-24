@@ -51,7 +51,7 @@ export default function MainLayoutMobile() {
       )}
 
       {/* layout content */}
-      <div className="flex w-full bg-gray-100 min-h-screen">
+      <div className="flex w-full bg-gray-200 min-h-screen">
         <div
           className={`
             fixed z-50 top-0 left-0 h-screen w-64 bg-white shadow-md transform transition-transform duration-300 ease-in-out
@@ -61,7 +61,7 @@ export default function MainLayoutMobile() {
           <Sidebar onNavigate={() => setSidebarOpen(false)} />
         </div>
 
-        <main className="flex-1 min-h-screen bg-gray-100 px-2 py-4 mt-16 max-w-[95%] mx-auto">
+        <main className="flex-1 min-h-screen px-2 py-4 mt-16 max-w-[95%] mx-auto">
           <Outlet />
         </main>
       </div>
