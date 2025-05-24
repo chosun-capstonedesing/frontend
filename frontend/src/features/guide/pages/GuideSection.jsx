@@ -71,7 +71,7 @@ function GuideSection() {
                             </div>
                             <div className="flex flex-wrap gap-4 mt-2">
                                 {[
-                                    { name: "Axios", icon: <img src="https://cdn.simpleicons.org/github/181717" alt="Axios" className="w-10 h-10 rounded-sm" /> },
+                                    { name: "Axios", icon: <img src="/axios-logo.png" alt="Axios" className="w-10 h-10 rounded-sm" /> },
                                     { name: "JavaScript", icon: <img src="https://cdn.simpleicons.org/javascript/F7DF1E" alt="JavaScript" className="w-10 h-10 rounded-sm" /> },
                                     { name: "Netlify", icon: <img src="https://cdn.simpleicons.org/netlify/00C7B7" alt="Netlify" className="w-10 h-10 rounded-sm" /> }
                                 ].map((item, idx) => (
