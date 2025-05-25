@@ -209,7 +209,7 @@ function AnalysisResults({
     },
   };
 
-  const actualIsLoggedIn = import.meta.env.MODE === "development" || !!localStorage.getItem("access_token");
+  const actualIsLoggedIn = !!localStorage.getItem("access_token");
 
   return (
     <div>
@@ -273,8 +273,8 @@ function AnalysisResults({
             분석 결과 PDF 다운로드
           </button>
         ) : (
-          <div className="inline-flex items-center px-5 py-2 text-base bg-blue-100 text-blue-400 rounded-lg cursor-not-allowed border border-blue-200 backdrop-blur-sm bg-opacity-70">
-            <FaLock className="w-5 h-5 mr-2 text-blue-300" />
+          <div className="inline-flex items-center px-5 py-2 text-base bg-blue-100 text-blue-600 rounded-2xl shadow-xl">
+            <FaLock className="w-5 h-5 mr-2" />
             로그인 시 PDF 다운로드 가능
           </div>
         )}

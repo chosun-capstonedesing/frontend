@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { FaLink, FaFileAlt, FaChartBar } from "react-icons/fa";
 import CountUp from "react-countup";
 
-const VirusTotal_API_KEY = import.meta.env.VITE_VirusTotal_API_KEY;
+//const VirusTotal_API_KEY = import.meta.env.VITE_VirusTotal_API_KEY;
 
 const StatCard = ({ icon, label, count, color }) => (
   <div className="flex flex-col items-center justify-center bg-white p-4 rounded-xl shadow-lg text-center">
