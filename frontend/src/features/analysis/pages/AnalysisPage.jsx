@@ -59,10 +59,7 @@ const handleCancelAnalysis = (analysisId, setFileState) => {
 
 export default function AnalysisPage({ uploadedFile, handleFileSelect }) {
   const [localUploadedFile, setLocalUploadedFile] = useState(uploadedFile);
-  const [recentResults, setRecentResults] = useState(() => {
-    const saved = sessionStorage.getItem("urlresult");
-    return saved ? JSON.parse(saved).slice(0, 4) : [];
-  });
+  const [recentResults, setRecentResults] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -70,35 +67,17 @@ export default function AnalysisPage({ uploadedFile, handleFileSelect }) {
   }, [uploadedFile]);
 
   useEffect(() => {
-    const examples = [
-      {
-        id: 'ex1',
-        url: 'https://malicious.example.com',
-        resultSummary: '악성 URL로 판단됨 (피싱 사이트)',
-        timestamp: '2025-05-21T10:24:00.000Z'
-      },
-      {
-        id: 'ex2',
-        url: 'https://safe-site.com',
-        resultSummary: '정상 사이트로 확인됨',
-        timestamp: '2025-05-20T15:42:00.000Z'
-      },
-      {
-        id: 'ex3',
-        url: 'http://suspicious.net',
-        resultSummary: '의심스러운 연결 기록 있음',
-        timestamp: '2025-05-19T08:10:00.000Z'
-      },
-      {
-        id: 'ex4',
-        url: 'http://unknown-site.org',
-        resultSummary: '정보 부족으로 판단 불가',
-        timestamp: '2025-05-18T13:55:00.000Z'
-      },
-    ];
-    setRecentResults(examples);
-    sessionStorage.setItem("urlresult", JSON.stringify(examples));
-    localStorage.setItem("urlresult", JSON.stringify(examples));
+    const stored = sessionStorage.getItem("urlresult") || localStorage.getItem("urlresult");
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          setRecentResults(parsed.slice(0, 4));
+        }
+      } catch (e) {
+        console.error("URL 분석 결과 로딩 실패:", e);
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -143,10 +122,21 @@ export default function AnalysisPage({ uploadedFile, handleFileSelect }) {
             <h2 className="text-lg font-semibold text-green-600">QR / URL 검색</h2>
           </div>
           <QRSearchBlock onResult={(result) => {
-            const updatedResults = [result, ...recentResults.filter(r => r.id !== result.id)].slice(0, 4);
-            setRecentResults(updatedResults);
+            if (!result?.url_info?.url || !result?.final_judgment?.final_verdict) return;
+
+            const parsedResult = {
+              id: `${result.url_info.url}-${result.analysis_metadata?.analysis_timestamp || Date.now()}`,
+              url: result.url_info.url,
+              resultSummary: result.final_judgment.recommendation,
+              verdict: result.final_judgment.final_verdict,
+              timestamp: new Date().toISOString(),
+            };
+
+            const existing = JSON.parse(sessionStorage.getItem("urlresult") || localStorage.getItem("urlresult") || "[]");
+            const updatedResults = [parsedResult, ...existing.filter(r => r.id !== parsedResult.id)].slice(0, 4);
             sessionStorage.setItem("urlresult", JSON.stringify(updatedResults));
             localStorage.setItem("urlresult", JSON.stringify(updatedResults));
+            setRecentResults(updatedResults);
           }} />
         </div>
 
@@ -166,19 +156,30 @@ export default function AnalysisPage({ uploadedFile, handleFileSelect }) {
                   className={`border-b ${idx === recentResults.length - 1 ? 'border-b-0 pb-0' : 'pb-4'}`}
                 >
                   <div className="flex justify-between items-center">
-                    <div className="font-semibold text-gray-800 break-words">{res.url || res.title || "분석 대상"}</div>
+                    <div className="font-semibold text-gray-800 break-words break-all">{res.url || res.title || "분석 대상"}</div>
                     <span className={`text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap ${
-                      res.resultSummary?.includes('악성') ? 'bg-red-100 text-red-600' :
-                      res.resultSummary?.includes('정상') ? 'bg-green-100 text-green-600' :
+                      res.verdict === 'MALICIOUS' ? 'bg-red-100 text-red-600' :
+                      res.verdict === 'SAFE' ? 'bg-green-100 text-green-600' :
                       'bg-yellow-100 text-yellow-700'
                     }`}>
-                      {res.resultSummary?.includes('악성') ? '악성' :
-                       res.resultSummary?.includes('정상') ? '정상' : '의심'}
+                      {res.verdict === 'MALICIOUS' ? '악성' :
+                       res.verdict === 'SAFE' ? '정상' : '의심'}
                     </span>
                   </div>
                   <div className="text-sm text-gray-600 mt-1 break-words">{res.resultSummary || "결과 없음"}</div>
                   {res.timestamp && (
-                    <div className="text-xs text-gray-400 mt-1">{new Date(res.timestamp).toLocaleString()}</div>
+                    <div className="text-xs text-gray-400 mt-1">
+                      {new Date(res.timestamp).toLocaleString('ko-KR', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: false,
+                        timeZone: 'Asia/Seoul'
+                      })}
+                    </div>
                   )}
                 </div>
               ))
