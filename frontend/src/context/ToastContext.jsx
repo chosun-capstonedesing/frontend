@@ -3,115 +3,83 @@ import { createPortal } from "react-dom";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 import { useNavigate } from "react-router-dom";
 
-// ✅ ToastContext 생성 - 전역에서 알림을 호출/관리하기 위해 사용
+// ToastContext: 전역 상태 관리를 위한 Context 생성
 const ToastContext = createContext();
 
-// ✅ useToast: 다른 컴포넌트에서 토스트 함수를 쉽게 사용하기 위한 커스텀 훅
+// useToast: 컴포넌트에서 토스트 기능을 쉽게 접근하기 위한 커스텀 훅
 export const useToast = () => useContext(ToastContext);
 
-// ✅ ToastProvider: 알림 상태와 렌더링을 제공하는 Context Provider
+// ToastProvider: 토스트 알림 상태와 관련 함수를 제공하는 Context Provider 컴포넌트
 export const ToastProvider = ({ children }) => {
+  // toasts 상태: 현재 화면에 표시 중인 토스트 알림 목록 (배열)
   const [toasts, setToasts] = useState([]);
   const navigate = useNavigate();
 
-  // ✅ showToast: 새 토스트 알림을 추가하는 함수
+  // showToast: 새 토스트 알림을 추가하는 함수
+  // message: 알림 메시지, status: 상태값, analysisId: 분석 식별자, progress: 진행률(0~100)
   const showToast = (message, status = "done", analysisId = null, progress = 0) => {
-    const id = Date.now();
+    const id = Date.now(); // 고유 ID 생성 (타임스탬프 사용)
     setToasts(prev => [...prev, { id, message, status, analysisId, progress }]);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 30000); // 30초 후 자동 제거
   };
 
-  // ✅ updateProgress: 진행 중인 토스트의 퍼센트를 업데이트
+  // updateToastStatus: 특정 분석 ID에 해당하는 토스트의 상태(status)를 업데이트
+  const updateToastStatus = (analysisId, status) => {
+    setToasts(prev =>
+      prev.map(t =>
+        t.analysisId === analysisId
+          ? { ...t, status }
+          : t
+      )
+    );
+  };
+
+  // updateProgress: 특정 분석 ID에 해당하는 토스트의 진행률(progress)를 업데이트
   const updateProgress = (analysisId, progress) => {
     setToasts(prev =>
       prev.map(t =>
-        t.analysisId === analysisId && t.status === "processing"
+        t.analysisId === analysisId
           ? { ...t, progress }
           : t
       )
     );
   };
 
-  // ✅ updateToastStatus: 분석 완료 상태로 변경하고 퍼센트를 100%로 설정 (상태에 상관없이 업데이트)
-  const updateToastStatus = (analysisId, status = "done") => {
-    setToasts(prev =>
-      prev.map(t =>
-        t.analysisId === analysisId
-          ? { ...t, status, progress: 100 }
-          : t
-      )
-    );
-    console.log("[Toast Sync] Updated toast status:", analysisId, status);
-
-    // 추가: 분석 완료 상태를 다른 컴포넌트에 알림
-    const event = new CustomEvent("toastStatusUpdated", { detail: { analysisId, status } });
-    window.dispatchEvent(event);
-  };
-
-  // ✅ cancelToastStatus: 분석 중 상태를 즉시 "cancelled"로 바꿔줌
-  const cancelToastStatus = (analysisId) => {
-    setToasts(prev =>
-      prev.map(t =>
-        t.analysisId === analysisId && t.status === "processing"
-          ? { ...t, status: "cancelled" }
-          : t
-      )
-    );
-  };
-
-  // ✅ removeToast: 사용자가 수동으로 알림을 제거할 때 사용
+  // removeToast: 특정 토스트 ID를 가진 알림을 수동으로 제거하는 함수
   const removeToast = (id) => {
     setToasts(prev => prev.filter(t => t.id !== id));
   };
 
-  // ✅ Listen for custom cancelAnalysis and viewAnalysisResult events to sync actions from file list
+  // 프로그래스가 100% 이상인 항목을 "done" 상태로 자동 전환 처리
   useEffect(() => {
-    const handleCancelAnalysis = (e) => {
-      const { analysisId } = e.detail;
-      cancelToastStatus(analysisId);
-    };
-    const handleViewAnalysisResult = (e) => {
-      const { analysisId } = e.detail;
-      if (analysisId) {
-        console.log("[Toast Sync] Navigating to:", analysisId);
-        navigate(`/analysis_results/${analysisId}`);
-      }
-    };
-    window.addEventListener("cancelAnalysis", handleCancelAnalysis);
-    window.addEventListener("viewAnalysisResult", handleViewAnalysisResult);
-    return () => {
-      window.removeEventListener("cancelAnalysis", handleCancelAnalysis);
-      window.removeEventListener("viewAnalysisResult", handleViewAnalysisResult);
-    };
-  }, [navigate]);
-
-  useEffect(() => {
-    const logToastUpdate = (e) => {
-      console.log("[Toast Sync] toastStatusUpdated received:", e.detail);
-    };
-    window.addEventListener("toastStatusUpdated", logToastUpdate);
-    return () => {
-      window.removeEventListener("toastStatusUpdated", logToastUpdate);
-    };
-  }, []);
+    const hasPending = toasts.some(t => t.progress >= 100 && t.status !== "done");
+    if (hasPending) {
+      setToasts(prev =>
+        prev.map(t =>
+          t.progress >= 100 && t.status !== "done"
+            ? { ...t, status: "done" }
+            : t
+        )
+      );
+    }
+  }, [toasts]);
 
   return (
-    <ToastContext.Provider value={{ showToast, updateProgress, updateToastStatus, cancelToastStatus }}>
+    <ToastContext.Provider value={{ showToast, updateProgress, updateToastStatus }}>
       {children}
-      {/* ✅ createPortal: 알림을 최상위 DOM(body)에 렌더링 */}
+      {/* createPortal: 알림을 최상위 DOM(body)에 렌더링하여 UI가 다른 컴포넌트에 가려지지 않도록 함 */}
       {createPortal(
-        <div className="fixed top-20 right-5 space-y-3 z-50">
+        <div className="fixed top-20 right-7 space-y-3 z-50">
           {toasts.map((toast) => (
-            // ✅ 알림 카드: 상태에 따라 테두리와 색상 변경
+            // 알림 카드: 상태에 따라 테두리 색상 및 애니메이션 적용
             <div
               key={toast.id}
-              className={`relative w-72 bg-white shadow-md rounded-md p-3 
-                ${toast.status === 'done' 
-                  ? 'border border-green-200' 
-                  : toast.status === 'cancelled' 
-                  ? 'border border-red-200' 
-                  : 'border border-yellow-300'}`}
+              className={`relative w-72 bg-white rounded-xl shadow-lg p-3 transition-all duration-700 ease-in-out
+                ${toast.status === 'done' ? 'translate-x-0 hover:translate-x-1 animate-slide-out border border-green-200' : 'border border-yellow-300'}`}
             >
-              {/* ✅ 닫기 버튼: 알림 수동 제거용 */}
+              {/* 닫기 버튼: 사용자가 수동으로 해당 토스트 알림을 제거할 수 있음 */}
               <button
                 onClick={() => removeToast(toast.id)}
                 className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-gray-400 hover:bg-gray-500 text-white flex items-center justify-center shadow"
@@ -123,65 +91,50 @@ export const ToastProvider = ({ children }) => {
               </button>
 
               <div className="flex items-center space-x-2">
-                {/* ✅ 아이콘 표시: 완료, 중지, 진행 중 상태에 따른 아이콘 및 배경 색상 */}
-                <div className={`${toast.status === 'done' ? 'bg-green-100' : toast.status === 'cancelled' ? 'bg-red-100' : 'bg-yellow-100'} p-1.5 rounded-full`}>
-                  {toast.status === "done" ? (
+                {/* 아이콘 표시: 상태에 따른 아이콘 및 배경 색상 변경 */}
+                <div className={`${toast.status === 'done' ? 'bg-green-100' : 'bg-yellow-100'} p-1.5 rounded-full`}>
+                  {toast.status === 'done' ? (
+                    // 분석 완료: 초록색 체크 아이콘 표시
                     <CheckCircleIcon className="h-5 w-5 text-green-500" />
-                  ) : toast.status === "cancelled" ? (
-                    <ClockIcon className="h-5 w-5 text-red-500 rotate-45" />
                   ) : (
+                    // 분석 중: 노란색 시계 아이콘 표시
                     <ClockIcon className="h-5 w-5 text-yellow-500" />
                   )}
                 </div>
 
                 <div className="flex-1">
+                  {/* 상태 텍스트: 완료 또는 진행 중에 따라 다르게 표시 */}
                   <p className="text-sm font-semibold text-gray-800">
-                    {toast.status === "done"
-                      ? "분석 완료"
-                      : toast.status === "cancelled"
-                      ? "분석 중지됨"
-                      : "분석 중"}
+                    {toast.status === 'done' ? "분석 완료" : "분석 중"}
                   </p>
 
+                  {/* 알림 메시지: 여러 줄 지원 및 줄바꿈 유지 */}
                   <div className="text-xs text-gray-600 break-all whitespace-pre-wrap max-w-full">{toast.message}</div>
 
-                  {/* ✅ 분석 중일 때: 프로그래스 바 표시 */}
-                  {toast.status === "processing" && (
+                  {/* 프로그래스 바 표시: 진행 중일 때만 */}
+                  {toast.status !== 'done' && (
                     <div className="w-full mt-2">
                       <div className="flex items-center space-x-2">
+                        {/* 프로그래스 바 배경 */}
                         <div className="flex-1 bg-gray-200 h-2 rounded-full">
+                          {/* 프로그래스 바 진행률 표시 */}
                           <div
                             className="h-2 bg-yellow-400 rounded-full transition-all duration-500"
                             style={{ width: `${toast.progress || 0}%` }}
                           />
                         </div>
+                        {/* 진행률 텍스트 */}
                         <div className="text-xs text-gray-500">{toast.progress || 0}%</div>
-                      </div>
-                      
-                      {/* ✅ 분석 중 상태일 때: 중지 버튼 표시 */}
-                      <div className="flex justify-end mt-2">
-                        <button
-                          onClick={() => {
-                            const event = new CustomEvent("cancelAnalysis", { detail: { analysisId: toast.analysisId } });
-                            window.dispatchEvent(event);
-                          }}
-                          className="text-xs text-red-500 font-medium hover:underline"
-                        >
-                          분석 중지
-                        </button>
                       </div>
                     </div>
                   )}
 
-                  {/* ✅ 분석 완료일 때: 결과 보기 링크 표시 */}
-                  {toast.status === "done" && (
+                  {/* 분석 완료: 결과 보기 버튼 표시 */}
+                  {toast.status === 'done' && (
                     <p
                       onClick={() => {
-                        if (toast.analysisId !== null) {
-                          const event = new CustomEvent("viewAnalysisResult", {
-                            detail: { analysisId: toast.analysisId }
-                          });
-                          window.dispatchEvent(event);
+                        if (toast.analysisId) {
+                          navigate(`/analysis_results/${toast.analysisId}`);
                         }
                       }}
                       className="text-xs text-green-600 mt-1 font-medium cursor-pointer hover:underline"
@@ -199,3 +152,18 @@ export const ToastProvider = ({ children }) => {
     </ToastContext.Provider>
   );
 };
+{/* --- Tailwind CSS Custom Animation for Slide-Out --- */}
+<style>
+{`
+@keyframes slide-out {
+  to {
+    transform: translateX(150%);
+    opacity: 0;
+  }
+}
+.animate-slide-out {
+  animation: slide-out 1s ease-in forwards;
+  animation-delay: 177s; /* start near 3min */
+}
+`}
+</style>

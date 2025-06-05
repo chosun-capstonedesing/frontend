@@ -71,3 +71,5 @@ cypress/screenshots/
 restructure.sh
 setup-vscode-settings.sh
 frontend/.vscode/settings.json
+
+dummy.exe

@@ -1,3 +1,4 @@
+import { setCookie } from '../utils/cookie';
 import axios from 'axios';
 
 const formatAxiosError = (error, fallback) => {
@@ -58,6 +59,7 @@ export const loginUser = async (loginInfo) => {
     const token = res.data.access_token;
     if (typeof token === "string" && token.length > 0) {
       localStorage.setItem("access_token", token);
+      setCookie("user_id", loginInfo.username);
     }
 
     return {

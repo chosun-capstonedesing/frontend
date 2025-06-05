@@ -25,20 +25,22 @@ function URLSearchForm({ onSearch }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2">
-      <input
-        type="text"
-        value={url}
-        onChange={(e) => setUrl(e.target.value)}
-        placeholder="https://example.com"
-        className="border p-2 w-full rounded"
-      />
-      <button
-        type="submit"
-        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-      >
-        검색
-      </button>
+    <form onSubmit={handleSubmit}>
+      <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
+        <input
+          type="text"
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="https://example.com"
+          className="border px-5 py-2 rounded-2xl shadow-xl flex-grow"
+        />
+        <button
+          type="submit"
+          className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-2xl shadow-xl whitespace-nowrap"
+        >
+          URL 입력하기
+        </button>
+      </div>
     </form>
   );
 }

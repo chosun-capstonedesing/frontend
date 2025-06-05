@@ -4,13 +4,10 @@ import { isLoggedIn as checkLoginStatus } from '../utils/isLoggedIn';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const isDev = import.meta.env.DEV;
-  const [isLoggedIn, setIsLoggedIn] = useState(isDev ? true : checkLoginStatus());
+  const [isLoggedIn, setIsLoggedIn] = useState(checkLoginStatus());
 
   const login = () => {
     localStorage.setItem('access_token', 'mock_token_value');
-    sessionStorage.removeItem('uploadedFiles');
-    sessionStorage.removeItem('uploadedCount');
     setIsLoggedIn(true);
   };
 

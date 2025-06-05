@@ -13,22 +13,22 @@ if (!document.cookie.includes("client_uuid")) {
   document.cookie = `client_uuid=${uuid}; path=/; max-age=86400`;
 }
 
-if (import.meta.env.DEV) {
-  const originalLog = console.log;
-  console.log = function (...args) {
-    originalLog(...args);
-    const LOG_URL =
-      import.meta.env.MODE === 'development'
-        ? "http://localhost:4000/log"
-        : "/api/log";
+// if (import.meta.env.DEV) {
+//   const originalLog = console.log;
+//   console.log = function (...args) {
+//     originalLog(...args);
+//     const LOG_URL =
+//       import.meta.env.MODE === 'development'
+//         ? "http://localhost:4000/log"
+//         : "/api/log";
 
-    fetch(LOG_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ log: args.join(" ") })
-    }).catch(() => {}); // fail silently
-  };
-}
+//     fetch(LOG_URL, {
+//       method: "POST",
+//       headers: { "Content-Type": "application/json" },
+//       body: JSON.stringify({ log: args.join(" ") })
+//     }).catch(() => {}); // fail silently
+//   };
+// }
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

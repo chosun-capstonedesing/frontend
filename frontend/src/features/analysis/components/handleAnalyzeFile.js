@@ -10,6 +10,65 @@ if (!handleAnalyzeFile.abortControllers) {
   handleAnalyzeFile.abortControllers = {};
 }
 
+// 로컬 스토리지 내 파일 결과 업데이트 함수 (모듈 최상위로 이동)
+export function updateLocalStorageResult(analysisId, result) {
+  if (!result?.display_name && result?.filename) {
+    result.display_name = result.filename.replace(/\.[^/.]+$/, '') + "_report.pdf";
+  }
+  // if (!result || result.display_name === null || typeof result !== "object") {
+  //   console.warn("⚠️ 저장 생략: display_name이 없거나 결과가 유효하지 않음", result);
+  //   return;
+  // }
+  const localFiles = JSON.parse(localStorage.getItem("uploadedFiles") || "[]");
+  const updatedLocal = localFiles.map((file) => {
+    if (file.analysis_id === analysisId) {
+      return {
+        ...file,
+        result,
+        report_url: result?.report_url,
+        display_name: result?.display_name ?? result?.filename ?? file.name,
+        filename: result?.filename ?? file.name,
+        malicious: result?.malicious,
+        normal: result?.normal,
+        confidence: result?.confidence,
+        summary: result?.summary,
+        log: result?.log,
+        model_info: result?.model_info,
+        performance: result?.performance,
+        uploaded_at: file.uploaded_at ?? new Date().toISOString()
+      };
+    }
+    return file;
+  });
+  localStorage.setItem("uploadedFiles", JSON.stringify(updatedLocal));
+  // Store the full analysis result under the analysisId key
+  localStorage.setItem(analysisId, JSON.stringify(result));
+  // Also update sessionStorage file list for My Page sync
+  const sessionFiles = JSON.parse(sessionStorage.getItem("uploadedFiles") || "[]");
+  const updatedSession = sessionFiles.map((file) => {
+    if (file.analysis_id === analysisId) {
+      return {
+        ...file,
+        result,
+        report_url: result?.report_url,
+        display_name: result?.display_name ?? result?.filename ?? file.name,
+        filename: result?.filename ?? file.name,
+        malicious: result?.malicious,
+        normal: result?.normal,
+        confidence: result?.confidence,
+        summary: result?.summary,
+        log: result?.log,
+        model_info: result?.model_info,
+        performance: result?.performance,
+        uploaded_at: file.uploaded_at ?? new Date().toISOString()
+      };
+    }
+    return file;
+  });
+  sessionStorage.setItem("uploadedFiles", JSON.stringify(updatedSession));
+  window.dispatchEvent(new Event("fileListUpdated"));
+}
+
 // 📦 파일 분석 처리 함수 - analysis_id별로 분석을 시작하거나 중지
 export async function handleAnalyzeFile(
   targetId,               // 분석할 파일의 analysis_id
@@ -63,6 +122,14 @@ export async function handleAnalyzeFile(
   const storedFiles = JSON.parse(localStorage.getItem("uploadedFiles") || "[]");
   const storedFile = storedFiles.find((f) => f.analysis_id === targetId);
   if (storedFile && storedFile.result) {
+    if (!storedFile.result.display_name && storedFile.result.filename) {
+      storedFile.result.display_name = storedFile.result.filename.replace(/\.[^/.]+$/, '') + "_report.pdf";
+    }
+    if (parsed?.display_name === null) {
+      localStorage.removeItem(targetId);
+      sessionStorage.removeItem(targetId);
+      return; // 분석 결과가 유효하지 않으면 스킵
+    }
     updatedFiles[targetIndex].status = "done";
     setFileList(updatedFiles);
     return; // 이미 완료된 분석은 다시 요청하지 않음
@@ -105,6 +172,9 @@ export async function handleAnalyzeFile(
   // 퍼센트 숫자 업데이트
   const numberIntervalId = setInterval(() => {
     updateProgress(targetId, Math.floor(progressValue));
+    if (!isResultReceived && resultData) {
+      isResultReceived = true;
+    }
     if (progressValue >= 100 && isResultReceived) {
       clearInterval(barIntervalId);
       clearInterval(numberIntervalId);
@@ -125,29 +195,18 @@ export async function handleAnalyzeFile(
         ]);
       }
 
+      const dedupedSession = Array.from(
+        new Map(
+          JSON.parse(sessionStorage.getItem("uploadedFiles") || "[]")
+            .map((f) => [f.analysis_id, f])
+        ).values()
+      );
+      sessionStorage.setItem("uploadedFiles", JSON.stringify(dedupedSession));
+
       delete handleAnalyzeFile.canceledFlags[targetId];
     }
   }, numberStepTime);
 
-  // 로컬 스토리지 내 파일 결과 업데이트 함수
-  const updateLocalStorageResult = (analysisId, result) => {
-    const localFiles = JSON.parse(localStorage.getItem("uploadedFiles") || "[]");
-    const updatedLocal = localFiles.map((file) => {
-      if (file.analysis_id === analysisId) {
-        return {
-          ...file,
-          result,
-          report_url: result?.report_url,
-          display_name: result?.display_name,
-        };
-      }
-      return file;
-    });
-    localStorage.setItem("uploadedFiles", JSON.stringify(updatedLocal));
-    // Store the full analysis result under the analysisId key
-    localStorage.setItem(analysisId, JSON.stringify(result));
-    window.dispatchEvent(new Event("fileListUpdated"));
-  };
 
   // 분석 요청 즉시 시작
   (async () => {

@@ -25,6 +25,19 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
   // 로그인 여부 확인(개발 환경에선 항상 true)
   const isLoggedIn = import.meta.env.DEV ? true : isActuallyLoggedIn();
 
+  const isExceedingLimit = (newFilesCount) => {
+    return !isLoggedIn && fileList.length + newFilesCount > maxCount;
+  };
+
+  const handleFileDelete = (targetFile) => {
+    const updatedFiles = fileList.filter(
+      (f) => f.id !== targetFile.id && f.name !== targetFile.name
+    );
+    setFileList(updatedFiles);
+    updateSession(updatedFiles);
+  };
+
+
   // ---------------------------
   // 파일 선택(input) 시 처리 함수
   // - 업로드 제한 초과 시 경고
@@ -32,12 +45,26 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
   // ---------------------------
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
-    if (!isLoggedIn && fileList.length + selectedFiles.length > maxCount) {
+    if (selectedFiles.length === 0) return;
+
+    const newFiles = selectedFiles.filter(
+      file => !fileList.some(f =>
+        f.name === file.name &&
+        f.size === file.size &&
+        f.lastModified === file.lastModified
+      )
+    );
+    if (newFiles.length === 0) {
+      alert("이미 분석한 파일입니다. 히스토리를 확인해주세요");
+      return;
+    }
+
+    if (isExceedingLimit(newFiles.length)) {
       alert(`비로그인 사용자는 하루 최대 ${maxCount}개 파일까지만 업로드할 수 있습니다.`);
       return;
     }
-    updateSession(selectedFiles);
-    onFileSelect?.(selectedFiles);
+    updateSession(newFiles);
+    onFileSelect?.(newFiles);
   };
 
   // ---------------------------
@@ -47,13 +74,27 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
   // ---------------------------
   const handleDrop = (e) => {
     e.preventDefault();
-    const droppedFiles = Array.from(e.dataTransfer.files);
-    if (!isLoggedIn && fileList.length + droppedFiles.length > maxCount) {
+    const selectedFiles = Array.from(e.dataTransfer.files);
+    if (selectedFiles.length === 0) return;
+
+    const newFiles = selectedFiles.filter(
+      file => !fileList.some(f =>
+        f.name === file.name &&
+        f.size === file.size &&
+        f.lastModified === file.lastModified
+      )
+    );
+    if (newFiles.length === 0) {
+      alert("이미 분석한 파일입니다. 히스토리를 확인해주세요");
+      return;
+    }
+
+    if (isExceedingLimit(newFiles.length)) {
       alert(`비로그인 사용자는 하루 최대 ${maxCount}개 파일까지만 업로드할 수 있습니다.`);
       return;
     }
-    updateSession(droppedFiles);
-    onFileSelect?.(droppedFiles);
+    updateSession(newFiles);
+    onFileSelect?.(newFiles);
   };
 
   // ---------------------------
@@ -80,23 +121,42 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
   };
 
   // ---------------------------
-  // 분석 완료된 파일의 토스트 상태 갱신
-  // - fileList의 각 파일 상태를 확인하고, 완료 시 토스트 업데이트
+  // 분석 완료된 파일의 토스트 상태 갱신 (향상된 신뢰성)
+  // - fileList의 각 파일 상태를 확인하고, 결과/로그 등 실제 데이터가 존재할 때만 토스트 및 세션 업데이트
   // ---------------------------
   useEffect(() => {
+    let changed = false;
+
     const updatedList = fileList.map((file, index) => {
-      if (file.status === "done" && !file.toastUpdated) {
+      if (
+        file.status === "done" &&
+        !file.toastUpdated &&
+        file.name &&
+        file.size > 0 &&
+        (file.result || file.malicious !== undefined || file.log)
+      ) {
+        const updatedFile = { ...file, toastUpdated: true };
         updateToastStatus(index);
-        return { ...file, toastUpdated: true };
+        updateSession(fileList.map((f, i) => (i === index ? updatedFile : f)));
+        changed = true;
+        return updatedFile;
       }
       return file;
     });
 
-    // 변경사항이 있을 때만 fileList 상태 갱신
-    if (JSON.stringify(updatedList) !== JSON.stringify(fileList)) {
+    if (changed) {
       setFileList(updatedList);
     }
-  }, [fileList, updateToastStatus]);
+  }, [fileList, updateToastStatus, updateSession]);
+
+  useEffect(() => {
+    const sessionFiles = JSON.parse(sessionStorage.getItem("uploadedFiles") || "[]");
+    if (sessionFiles.length > 0 && fileList.length === 0) {
+      setFileList(sessionFiles);
+    }
+  }, []);
+
+  const uploadedCount = Number(sessionStorage.getItem("uploadedCount") || 0);
 
   // ===============================
   // UI 렌더링
@@ -124,15 +184,16 @@ function FileUpload({ onFileSelect, onUploadProgress }) {
         isLoggedIn={isLoggedIn}
         remainingInfo={remainingInfo}
         progressMap={progressMap}
-        onAnalyzeFile={handleAnalyzeFileClick}
+        onAnalyzeFile={(file) => handleAnalyzeFileClick(file)}
+        onDeleteFile={handleFileDelete}
       />
 
       {/* 업로드 카운트 및 제한 안내 */}
       <div className="mt-3 text-sm text-center text-gray-500">
         업로드 파일 수:{" "}
         {isLoggedIn
-          ? `${fileList.length} / 제한 없음`
-          : `${fileList.length} / ${remainingInfo?.limit ?? 3}`}
+          ? `${uploadedCount} / 제한 없음`
+          : `${uploadedCount} / ${remainingInfo?.limit ?? 3}`}
       </div>
     </div>
   );
