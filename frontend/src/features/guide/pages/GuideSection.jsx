@@ -57,8 +57,7 @@ function GuideSection() {
                             </div>
                             <div className="flex flex-wrap gap-10 justify-start mt-6">
                                 {[
-                                    { name: "AWS EC2", icon: <img src="https://cdn.simpleicons.org/amazonec2/FF9900" alt="AWS EC2" className="w-10 h-10 rounded-sm" /> },
-                                    { name: "AWS RDS", icon: <img src="https://cdn.simpleicons.org/amazonrds/527FFF" alt="AWS RDS" className="w-10 h-10 rounded-sm" /> }
+                                    { name: "AWS", icon: <img src="/AWS.png" alt="AWS" className="w-10 h-10 rounded-sm" /> }
                                 ].map((item, idx) => (
                                     <div key={idx} className="flex items-center gap-2 px-2 py-1 text-sm">
                                         {item.icon}
