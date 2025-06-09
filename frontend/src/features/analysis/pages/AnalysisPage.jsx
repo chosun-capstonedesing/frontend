@@ -102,6 +102,28 @@ export default function AnalysisPage({ uploadedFile, handleFileSelect }) {
     };
   }, []);
 
+  // Listen for urlResultUpdated event and reload recentResults from storage immediately
+  useEffect(() => {
+    const handleUrlResultUpdated = () => {
+      const stored = sessionStorage.getItem("urlresult") || localStorage.getItem("urlresult");
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
+            setRecentResults(parsed.slice(0, 4));
+          }
+        } catch (e) {
+          console.error("URL 분석 결과 업데이트 반영 실패:", e);
+        }
+      }
+    };
+
+    window.addEventListener("urlResultUpdated", handleUrlResultUpdated);
+    return () => {
+      window.removeEventListener("urlResultUpdated", handleUrlResultUpdated);
+    };
+  }, []);
+
   return (
     <div className="flex flex-col gap-6">
       {/* 파일 업로드 박스 */}
@@ -121,28 +143,42 @@ export default function AnalysisPage({ uploadedFile, handleFileSelect }) {
             <span className="text-2xl">🔎</span>
             <h2 className="text-lg font-semibold text-green-600">QR / URL 검색</h2>
           </div>
-          <QRSearchBlock onResult={(result) => {
-            if (!result?.url_info?.url || !result?.final_judgment?.final_verdict) return;
+          <QRSearchBlock
+            onResult={(result) => {
+              if (!result?.url_info?.url || !result?.final_judgment?.final_verdict) return;
 
-            const parsedResult = {
-              id: `${result.url_info.url}-${result.analysis_metadata?.analysis_timestamp || Date.now()}`,
-              url: result.url_info.url,
-              resultSummary: result.final_judgment.recommendation,
-              verdict: result.final_judgment.final_verdict,
-              timestamp: new Date().toISOString(),
-            };
+              const parsedResult = {
+                id: `${result.url_info.url}-${Date.now()}`,
+                url: result.url_info.url,
+                resultSummary: result.final_judgment.recommendation,
+                verdict: result.final_judgment.final_verdict,
+                timestamp: new Date().toISOString(),
+              };
 
-            const existing = JSON.parse(sessionStorage.getItem("urlresult") || localStorage.getItem("urlresult") || "[]");
-            const updatedResults = [parsedResult, ...existing.filter(r => r.id !== parsedResult.id)].slice(0, 4);
-            sessionStorage.setItem("urlresult", JSON.stringify(updatedResults));
-            localStorage.setItem("urlresult", JSON.stringify(updatedResults));
-            setRecentResults(updatedResults);
-          }} />
+              setRecentResults((prev) => {
+                const updated = [parsedResult, ...prev.filter(r => r.id !== parsedResult.id)].slice(0, 4);
+                sessionStorage.setItem("urlresult", JSON.stringify(updated));
+                localStorage.setItem("urlresult", JSON.stringify(updated));
+
+                // Dispatch custom event to trigger any sync listeners
+                window.dispatchEvent(new Event("urlResultUpdated"));
+
+                return updated;
+              });
+
+              setTimeout(() => {
+                const resultsSection = document.getElementById("url-results");
+                if (resultsSection) {
+                  resultsSection.scrollIntoView({ behavior: 'smooth' });
+                }
+              }, 100);
+            }}
+          />
         </div>
 
         {/* QR 분석 결과 박스 */}
         <div className="bg-white rounded-2xl shadow-xl p-6 w-full lg:w-1/3">
-          <div className="flex items-center space-x-3 mb-4">
+          <div className="flex items-center space-x-3 mb-4" id="url-results">
             <span className="text-2xl">📊</span>
             <h2 className="text-lg font-semibold text-purple-600"> QR / URL 분석 결과</h2>
           </div>
@@ -169,15 +205,10 @@ export default function AnalysisPage({ uploadedFile, handleFileSelect }) {
                   <div className="text-sm text-gray-600 mt-1 break-words">{res.resultSummary || "결과 없음"}</div>
                   {res.timestamp && (
                     <div className="text-xs text-gray-400 mt-1">
-                      {new Date(res.timestamp).toLocaleString('ko-KR', {
+                      {new Date(res.timestamp).toLocaleDateString(undefined, {
                         year: 'numeric',
                         month: 'long',
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        second: '2-digit',
-                        hour12: false,
-                        timeZone: 'Asia/Seoul'
+                        day: 'numeric'
                       })}
                     </div>
                   )}

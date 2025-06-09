@@ -40,7 +40,7 @@ function QRSearchBlock({ onResult }) {
       alert(`분석 완료! 위험도: ${result.final_judgment.final_verdict}\n추천: ${result.final_judgment.recommendation}`);
 
       const parsedResult = {
-        id: `${result.url_info.url}-${result.analysis_metadata?.analysis_timestamp || Date.now()}`,
+        id: `${result.url_info.url}-${Date.now()}`, // Use consistent and unique ID
         url: result.url_info.url,
         resultSummary: result.final_judgment.recommendation,
         verdict: result.final_judgment.final_verdict,
@@ -51,9 +51,13 @@ function QRSearchBlock({ onResult }) {
       const updatedResults = [parsedResult, ...existing.filter(r => r.id !== parsedResult.id)].slice(0, 4);
       sessionStorage.setItem("urlresult", JSON.stringify(updatedResults));
       localStorage.setItem("urlresult", JSON.stringify(updatedResults));
+
+      // Ensure both result update and UI re-render
       if (onResult) {
         onResult(parsedResult);
       }
+      window.dispatchEvent(new Event("urlResultUpdated"));
+      setDecodedText('');
     } catch (error) {
       console.error("분석 요청 실패:", error);
       alert("분석 요청 중 네트워크 오류가 발생했습니다.");
