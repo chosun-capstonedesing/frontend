@@ -1,5 +1,15 @@
 let autoAnalyzeEnabled = true;
 
+function toggleAutoAnalyze() {
+  autoAnalyzeEnabled = !autoAnalyzeEnabled;
+  chrome.action.setBadgeText({ text: autoAnalyzeEnabled ? "ON" : "OFF" });
+  chrome.action.setBadgeBackgroundColor({
+    color: autoAnalyzeEnabled ? "#00c853" : "#d50000"
+  });
+  chrome.action.setIcon({ path: autoAnalyzeEnabled ? "icons/icon-on.png" : "icons/icon-off.png" });
+  console.log("자동 분석 기능:", autoAnalyzeEnabled ? "켜짐" : "꺼짐");
+}
+
 async function analyzeDownloadedFile(fileUrl) {
   try {
     const response = await fetch(fileUrl);
@@ -34,13 +44,17 @@ async function analyzeDownloadedFile(fileUrl) {
 
     const result = await res.json();
     console.log("백엔드 분석 결과:", result);
-    const verdict = result?.result || "UNKNOWN";
-    const message = result?.summary || "검증 결과를 확인해주세요.";
+    const rawVerdict = result?.result || "UNKNOWN";
+    const verdictIcon = rawVerdict === "정상" ? "🟢" : rawVerdict === "악성" ? "🔴" : "🔍";
+    const verdict = `${verdictIcon} ${rawVerdict}`;
+    const message = result?.summary
+      ? `${rawVerdict === "정상" ? "✅" : rawVerdict === "악성" ? "❌" : "ℹ️"} ${result.summary}`
+      : "ℹ️ 검증 결과를 확인해주세요.";
 
     chrome.notifications.create({
       type: "basic",
       iconUrl: "icons/icon.png",
-      title: `검증 결과: ${verdict}`,
+      title: `🔍 검증 결과: ${verdict}`,
       message
     });
   } catch (error) {
@@ -106,4 +120,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log("자동 분석 설정 변경됨:", autoAnalyzeEnabled);
     sendResponse({ success: true });
   }
+});
+
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.action.setBadgeText({ text: "ON" });
+  chrome.action.setBadgeBackgroundColor({ color: "#00c853" });
+  chrome.action.setIcon({ path: "icons/icon-on.png" });
+});
+
+chrome.action.onClicked.addListener(() => {
+  toggleAutoAnalyze();
 });
