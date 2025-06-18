@@ -28,6 +28,16 @@ function App() {
   };
 
   useEffect(() => {
+    const clientUuid = Cookies.get('client_uuid');
+    if (clientUuid && chrome?.runtime?.sendMessage) {
+      chrome.runtime.sendMessage({
+        type: "SET_CLIENT_UUID",
+        uuid: clientUuid,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
     const token = localStorage.getItem("access_token");
     setIsLoggedIn(isValidToken(token));
   }, []);
