@@ -6,7 +6,7 @@ function toggleAutoAnalyze() {
   chrome.action.setBadgeBackgroundColor({
     color: autoAnalyzeEnabled ? "#00c853" : "#d50000"
   });
-  chrome.action.setIcon({ path: autoAnalyzeEnabled ? "icons/icon-on.png" : "icons/icon-off.png" });
+  //chrome.action.setIcon({ path: autoAnalyzeEnabled ? "icons/icon-on.png" : "icons/icon-off.png" });
   console.log("자동 분석 기능:", autoAnalyzeEnabled ? "켜짐" : "꺼짐");
 }
 
@@ -125,7 +125,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 chrome.runtime.onInstalled.addListener(() => {
   chrome.action.setBadgeText({ text: "ON" });
   chrome.action.setBadgeBackgroundColor({ color: "#00c853" });
-  chrome.action.setIcon({ path: "icons/icon-on.png" });
+  //chrome.action.setIcon({ path: "icons/icon-on.png" });
 });
 
 chrome.action.onClicked.addListener(() => {
